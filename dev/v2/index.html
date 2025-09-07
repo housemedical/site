@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Realm Reporting Platform - Mobile Ready</title>
+    
+    <!-- CDN Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Mobile-First Navigation */
+        .nav-container {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            color: white;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 11px;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-tab i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            padding: 20px;
+            min-height: calc(100vh - 60px);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Mobile-Optimized Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Issue Categories */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-card.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            transform: translateY(-2px);
+        }
+
+        .category-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .category-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark-color);
+            line-height: 1.2;
+        }
+
+        /* Suggestions */
+        .suggestions-container {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .suggestions-container.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .suggestion-item {
+            background: white;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .suggestion-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .suggestion-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Map Container */
+        .map-container {
+            display: none;
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .map-container.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+        }
+
+        #fullMap {
+            height: calc(100vh - 140px);
+            width: 100%;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        /* Issue List */
+        .issue-list {
+            space-y: 15px;
+        }
+
+        .issue-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .issue-item:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .issue-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .issue-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-new { background: #fef3c7; color: #92400e; }
+        .status-progress { background: #dbeafe; color: #1e40af; }
+        .status-resolved { background: #d1fae5; color: #065f46; }
+
+        .issue-meta {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background: #f0f9ff;
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary-color);
+            background: #dbeafe;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Mobile Specific */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .content-section {
+                padding: 15px;
+            }
+            
+            .nav-tab {
+                font-size: 10px;
+                padding: 10px 6px;
+            }
+            
+            .nav-tab i {
+                font-size: 16px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header p {
+                font-size: 12px;
+            }
+            
+            .category-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .category-card {
+                padding: 12px;
+                min-height: 100px;
+            }
+            
+            .category-icon {
+                font-size: 24px;
+            }
+            
+            .category-name {
+                font-size: 11px;
+            }
+        }
+    
+/* --- HMC Stage-2 Additions --- */
+#brandBar {position: fixed; top: 8px; right: 8px; z-index: 9999; display:flex; gap:8px;}
+.brand-btn {background: var(--primary-color); color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:12px;}
+.brand-btn.secondary {background: var(--secondary-color);}
+.brand-btn.outline {background:#fff;color:var(--primary-color);border:1px solid var(--primary-color);}
+#schedulePanel {border:1px solid #e5e7eb; border-radius:10px; padding:10px; margin-top:10px; background:#f9fafb;}
+#schedulePanel h4 {font-weight:600; margin-bottom:6px; color:var(--dark-color);}
+#auditConsole {position: fixed; bottom: 0; left: 0; right: 0; height: 160px; background:#0b1220; color:#d1d5db; font-family:monospace; overflow:auto; border-top:3px solid var(--primary-color); z-index:9998;}
+#auditConsole .row {padding:4px 8px; border-bottom:1px solid #1f2937;}
+#auditConsole .row span {margin-right:8px;}
+#auditToggle {position:fixed; bottom:168px; right:8px; z-index:9999;}
+#agent {display:none;}
+.content-section.active {display:block;}
+.content-section {display:none;}
+.toggle {display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;}
+#outOfScope {display:none; background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; padding:8px 10px; border-radius:8px; margin-top:10px;}
+/* High-contrast mode */
+:root.hc { --primary-color:#000; --secondary-color:#111827; --accent-color:#000; --warning-color:#b45309; --success-color:#166534; --danger-color:#991b1b; --dark-color:#000; --light-color:#fff; }
+
+</style>
+</head>
+<body>
+
+<div id="brandBar" aria-label="Brand and accessibility controls">
+  <button class="brand-btn outline" onclick="setBrand('default')">Default</button>
+  <button class="brand-btn" onclick="setBrand('southwark')">Southwark</button>
+  <label class="toggle"><input type="checkbox" id="hcToggle" onchange="toggleHC()"> High contrast</label>
+</div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-city"></i> Public Realm Reporting</h1>
+            <p>Report issues in your community quickly and easily</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-container">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('report')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Report Issue</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('analytics')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('map')">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Map</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Report Issue Section -->
+        <div id="report" class="content-section active">
+            <div class="card">
+                <h2 style="color: var(--dark-color); margin-bottom: 20px; font-size: 20px;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+                    Report New Issue
+                </h2>
+
+                <form id="reportForm">
+                    <!-- Issue Category -->
+                    <div class="form-group">
+                        <label class="form-label">Issue Category *</label>
+                        <div class="category-grid">
+                            <div class="category-card" onclick="selectCategory('street-cleaning')">
+                                <span class="category-icon">🧹</span>
+                                <span class="category-name">Street Cleaning</span>
+                            </div>
+                            <div class="category-card" onclick="selectCategory('highways')">
+                                <span class="category-icon">🛣️</span>
+                                <span class="category-name">Highways</span>
+                            </div>
+                            <div class="category-card" onclick="selectCategory('parks')">
+                                <span class="category-icon">🌳</span>
+                                <span class="category-name">Parks</span>
+                            </div>
+                            <div class="category-card" onclick="selectCategory('trees')">
+                                <span class="category-icon">🌲</span>
+                                <span class="category-name">Trees</span>
+                            </div>
+                            <div class="category-card" onclick="selectCategory('street-lighting')">
+                                <span class="category-icon">💡</span>
+                                <span class="category-name">Street Lighting</span>
+                            </div>
+                            <div class="category-card" onclick="selectCategory('housing')">
+                                <span class="category-icon">🏠</span>
+                                <span class="category-name">Housing Estates</span>
+                            </div>
+                            <div class="category-card" onclick="selectCategory('other')">
+                                <span class="category-icon">❓</span>
+                                <span class="category-name">Other</span>
+                            </div>
+                        </div>
+
+                        <!-- Suggestions Container -->
+                        <div id="suggestionsContainer" class="suggestions-container">
+                            <div class="form-label" style="margin-bottom: 10px;">
+                                <i class="fas fa-lightbulb"></i> Quick suggestions:
+                            </div>
+                            <div id="suggestions"></div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label class="form-label" for="description">Issue Description *</label>
+                        <textarea id="description" class="form-textarea" placeholder="Describe the issue in detail..." required></textarea>
+                    </div>
+
+                    <!-- Location --><!-- augmented -->
+                    <div class="form-group">
+                        <label class="form-label">Location *</label>
+                        <input type="text" id="address" class="form-input" placeholder="Enter street address or location" required>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button type="button" class="btn btn-outline" style="flex: 1;" onclick="getCurrentLocation()">
+                                <i class="fas fa-crosshairs"></i> Use GPS
+                            </button>
+                            <button type="button" class="btn btn-outline" style="flex: 1;" onclick="toggleMap()">
+                                <i class="fas fa-map-pin"></i> Select on Map
+                            </button>
+                        </div>
+
+                        <!-- Inline Map -->
+                        <div id="mapContainer" class="map-container">
+                            <div id="map"></div>
+                        </div>
+                    </div>
+
+                    <!-- Photo Upload -->
+                    <div class="form-group">
+                        <label class="form-label">Upload Photo (Optional)</label>
+                        <div class="file-upload" onclick="document.getElementById('photo').click()">
+                            <i class="fas fa-camera" style="font-size: 24px; color: var(--primary-color); margin-bottom: 10px;"></i>
+                            <p>Tap to take a photo or select from gallery</p>
+                            <input type="file" id="photo" accept="image/*" capture="environment" style="display: none;" onchange="handleFileUpload(this)">
+                        </div>
+                        <div id="photoPreview" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="form-group">
+                        <label class="form-label" for="priority">Priority Level</label>
+                        <select id="priority" class="form-select">
+                            <option value="low">Low - Not urgent</option>
+                            <option value="medium" selected>Medium - Needs attention</option>
+                            <option value="high">High - Urgent</option>
+                        </select>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="form-group">
+                        <label class="form-label" for="contact">Contact Information (Optional)</label>
+                        <input type="email" id="contact" class="form-input" placeholder="your.email@example.com">
+                        <small style="color: #6b7280; font-size: 12px;">We'll notify you when your issue is addressed</small>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Report
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section">
+            <h2 style="color: var(--dark-color); margin-bottom: 20px; font-size: 20px;">
+                <i class="fas fa-tachometer-alt"></i> Dashboard Overview
+            </h2>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">127</span>
+                    <span class="stat-label">Total Reports</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">89</span>
+                    <span class="stat-label">Resolved</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">23</span>
+                    <span class="stat-label">In Progress</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">15</span>
+                    <span class="stat-label">New</span>
+                </div>
+            </div>
+
+            <!-- Recent Issues -->
+            <div class="card">
+                <h3 style="margin-bottom: 15px; color: var(--dark-color);">Recent Reports</h3>
+                <div class="issue-list">
+                    <div class="issue-item">
+                        <div class="issue-header">
+                            <div class="issue-title">Broken street lamp on Oak Avenue</div>
+                            <span class="issue-status status-progress">In Progress</span>
+                        </div>
+                        <div class="issue-meta">
+                            <i class="fas fa-map-marker-alt"></i> Oak Avenue, City Center
+                            <span style="margin-left: 15px;"><i class="fas fa-clock"></i> 2 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div class="issue-header">
+                            <div class="issue-title">Pothole needs repair on Main Street</div>
+                            <span class="issue-status status-new">New</span>
+                        </div>
+                        <div class="issue-meta">
+                            <i class="fas fa-map-marker-alt"></i> Main Street, Downtown
+                            <span style="margin-left: 15px;"><i class="fas fa-clock"></i> 4 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div class="issue-header">
+                            <div class="issue-title">Overflowing bin in Central Park</div>
+                            <span class="issue-status status-resolved">Resolved</span>
+                        </div>
+                        <div class="issue-meta">
+                            <i class="fas fa-map-marker-alt"></i> Central Park, East Side
+                            <span style="margin-left: 15px;"><i class="fas fa-clock"></i> 1 day ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics" class="content-section">
+            <h2 style="color: var(--dark-color); margin-bottom: 20px; font-size: 20px;">
+                <i class="fas fa-chart-bar"></i> Analytics & Reports
+            </h2>
+
+            <!-- Charts -->
+            <div class="card">
+                <h3 style="margin-bottom: 15px;">Issues by Category</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 15px;">Resolution Time Trends</h3>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 15px;">Performance Metrics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">2.3</span>
+                        <span class="stat-label">Avg Response Days</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">94%</span>
+                        <span class="stat-label">Resolution Rate</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">4.6</span>
+                        <span class="stat-label">User Satisfaction</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">312</span>
+                        <span class="stat-label">This Month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div id="map-section" class="content-section">
+            <h2 style="color: var(--dark-color); margin-bottom: 20px; font-size: 20px;">
+                <i class="fas fa-map-marked-alt"></i> Issue Map View
+            </h2>
+            
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div id="fullMap"></div>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 15px;">Map Controls</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="toggleHeatmap()">
+                        <i class="fas fa-fire"></i> Toggle Heatmap
+                    </button>
+                    <button class="btn btn-outline" onclick="filterByCategory('all')">
+                        <i class="fas fa-filter"></i> Show All
+                    </button>
+                    <button class="btn btn-outline" onclick="filterByStatus('new')">
+                        <i class="fas fa-exclamation"></i> New Issues
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Issue reported successfully!</span>
+    </div>
+
+    <script>
+        // Global variables
+        let currentMap = null;
+        let fullMap = null;
+        let selectedCategory = null;
+        let selectedLocation = null;
+        let reportMarker = null;
+        let fullMapMarkers = [];
+        let heatmapLayer = null;
+
+        // Issue categories with suggestions
+        const categoryData = {
+            'street-cleaning': {
+                name: 'Street Cleaning',
+                icon: '🧹',
+                suggestions: [
+                    'Litter/rubbish accumulation',
+                    'Overflowing bins',
+                    'Dog waste not cleared'
+                ]
+            },
+            'highways': {
+                name: 'Highways',
+                icon: '🛣️',
+                suggestions: [
+                    'Pothole needs repair',
+                    'Road marking faded',
+                    'Traffic sign damaged'
+                ]
+            },
+            'parks': {
+                name: 'Parks',
+                icon: '🌳',
+                suggestions: [
+                    'Playground equipment broken',
+                    'Grass needs cutting',
+                    'Vandalism/graffiti'
+                ]
+            },
+            'trees': {
+                name: 'Trees',
+                icon: '🌲',
+                suggestions: [
+                    'Tree blocking pathway',
+                    'Dead/dangerous branches',
+                    'Root damage to pavement'
+                ]
+            },
+            'street-lighting': {
+                name: 'Street Lighting',
+                icon: '💡',
+                suggestions: [
+                    'Street light not working',
+                    'Light flickering/dim',
+                    'Pole damaged/leaning'
+                ]
+            },
+            'housing': {
+                name: 'Housing Estates',
+                icon: '🏠',
+                suggestions: [
+                    'Common area maintenance',
+                    'Parking issues',
+                    'Security concerns'
+                ]
+            },
+            'other': {
+                name: 'Other',
+                icon: '❓',
+                suggestions: [
+                    'Noise complaint',
+                    'Public safety concern',
+                    'General enquiry'
+                ]
+            }
+        };
+
+        // Sample issues data
+        const sampleIssues = [
+            { lat: 51.5074, lng: -0.1278, category: 'street-cleaning', status: 'new', priority: 'medium', title: 'Overflowing bin on Oxford Street' },
+            { lat: 51.5085, lng: -0.1257, category: 'highways', status: 'progress', priority: 'high', title: 'Pothole on Regent Street' },
+            { lat: 51.5095, lng: -0.1235, category: 'parks', status: 'resolved', priority: 'low', title: 'Broken bench in Hyde Park' },
+            { lat: 51.5065, lng: -0.1289, category: 'street-lighting', status: 'new', priority: 'high', title: 'Street light out on Bond Street' },
+            { lat: 51.5055, lng: -0.1245, category: 'trees', status: 'progress', priority: 'medium', title: 'Tree blocking sidewalk' }
+        ];
+
+        // Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            if (sectionName === 'map') {
+                document.getElementById('map-section').classList.add('active');
+                setTimeout(initFullMap, 100);
+            } else {
+                document.getElementById(sectionName).classList.add('active');
+            }
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Initialize charts if analytics section
+            if (sectionName === 'analytics') {
+                setTimeout(initCharts, 100);
+            }
+        }
+
+        // Category selection
+        function selectCategory(category) {
+            // Remove previous selection
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new category
+            event.target.closest('.category-card').classList.add('selected');
+            selectedCategory = category;
+            
+            // Show suggestions
+            showSuggestions(category);
+        }
+
+        // Show suggestions
+        function showSuggestions(category) {
+            const container = document.getElementById('suggestionsContainer');
+            const suggestionsDiv = document.getElementById('suggestions');
+            
+            const suggestions = categoryData[category].suggestions;
+            
+            suggestionsDiv.innerHTML = '';
+            suggestions.forEach(suggestion => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.textContent = suggestion;
+                item.onclick = () => {
+                    document.getElementById('description').value = suggestion;
+                    showToast('Suggestion added to description');
+                };
+                suggestionsDiv.appendChild(item);
+            });
+            
+            container.classList.add('show');
+        }
+
+        // Map functions
+        function toggleMap() {
+            const container = document.getElementById('mapContainer');
+            
+            if (container.classList.contains('show')) {
+                container.classList.remove('show');
+            } else {
+                container.classList.add('show');
+                if (!currentMap) {
+                    setTimeout(initMap, 100);
+                }
+            }
+        }
+
+        function initMap() {
+            if (currentMap) return;
+            
+            currentMap = L.map('map').setView([51.5074, -0.1278], 13);
+            
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(currentMap);
+            
+            currentMap.on('click', function(e) {
+                const { lat, lng } = e.latlng;
+                selectedLocation = { lat, lng };
+                
+                if (reportMarker) {
+                    currentMap.removeLayer(reportMarker);
+                }
+                
+                reportMarker = L.marker([lat, lng]).addTo(currentMap);
+                
+                // Reverse geocode to get address
+                document.getElementById('address').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                showToast('Location selected on map');
+            });
+        }
+
+        function initFullMap() {
+            if (fullMap) {
+                fullMap.invalidateSize();
+                return;
+            }
+            
+            fullMap = L.map('fullMap').setView([51.5074, -0.1278], 13);
+            
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(fullMap);
+            
+            // Add sample issues to map
+            sampleIssues.forEach(issue => {
+                const color = issue.status === 'new' ? 'red' : 
+                             issue.status === 'progress' ? 'orange' : 'green';
+                
+                const marker = L.circleMarker([issue.lat, issue.lng], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.7,
+                    radius: 8
+                }).addTo(fullMap);
+                
+                marker.bindPopup(`
+                    <strong>${issue.title}</strong><br>
+                    Category: ${categoryData[issue.category].name}<br>
+                    Status: ${issue.status}<br>
+                    Priority: ${issue.priority}
+                `);
+                
+                fullMapMarkers.push(marker);
+            });
+        }
+
+        // GPS Location
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    selectedLocation = { lat, lng };
+                    document.getElementById('address').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                    
+                    if (currentMap) {
+                        currentMap.setView([lat, lng], 15);
+                        if (reportMarker) {
+                            currentMap.removeLayer(reportMarker);
+                        }
+                        reportMarker = L.marker([lat, lng]).addTo(currentMap);
+                    }
+                    
+                    showToast('Location found using GPS');
+                }, function(error) {
+                    showToast('Unable to get location. Please enter address manually.', 'error');
+                });
+            } else {
+                showToast('Geolocation is not supported by this browser.', 'error');
+            }
+        }
+
+        // File upload
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            const preview = document.getElementById('photoPreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <div style="position: relative; display: inline-block;">
+                            <img src="${e.target.result}" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                            <button type="button" onclick="removePhoto()" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+                showToast('Photo uploaded successfully');
+            }
+        }
+
+        function removePhoto() {
+            document.getElementById('photo').value = '';
+            document.getElementById('photoPreview').innerHTML = '';
+            showToast('Photo removed');
+        }
+
+        // Form submission
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!selectedCategory) {
+                showToast('Please select an issue category', 'error');
+                return;
+            }
+            
+            const formData = {
+                category: selectedCategory,
+                description: document.getElementById('description').value,
+                address: document.getElementById('address').value,
+                priority: document.getElementById('priority').value,
+                contact: document.getElementById('contact').value,
+                location: selectedLocation,
+                timestamp: new Date().toISOString(),
+                photo: document.getElementById('photo').files[0]
+            };
+            
+            // Simulate form submission
+            setTimeout(() => {
+                showToast('Issue reported successfully! Reference #' + Math.random().toString(36).substr(2, 9));
+                document.getElementById('reportForm').reset();
+                document.querySelectorAll('.category-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                document.getElementById('suggestionsContainer').classList.remove('show');
+                document.getElementById('photoPreview').innerHTML = '';
+                selectedCategory = null;
+                selectedLocation = null;
+            }, 1000);
+        });
+
+        // Charts initialization
+        function initCharts() {
+            // Category chart
+            const categoryCtx = document.getElementById('categoryChart');
+            if (categoryCtx && !categoryCtx.chart) {
+                categoryCtx.chart = new Chart(categoryCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Street Cleaning', 'Highways', 'Parks', 'Trees', 'Street Lighting', 'Housing'],
+                        datasets: [{
+                            data: [45, 32, 28, 19, 15, 12],
+                            backgroundColor: [
+                                '#3b82f6', '#10b981', '#f59e0b', 
+                                '#ef4444', '#8b5cf6', '#06b6d4'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Trend chart
+            const trendCtx = document.getElementById('trendChart');
+            if (trendCtx && !trendCtx.chart) {
+                trendCtx.chart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Average Resolution Time (days)',
+                            data: [3.2, 2.8, 2.1, 2.3, 1.9, 2.1],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.style.background = type === 'error' ? '#ef4444' : '#10b981';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Map controls
+        function toggleHeatmap() {
+            showToast('Heatmap view toggled');
+        }
+
+        function filterByCategory(category) {
+            showToast(`Showing ${category} issues`);
+        }
+
+        function filterByStatus(status) {
+            showToast(`Showing ${status} issues`);
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('Public Realm Reporting Platform loaded');
+        });
+
+        // Drag and drop for file upload
+        const fileUpload = document.querySelector('.file-upload');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            fileUpload.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            fileUpload.classList.remove('dragover');
+        }
+
+        fileUpload.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                document.getElementById('photo').files = files;
+                handleFileUpload(document.getElementById('photo'));
+            }
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"97a134a5c9e960ed","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.8.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+
+<!-- Agent / Contact Centre Section -->
+<div id="agent" class="content-section">
+  <div class="card">
+    <h2 style="color:var(--dark-color); font-size:20px; margin-bottom:10px;"><i class="fas fa-headset" style="color:var(--primary-color);"></i> Contact Centre</h2>
+    <div class="form-group">
+      <label class="form-label">Search by Reference or Postcode</label>
+      <input id="agentSearch" class="form-input" placeholder="e.g., PRRP-1024 or SE1 1AA" oninput="agentSearch()" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Caller Name (for audit)</label>
+      <input id="callerName" class="form-input" placeholder="Resident name" />
+    </div>
+    <div id="agentResults"></div>
+  </div>
+</div>
+
+<!-- Audit Console -->
+<div id="auditToggle"><button class="brand-btn secondary" onclick="toggleAudit()">Audit</button></div>
+<div id="auditConsole" aria-live="polite" hidden></div>
+
+
+<script>
+// --- HMC Stage-2 Additions JS ---
+
+// Brand themes
+const BRANDS = {
+  default: { primary:'#6366f1', secondary:'#10b981', dark:'#1f2937', light:'#f3f4f6' },
+  southwark: { primary:'#6A1E74', secondary:'#00AEEF', dark:'#111827', light:'#f3f4f6' }
+};
+function setBrand(name){
+  const b = BRANDS[name] || BRANDS.default;
+  document.documentElement.style.setProperty('--primary-color', b.primary);
+  document.documentElement.style.setProperty('--secondary-color', b.secondary);
+  document.documentElement.style.setProperty('--dark-color', b.dark);
+  document.documentElement.style.setProperty('--light-color', b.light);
+  logAudit('BRAND', 'Switched to '+name);
+}
+function toggleHC(){
+  document.documentElement.classList.toggle('hc', document.getElementById('hcToggle').checked);
+  logAudit('A11Y', 'High contrast '+(document.getElementById('hcToggle').checked?'ON':'OFF'));
+}
+
+// Simple audit console
+function toggleAudit(){
+  const el = document.getElementById('auditConsole');
+  el.hidden = !el.hidden;
+}
+function logAudit(type, msg, payload){
+  const el = document.getElementById('auditConsole');
+  if(!el) return;
+  const row = document.createElement('div');
+  row.className = 'row';
+  const ts = new Date().toLocaleTimeString();
+  row.innerHTML = '<span>['+ts+']</span><span>'+type+'</span><span>'+msg+'</span>'+(payload?'<pre>'+JSON.stringify(payload,null,2)+'</pre>':'');
+  el.prepend(row);
+}
+
+// Area detection & schedules
+function wardFromLatLng(lat, lng){
+  // crude bounding-box demo around Southwark centre
+  if(lng>-0.12 && lng<-0.07 && lat>51.48 && lat<51.53) return 'Southwark Central';
+  if(lng<=-0.12 && lat>51.48 && lat<51.55) return 'Southwark West';
+  if(lng>=-0.07 && lat>51.47 && lat<51.55) return 'Southwark East';
+  return 'OUT_OF_SCOPE';
+}
+const SCHEDULES = {
+  'Southwark Central':[ 'Street sweeping: Mon/Wed/Fri 06:00', 'Bin collections: Tue/Thu 07:00' ],
+  'Southwark West':[ 'Street sweeping: Tue/Thu 06:00', 'Bin collections: Mon/Wed/Fri 07:00' ],
+  'Southwark East':[ 'Street sweeping: Mon/Fri 06:00', 'Bin collections: Wed 07:00' ],
+};
+function updateSchedule(lat,lng){
+  const ward = wardFromLatLng(lat,lng);
+  const panel = document.getElementById('schedulePanel');
+  const body = document.getElementById('scheduleBody');
+  const oos = document.getElementById('outOfScope');
+  if(ward==='OUT_OF_SCOPE'){
+    panel.style.display='none';
+    oos.style.display='block';
+    logAudit('ROUTING','Out-of-scope location chosen');
+    return;
+  }
+  oos.style.display='none';
+  panel.style.display='block';
+  const lines = SCHEDULES[ward]||['No schedule available.'];
+  body.innerHTML = '<strong>Ward:</strong> '+ward+'<br>'+lines.map(l=>'- '+l).join('<br>');
+  // Filter categories by ward (demo logic)
+  filterCategoriesForWard(ward);
+}
+function filterCategoriesForWard(ward){
+  // Example: In West, hide "Street Lighting"; in East, hide "Trees"
+  const cfg = {
+    'Southwark Central': [],
+    'Southwark West': ['Street Lighting'],
+    'Southwark East': ['Trees']
+  };
+  const hide = new Set(cfg[ward]||[]);
+  document.querySelectorAll('[data-category]').forEach(el=>{
+    const name = el.getAttribute('data-category');
+    el.style.display = hide.has(name)?'none':'inline-flex';
+  });
+}
+
+// Hook location updates (assumes you already set lat/lng somewhere)
+(function(){
+  const locInput = document.getElementById('location');
+  if(!locInput) return;
+  locInput.addEventListener('change', ()=>{
+    const parts = locInput.value.split(',');
+    if(parts.length===2){
+      const lat = parseFloat(parts[0]); const lng = parseFloat(parts[1]);
+      updateSchedule(lat,lng);
+    }
+  });
+})();
+
+// Mock Confirm API + webhook
+const ConfirmSim = {
+  store: {}, // ref -> object
+  create(job){
+    const ref = 'PRRP-' + Math.floor(1000+Math.random()*9000);
+    this.store[ref] = { ...job, ref, status:'Received'};
+    logAudit('POST /confirm/jobs', 'Created', {ref, job});
+    // webhook status changes
+    setTimeout(()=>this.webhook(ref,'In progress'), 2000);
+    setTimeout(()=>this.webhook(ref,'Closed'), 6000);
+    return ref;
+  },
+  webhook(ref,status){
+    if(!this.store[ref]) return;
+    this.store[ref].status = status;
+    logAudit('Webhook', 'Status '+status, {ref});
+    // update UI badge if visible
+    const el = document.querySelector('[data-ref="'+ref+'"] .status');
+    if(el) el.textContent = status;
+    // update map marker color (if you have markers in your map)
+    if(window.updateMarkerStatus) window.updateMarkerStatus(ref,status);
+  },
+  search(q){
+    q = q.trim().toUpperCase();
+    return Object.values(this.store).filter(j=>j.ref.toUpperCase().includes(q) || (j.postcode||'').toUpperCase().includes(q));
+  }
+};
+
+// Override your existing submission handler if present
+if(typeof submitReport === 'function'){
+  const orig = submitReport;
+  window.submitReport = function(){
+    const result = orig();
+    try {
+      // pull form values
+      const cat = document.getElementById('category').value || 'Street Cleaning';
+      const loc = document.getElementById('location').value || '51.501,-0.09';
+      const desc = document.getElementById('description').value || '';
+      const emailEl = document.getElementById('email') || document.getElementById('contact') || {value:''};
+      const email = emailEl.value;
+      const priority = document.getElementById('priority')?document.getElementById('priority').value:'low';
+      const ref = ConfirmSim.create({cat, loc, desc, email, priority});
+      // render mini receipt
+      const list = document.getElementById('recentIssues') || document.createElement('div');
+      list.id = 'recentIssues';
+      const card = document.createElement('div');
+      card.className='card';
+      card.setAttribute('data-ref',ref);
+      card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>'+cat+'</strong><br><small>'+loc+'</small><br><span class="status">Received</span></div><div>'+ref+'</div></div>';
+      list.prepend(card);
+      if(!list.parentElement) document.getElementById('report').appendChild(list);
+      // email opt-in
+      if(email){
+        subscriptions.add(ref,email);
+        card.appendChild(subscriptions.ui(ref));
+      }
+    } catch(e){ console.warn(e); }
+    return result;
+  }
+}
+
+// Email subscriptions (opt-in + unsubscribe stub)
+const subscriptions = {
+  map: new Map(),
+  add(ref,email){ this.map.set(ref,email); logAudit('EMAIL','Subscribed '+email+' to '+ref); },
+  remove(ref){ const email=this.map.get(ref); if(!email) return; this.map.delete(ref); logAudit('EMAIL','Unsubscribed '+email+' from '+ref); },
+  ui(ref){
+    const el = document.createElement('div');
+    el.innerHTML = '<button class="brand-btn outline" onclick="subscriptions.remove(\''+ref+'\')">Unsubscribe email updates</button>';
+    return el;
+  }
+};
+
+// Agent search UI
+window.agentSearch = function(){
+  const q = document.getElementById('agentSearch').value || '';
+  const results = ConfirmSim.search(q);
+  const host = document.getElementById('agentResults');
+  host.innerHTML = '';
+  results.forEach(r=>{
+    const div = document.createElement('div');
+    div.className='card';
+    div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>'+r.cat+'</strong><br><small>'+r.loc+'</small><br>Status: <span>'+r.status+'</span></div><div>'+r.ref+'</div></div>';
+    const btn = document.createElement('button');
+    btn.className='brand-btn';
+    btn.textContent='Mark Resolved';
+    btn.onclick = ()=>ConfirmSim.webhook(r.ref,'Closed');
+    div.appendChild(btn);
+    host.appendChild(div);
+  });
+}
+
+// Map augmentation: add WMS/Layers button if Leaflet is present
+function addWMSLayer(){
+  if(!window.L || !window.map) return showToast('Map not initialised');
+  try {
+    const wms = L.tileLayer.wms('https://demo.geo-solutions.it/geoserver/wms', { // placeholder for Pitney Bowes WMS
+      layers: 'topp:states', format: 'image/png', transparent:true, attribution:'WMS demo'
+    });
+    wms.addTo(map);
+    showToast('Pitney Bowes WMS (demo) added');
+    logAudit('MAP','WMS layer added (demo)');
+  } catch(e){
+    logAudit('MAP','WMS failed, drawing fallback overlay');
+  }
+}
+window.addEventListener('DOMContentLoaded', ()=>{
+  // Add button to map toolbar if present
+  const mapToolbar = document.querySelector('#map')?.parentElement;
+  if(mapToolbar){
+    const btn = document.createElement('button');
+    btn.className='brand-btn outline';
+    btn.textContent='Add WMS (demo)';
+    btn.onclick = addWMSLayer;
+    mapToolbar.insertBefore(btn, mapToolbar.firstChild);
+  }
+});
+
+// Expose schedule update when geolocate button is used (hook into your useMyLocation if present)
+if(typeof useMyLocation === 'function'){
+  const origLoc = useMyLocation;
+  window.useMyLocation = function(){
+    const res = origLoc();
+    try {
+      setTimeout(()=>{
+        const loc = (document.getElementById('location').value||'').split(',');
+        if(loc.length===2) updateSchedule(parseFloat(loc[0]), parseFloat(loc[1]));
+      }, 800);
+    } catch(e){}
+    return res;
+  }
+}
+
+// Show Agent tab via existing showSection
+(function(){
+  if(typeof showSection!=='function'){
+    window.showSection = function(id){
+      document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  }
+})();
+</script>
+
+
+<script>
+// --- HMC Stage-2 Additions v2 (completing must-haves) ---
+
+// 1) Tag category cards so ward filtering works even if HTML lacks data-category
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.category-card').forEach(card=>{
+    const nameEl = card.querySelector('.category-name');
+    if(nameEl) card.setAttribute('data-category', nameEl.textContent.trim());
+  });
+});
+
+// 2) Hook address input changes to update schedule and ward-based category filtering
+(function(){
+  const addr = document.getElementById('address');
+  if(addr){
+    addr.addEventListener('change', ()=>{
+      const m = addr.value.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+      if(m){ updateSchedule(parseFloat(m[1]), parseFloat(m[2])); }
+    });
+  }
+})();
+
+// 3) Wrap getCurrentLocation to also update schedules
+if(typeof getCurrentLocation === 'function'){
+  const _g = getCurrentLocation;
+  window.getCurrentLocation = function(){
+    const out = _g();
+    setTimeout(()=>{
+      const addr = document.getElementById('address');
+      if(!addr) return;
+      const m = (addr.value||'').match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+      if(m){ updateSchedule(parseFloat(m[1]), parseFloat(m[2])); }
+    }, 800);
+    return out;
+  };
+}
+
+// 4) Attach to Leaflet inline map clicks to drive schedules
+const __attachMapHooks = setInterval(()=>{
+  if(window.currentMap && !window.__hmcMapHooked){
+    window.__hmcMapHooked = true;
+    currentMap.on('click', (e)=> updateSchedule(e.latlng.lat, e.latlng.lng));
+  }
+  if(window.fullMap && !window.__hmcFullMapReady){
+    window.__hmcFullMapReady = true;
+    // Add "Last updated" banner
+    const ctrlCard = document.querySelector('#fullMap')?.parentElement?.nextElementSibling;
+    if(ctrlCard){
+      const banner = document.createElement('div');
+      banner.style.margin='8px 0 0 0';
+      banner.innerHTML = '<small id="lastUpdated" style="color:#6b7280">Last updated: just now</small>';
+      ctrlCard.insertBefore(banner, ctrlCard.firstChild);
+      setInterval(()=>{
+        const el = document.getElementById('lastUpdated');
+        if(el){
+          const now = new Date();
+          el.textContent = 'Last updated: ' + now.toLocaleTimeString();
+        }
+      }, 5000);
+    }
+  }
+  if(window.__hmcMapHooked && window.__hmcFullMapReady) clearInterval(__attachMapHooks);
+}, 400);
+
+// 5) Live map markers for submitted jobs + status colour updates
+window.__markers = {}; // ref -> Leaflet marker
+window.addJobMarker = function(ref, loc, status){
+  if(!(window.fullMap || window.currentMap)) return;
+  const latlng = (loc||'0,0').split(',').map(parseFloat);
+  const lat = latlng[0]; const lng = latlng[1];
+  const map = window.fullMap || window.currentMap;
+  const color = (status==='Closed')?'#10b981':(status==='In progress')?'#f59e0b':'#ef4444';
+  const icon = L.divIcon({className:'custom-marker', html:`<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 0 0 2px ${color}"></div>`});
+  const m = L.marker([lat,lng], {icon}).addTo(map).bindPopup(ref+' — '+status);
+  window.__markers[ref] = m;
+};
+window.updateMarkerStatus = function(ref,status){
+  const m = window.__markers[ref];
+  if(!m) return;
+  const color = (status==='Closed')?'#10b981':(status==='In progress')?'#f59e0b':'#ef4444';
+  const icon = L.divIcon({className:'custom-marker', html:`<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 0 0 2px ${color}"></div>`});
+  m.setIcon(icon);
+  m.setPopupContent(ref+' — '+status);
+};
+
+// 6) After the existing submit handler runs, capture the data and feed ConfirmSim + markers + routing + email UI
+(function(){
+  const form = document.getElementById('reportForm');
+  if(!form) return;
+  form.addEventListener('submit', function(){
+    try {
+      const catCode = window.selectedCategory || 'street-cleaning';
+      const catName = (document.querySelector('.category-card.selected .category-name')?.textContent || 'Street Cleaning').trim();
+      const loc = document.getElementById('address')?.value || '51.501,-0.09';
+      const desc = document.getElementById('description')?.value || '';
+      const email = document.getElementById('contact')?.value || '';
+      const priority = document.getElementById('priority')?.value || 'low';
+      const ref = ConfirmSim.create({cat:catName, loc, desc, email, priority});
+      addJobMarker(ref, loc, 'Received');
+      // Mailbox routing (demo)
+      const routing = {
+        'Street Cleaning': 'streetcleaning@southwark.gov.uk',
+        'Highways': 'highways@southwark.gov.uk',
+        'Parks': 'parks@southwark.gov.uk',
+        'Trees': 'trees@southwark.gov.uk',
+        'Street Lighting': 'lighting@southwark.gov.uk',
+        'Housing Estates': 'housing@southwark.gov.uk',
+        'Other': 'contactcentre@southwark.gov.uk'
+      };
+      const mailbox = routing[catName] || routing['Other'];
+      logAudit('ROUTING','Routed to mailbox '+mailbox, {ref, catName});
+      // Show receipt card with unsubscribe + manual reassign
+      const list = document.getElementById('recentIssues') || (function(){ const d=document.createElement('div'); d.id='recentIssues'; document.getElementById('report').appendChild(d); return d; })();
+      const card = document.createElement('div');
+      card.className='card';
+      card.setAttribute('data-ref',ref);
+      card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div><strong>'+catName+'</strong><br><small>'+loc+'</small><br>Status: <span class="status">Received</span></div><div>'+ref+'</div></div>';
+      const controls = document.createElement('div');
+      controls.style.marginTop='10px';
+      controls.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font-size:12px;color:#6b7280">Mailbox: '+mailbox+'</span><button class="brand-btn outline" onclick="subscriptions.remove(\\''+ref+'\\')">Unsubscribe</button><button class="brand-btn" onclick="manualReassign(\\''+ref+'\\')">Force reassign</button><button class="brand-btn secondary" onclick="flagDelay(\\''+ref+'\\')">Flag delay</button></div>';
+      card.appendChild(controls);
+      list.prepend(card);
+      // Email subscription
+      if(email) subscriptions.add(ref,email);
+    } catch(e){ console.warn(e); }
+  }, false);
+})();
+
+window.manualReassign = function(ref){
+  const dept = prompt('Reassign to mailbox (enter email):', 'contactcentre@southwark.gov.uk');
+  if(!dept) return;
+  logAudit('ROUTING','Manual override to '+dept, {ref});
+};
+window.flagDelay = function(ref){
+  logAudit('EMAIL','Delay notice sent', {ref});
+  ConfirmSim.webhook(ref, 'In progress'); // ensure visible change
+};
+
+</script>
+
+</body>
+</html>
+
+    
