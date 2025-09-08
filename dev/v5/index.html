@@ -1147,10 +1147,15 @@ h1, h2, h3 { letter-spacing: .2px; }
             
             // Show selected section
             const targetSection = document.getElementById(sectionName);
-            targetSection.classList.add('active');
+            if (targetSection) {
+                 targetSection.classList.add('active');
+            }
             
             // Add active class to clicked tab
-            document.querySelector(`[onclick="showSection('${sectionName}')"]`).classList.add('active');
+            const navTab = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
+            if (navTab) {
+                navTab.classList.add('active');
+            }
             
             const adminSubNav = document.getElementById('admin-sub-nav');
             if(sectionName === 'admin') {
@@ -1165,17 +1170,8 @@ h1, h2, h3 { letter-spacing: .2px; }
             if (sectionName === 'map-section') {
                 setTimeout(initFullMap, 10);
             }
-            if (sectionName === 'analytics') {
-                setTimeout(initCharts, 10);
-            }
-            if (sectionName === 'dashboard') {
-                displayReports(currentReports);
-            }
             if (sectionName === 'feedback') {
                 renderFeedback();
-            }
-            if (sectionName === 'agent') {
-                agentSearch();
             }
         }
         
@@ -1191,10 +1187,16 @@ h1, h2, h3 { letter-spacing: .2px; }
             });
             
             // Show selected section
-            document.getElementById(sectionName).classList.add('active');
+            const targetSection = document.getElementById(sectionName);
+            if(targetSection) {
+                targetSection.classList.add('active');
+            }
             
             // Add active class to clicked sub-tab
-            document.querySelector(`[onclick="showAdminSection('${sectionName}')"]`).classList.add('active');
+            const subNavTab = document.querySelector(`[onclick="showAdminSection('${sectionName}')"]`);
+            if(subNavTab) {
+                subNavTab.classList.add('active');
+            }
 
             // Re-initialize maps and charts as needed
             if (sectionName === 'analytics') {
