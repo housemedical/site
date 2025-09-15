@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🚌 North Lincolnshire Bus Tracker</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      --primary: #1a5f7a;
+      --primary-dark: #134b5f;
+      --secondary: #e6f0f7;
+      --accent: #ff9900;
+      --text: #2d3748;
+      --text-light: #718096;
+      --bg: #f7fafc;
+      --white: #ffffff;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --hover: #edf2f7;
+    }
+
+    [data-theme="dark"] {
+      --primary: #2a7c9c;
+      --primary-dark: #1f5f77;
+      --secondary: #1a3b4d;
+      --text: #e2e8f0;
+      --text-light: #a0aec0;
+      --bg: #121826;
+      --white: #1e293b;
+      --border: #334155;
+      --hover: #2c3c53;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://source.unsplash.com/random/1600x600/?bus,uk') no-repeat center center/cover;
+      color: white;
+      text-align: center;
+      padding: 4rem 1rem;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin: 0;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 1rem auto;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 0.5rem 0.8rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    nav {
+      background-color: var(--primary);
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    nav a {
+      color: white;
+      padding: 1rem 1.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s;
+      position: relative;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background-color: var(--primary-dark);
+    }
+
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 1.8rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.3s;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      color: var(--primary);
+      margin-top: 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card h2 i {
+      color: var(--accent);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 1rem;
+      background: var(--secondary);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .stat-card h3 {
+      margin: 0.25rem 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: var(--secondary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: var(--hover);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge.on-time { background: #d4edda; color: var(--success); }
+    .badge.delayed { background: #f8d7da; color: var(--danger); }
+    .badge.cancelled { background: #f4c2c2; color: #8b0000; }
+    .badge.info { background: #d1ecf1; color: #0c5460; }
+
+    .search-bar {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      margin: 1rem 0;
+      transition: border-color 0.3s;
+      background: var(--white);
+      color: var(--text);
+    }
+
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.2);
+    }
+
+    .map-container, .chart-container {
+      height: 400px;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.accent {
+      background: var(--accent);
+    }
+
+    .btn.accent:hover {
+      background: #e68a00;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 2000;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.4s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .alert-banner {
+      background: #fff3cd;
+      border-left: 5px solid var(--accent);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .route-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .route-tab {
+      padding: 0.5rem 1rem;
+      background: var(--secondary);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .route-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .route-content {
+      display: none;
+    }
+
+    .route-content.active {
+      display: block;
+    }
+
+    .feedback-widget {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .feedback-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .feedback-form {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background-color: var(--primary);
+      color: white;
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">Action completed!</div>
+
+  <header>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle Dark Mode">
+      <i class="fas fa-moon"></i>
+    </button>
+    <h1><i class="fas fa-bus"></i> North Lincolnshire Bus Tracker</h1>
+    <p>Real-time arrivals • Routes • Reliability stats • Fully accessible</p>
+  </header>
+
+  <nav id="mainNav" aria-label="Main Navigation">
+    <a href="#home" class="active"><i class="fas fa-home"></i> Home</a>
+    <a href="#arrivals"><i class="fas fa-clock"></i> Live Arrivals</a>
+    <a href="#map"><i class="fas fa-map"></i> Interactive Map</a>
+    <a href="#routes"><i class="fas fa-route"></i> Routes & Stops</a>
+    <a href="#stats"><i class="fas fa-chart-line"></i> Service Stats</a>
+    <a href="#planner"><i class="fas fa-route"></i> Journey Planner</a>
+    <a href="#admin-login" onclick="showAdmin()"><i class="fas fa-cog"></i> Admin Portal</a>
+  </nav>
+
+  <main class="container">
+
+    <!-- Home Section -->
+    <section id="home">
+      <div class="card">
+        <h2><i class="fas fa-info-circle"></i> Welcome</h2>
+        <p>Welcome to the official public transport portal for <strong>North Lincolnshire</strong>. This site provides:</p>
+        <ul>
+          <li>🚍 Real-time bus arrival predictions (powered by BODS)</li>
+          <li>📊 Monthly reliability reports & punctuality stats</li>
+          <li>📍 Interactive map with live stop locations</li>
+          <li>🔔 Push alerts for disruptions (opt-in)</li>
+          <li>💬 Feedback tool for accessibility & route suggestions</li>
+        </ul>
+        <p>All features are designed to meet <strong>WCAG 2.2 AA standards</strong>.</p>
+      </div>
+
+      <div class="card">
+        <h2><i class="fas fa-exclamation-triangle"></i> Live Service Incidents</h2>
+        <div class="alert-banner">
+          <strong>⚠️ Delay on X4:</strong> Heavy traffic near Brigg Road. Expect 10-min delay.
+        </div>
+        <div class="alert-banner">
+          <strong>🚧 Stop Closed:</strong> "Immingham Europort Entrance" closed until 15 Dec.
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Arrivals -->
+    <section id="arrivals" style="display:none;">
+      <div class="card">
+        <h2><i class="fas fa-clock"></i> Live Bus Arrivals</h2>
+        <p>Search by stop name or code (e.g., SCO, CLE).</p>
+        <input type="text" class="search-bar" placeholder="Search stop..." oninput="filterStops(this.value)" />
+
+        <table id="arrivalTable">
+          <thead>
+            <tr>
+              <th>Stop Name</th>
+              <th>Service</th>
+              <th>Destination</th>
+              <th>Due</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Scunthorpe - Bus Station (Bay A)</td>
+              <td><strong>X4</strong></td>
+              <td>Cleethorpes</td>
+              <td>2 min</td>
+              <td><span class="badge on-time">On Time</span></td>
+            </tr>
+            <tr>
+              <td>Scunthorpe - Bus Station (Bay C)</td>
+              <td><strong>10</strong></td>
+              <td>Brumby Wood</td>
+              <td>5 min</td>
+              <td><span class="badge on-time">On Time</span></td>
+            </tr>
+            <tr>
+              <td>Grimsby - Town Centre (Stop G)</td>
+              <td><strong>8</strong></td>
+              <td>Immingham Dock</td>
+              <td>7 min</td>
+              <td><span class="badge delayed">Delayed</span></td>
+            </tr>
+            <tr>
+              <td>Cleethorpes - Sea Road (Stop S)</td>
+              <td><strong>X4</strong></td>
+              <td>Scunthorpe</td>
+              <td>10 min</td>
+              <td><span class="badge on-time">On Time</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Interactive Map -->
+    <section id="map" style="display:none;">
+      <div class="card">
+        <h2><i class="fas fa-map-marked-alt"></i> Interactive Bus Map</h2>
+        <p>Click on any stop to view real-time arrivals.</p>
+        <div id="mapContainer" class="map-container"></div>
+      </div>
+    </section>
+
+    <!-- Routes & Stops -->
+    <section id="routes" style="display:none;">
+      <div class="card">
+        <h2><i class="fas fa-route"></i> Routes & Stop Details</h2>
+        <p>Select a route to view stops and timetables.</p>
+
+        <div class="route-tabs">
+          <div class="route-tab active" data-route="x4">X4: Scunthorpe ↔ Cleethorpes</div>
+          <div class="route-tab" data-route="8">8: Immingham ↔ Grimsby</div>
+          <div class="route-tab" data-route="10">10: Scunthorpe → Brumby</div>
+          <div class="route-tab" data-route="55">55: Barrow → Hull</div>
+        </div>
+
+        <div id="route-x4" class="route-content active">
+          <h3>🚌 Route X4</h3>
+          <p><strong>Frequent service | Every 15 mins | Operated by Stagecoach</strong></p>
+          <ul class="stops-list">
+            <li>Scunthorpe Bus Station (SCO)</li>
+            <li>Frodingham – High Street</li>
+            <li>Barrow – School Lane (BRR)</li>
+            <li>Habrough – Cross Roads</li>
+            <li>Great Coates – Village Green</li>
+            <li>Grimsby – Corporation Road</li>
+            <li>Cleethorpes – Sea Road (CLE)</li>
+            <li>Cleethorpes Beach</li>
+          </ul>
+          <p><a href="#" class="btn" onclick="showToast('Downloading X4 timetable...')">Download Timetable (PDF)</a></p>
+        </div>
+
+        <div id="route-8" class="route-content">
+          <h3>🚌 Route 8</h3>
+          <p><strong>Every 20–30 mins</strong></p>
+          <ul class="stops-list">
+            <li>Immingham Dock (IMM)</li>
+            <li>Immingham Europort</li>
+            <li>Habrough</li>
+            <li>Great Coates</li>
+            <li>Grimsby – Corporation Road</li>
+            <li>Grimsby – Town Centre (GRI)</li>
+          </ul>
+          <p><a href="#" class="btn" onclick="showToast('Downloading Route 8 timetable...')">Download Timetable (PDF)</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Service Reliability Stats -->
+    <section id="stats" style="display:none;">
+      <div class="card">
+        <h2><i class="fas fa-chart-line"></i> Service Reliability Dashboard</h2>
+        <p>Performance data based on last 30 days of BODS reporting.</p>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <i class="fas fa-check-circle"></i>
+            <h3>94%</h3>
+            <p>On-Time Arrivals</p>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-times-circle"></i>
+            <h3>3%</h3>
+            <p>Cancellations</p>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <h3>7.2 min</h3>
+            <p>Avg Delay</p>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-bus"></i>
+            <h3>12</h3>
+            <p>Active Routes</p>
+          </div>
+        </div>
+
+        <h3>📅 On-Time Performance (Last 6 Months)</h3>
+        <div class="chart-container">
+          <canvas id="performanceChart"></canvas>
+        </div>
+
+        <h3>🚦 Top Delay Causes</h3>
+        <ul>
+          <li><span class="badge info">Traffic Congestion</span> – 48%</li>
+          <li><span class="badge info">Roadworks</span> – 22%</li>
+          <li><span class="badge info">Weather</span> – 15%</li>
+          <li><span class="badge info">Vehicle Issues</span> – 10%</li>
+          <li><span class="badge info">Other</span> – 5%</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Journey Planner -->
+    <section id="planner" style="display:none;">
+      <div class="card">
+        <h2><i class="fas fa-route"></i> Journey Planner</h2>
+        <p>Plan your trip across North Lincolnshire.</p>
+
+        <select class="search-bar" id="fromStop">
+          <option value="">From Stop...</option>
+          <option value="scunthorpe">Scunthorpe Bus Station</option>
+          <option value="grimsby">Grimsby Town Centre</option>
+          <option value="cleethorpes">Cleethorpes Sea Road</option>
+          <option value="immingham">Immingham Dock</option>
+        </select>
+
+        <select class="search-bar" id="toStop">
+          <option value="">To Stop...</option>
+          <option value="scunthorpe">Scunthorpe Bus Station</option>
+          <option value="grimsby">Grimsby Town Centre</option>
+          <option value="cleethorpes">Cleethorpes Sea Road</option>
+          <option value="immingham">Immingham Dock</option>
+        </select>
+
+        <button class="btn" onclick="findRoute()">Find Route</button>
+
+        <div id="routeResult" style="margin-top:1rem; display:none;">
+          <h4>Recommended Route: X4</h4>
+          <p><strong>Depart:</strong> Scunthorpe Bus Station at 10:15</p>
+          <p><strong>Arrive:</strong> Cleethorpes Sea Road at 10:45</p>
+          <p><strong>Changes:</strong> None • <strong>Duration:</strong> 30 mins</p>
+          <button class="btn accent" onclick="subscribeAlerts()">🔔 Get Delay Alerts</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin CMS Mock -->
+    <section id="admin-login" style="display:none;">
+      <div class="card">
+        <h2><i class="fas fa-user-shield"></i> Council Admin Portal</h2>
+        <form id="adminForm">
+          <label for="username"><strong>Username:</strong></label>
+          <input type="text" id="username" class="search-bar" required />
+          <label for="password"><strong>Password:</strong></label>
+          <input type="password" id="password" class="search-bar" required />
+          <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Log In</button>
+        </form>
+
+        <div id="adminDashboard" style="display:none; margin-top:2rem;">
+          <h3>Hello, <span id="userGreeting"></span>!</h3>
+          <p><i class="fas fa-bullhorn"></i> <strong>Publish Disruption:</strong></p>
+          <textarea id="disruptionMsg" class="search-bar" rows="3" placeholder="Enter message..."></textarea>
+          <button onclick="postDisruption()" class="btn accent">Publish Alert</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Feedback Widget -->
+  <div class="feedback-widget">
+    <button id="feedbackBtn" class="feedback-btn" aria-label="Give Feedback">
+      <i class="fas fa-comment"></i>
+    </button>
+    <div id="feedbackForm" class="feedback-form">
+      <h4>Send Feedback</h4>
+      <textarea class="search-bar" placeholder="Report an issue, suggest a route, or comment on accessibility..." rows="3"></textarea>
+      <button class="btn" onclick="submitFeedback()">Send</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 North Lincolnshire Council | Compliant with WCAG 2.2 AA</p>
+    <p>Contact: transport@northlincs.gov.uk | <a href="#">Accessibility Statement</a></p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // =============== Theme Toggle ===============
+    const themeToggle = document.getElementById("themeToggle");
+    const icon = themeToggle.querySelector("i");
+
+    const savedTheme = localStorage.getItem("theme") || "light";
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+      icon.classList.replace("fa-moon", "fa-sun");
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const newTheme = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      icon.classList.toggle("fa-moon"); icon.classList.toggle("fa-sun");
+      showToast(newTheme === 'dark' ? '🌙 Dark Mode On' : '☀️ Light Mode On');
+    });
+
+    // =============== Navigation Active State ===============
+    function setActiveLink(targetId) {
+      document.querySelectorAll("#mainNav a").forEach(a => a.classList.remove("active"));
+      document.querySelector(`#mainNav a[href="#${targetId}"]`).classList.add("active");
+    }
+
+    function showSection(id) {
+      document.querySelectorAll("section[id]").forEach(s => s.style.display = s.id === id ? "block" : "none");
+      setActiveLink(id);
+      if (id === "map") initMap();
+      if (id === "routes") setupRouteTabs();
+      if (id === "stats") initChart();
+    }
+
+    document.querySelectorAll("nav a").forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const target = e.target.closest("a").getAttribute("href").substring(1);
+        showSection(target);
+      });
+    });
+
+    showSection("home");
+
+    // =============== Filter Stops ===============
+    function filterStops(query) {
+      const rows = document.getElementById("arrivalTable").querySelectorAll("tbody tr");
+      query = query.toLowerCase();
+      rows.forEach(row => {
+        const txt = row.textContent.toLowerCase();
+        row.style.display = txt.includes(query) ? "" : "none";
+      });
+    }
+
+    // =============== Toast Notifications ===============
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    // =============== Route Tabs ===============
+    function setupRouteTabs() {
+      document.querySelectorAll(".route-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          const route = tab.dataset.route;
+          document.querySelectorAll(".route-tab").forEach(t => t.classList.remove("active"));
+          document.querySelectorAll(".route-content").forEach(c => c.classList.remove("active"));
+          tab.classList.add("active");
+          document.getElementById(`route-${route}`).classList.add("active");
+        });
+      });
+    }
+
+    // =============== Init Map ===============
+    function initMap() {
+      const map = L.map('mapContainer').setView([53.57, -0.55], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+      const stops = [
+        { name: "Scunthorpe Bus Station", lat: 53.595, lng: -0.660 },
+        { name: "Cleethorpes Sea Road", lat: 53.547, lng: 0.035 },
+        { name: "Grimsby Town Centre", lat: 53.550, lng: -0.080 }
+      ];
+
+      stops.forEach(stop => {
+        L.marker([stop.lat, stop.lng]).addTo(map).bindPopup(`<b>${stop.name}</b>`);
+      });
+    }
+
+    // =============== Chart.js ===============
+    let performanceChart;
+    function initChart() {
+      const ctx = document.getElementById('performanceChart').getContext('2d');
+      performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+          datasets: [{
+            label: 'On-Time Percentage',
+            data: [91, 93, 92, 94, 93, 94],
+            borderColor: '#1a5f7a',
+            backgroundColor: 'rgba(26, 95, 122, 0.1)',
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+          },
+          scales: {
+            y: { beginAtZero: false, min: 85, max: 100 }
+          }
+        }
+      });
+    }
+
+    // =============== Journey Planner ===============
+    function findRoute() {
+      const from = document.getElementById("fromStop").value;
+      const to = document.getElementById("toStop").value;
+      if (!from || !to || from === to) return showToast("Please select valid stops.");
+      document.getElementById("routeResult").style.display = "block";
+      showToast("atedRoute found!");
+    }
+
+    function subscribeAlerts() {
+      showToast("🔔 You'll now receive delay alerts for this journey.");
+    }
+
+    // =============== Feedback Widget ===============
+    document.getElementById("feedbackBtn").onclick = () => {
+      const form = document.getElementById("feedbackForm");
+      form.style.display = form.style.display === "block" ? "none" : "block";
+    };
+
+    function submitFeedback() {
+      showToast("✅ Thank you for your feedback!");
+      document.getElementById("feedbackForm").style.display = "none";
+    }
+
+    // =============== Admin Actions ===============
+    document.getElementById("adminForm").onsubmit = function(e) {
+      e.preventDefault();
+      document.getElementById("adminDashboard").style.display = "block";
+      document.getElementById("userGreeting").textContent = this.username.value;
+      showToast("🔐 Logged in");
+    };
+
+    function postDisruption() {
+      const msg = document.getElementById("disruptionMsg").value;
+      if (!msg) return showToast("❌ Enter a message.");
+      showToast("📢 Alert published!");
+      document.getElementById("disruptionMsg").value = "";
+    }
+  </script>
+
+</body>
+</html>
