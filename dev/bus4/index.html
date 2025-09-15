@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>North Lincolnshire Bus Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00539f;
+            --secondary: #ffcc00;
+            --dark: #333;
+            --light: #f8f9fa;
+            --danger: #dc3545;
+            --success: #28a745;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Page containers */
+        .page {
+            display: none;
+            flex: 1;
+            padding: 1rem;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Accessibility Utilities */
+        .high-contrast {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+        
+        .high-contrast .card,
+        .high-contrast .header,
+        .high-contrast .footer {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 1px solid #fff !important;
+        }
+        
+        .large-text {
+            font-size: 120% !important;
+        }
+        
+        .screen-reader-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Header */
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .nav a:hover, .nav a:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            outline: 2px solid white;
+        }
+        
+        .accessibility-tools {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .accessibility-tools button {
+            background: var(--secondary);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        
+        /* Main Content */
+        .main {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .search-section {
+            padding: 1rem;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .search-form input, .search-form select {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+        }
+        
+        @media (min-width: 992px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .map-container {
+            flex: 1;
+            min-height: 400px;
+            position: relative;
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+        
+        .info-panel {
+            width: 100%;
+            background: white;
+            padding: 1rem;
+            overflow-y: auto;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        @media (min-width: 992px) {
+            .info-panel {
+                width: 400px;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .arrival-list {
+            list-style: none;
+        }
+        
+        .arrival-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .arrival-item:last-child {
+            border-bottom: none;
+        }
+        
+        .route-number {
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .real-time {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .disruption-alert {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        /* CMS Login */
+        .cms-login {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .cms-btn {
+            background-color: var(--secondary);
+            color: var(--dark);
+            padding: 0.75rem;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        /* Stops page */
+        .stops-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stop-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Routes page */
+        .route-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .route-path {
+            height: 200px;
+            background-color: #f0f0f0;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        /* About page */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Focus styles for accessibility */
+        button:focus, input:focus, select:focus, a:focus {
+            outline: 2px solid var(--secondary);
+            outline-offset: 2px;
+        }
+        
+        /* Map loading indicator */
+        .map-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: #f0f0f0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header" role="banner">
+        <div class="logo">
+            <i class="fas fa-bus fa-2x"></i>
+            <div class="logo-text">North Lincolnshire Bus Tracker</div>
+        </div>
+        
+        <nav class="nav" role="navigation">
+            <a href="#" data-page="home"><i class="fas fa-home"></i> Home</a>
+            <a href="#" data-page="stops"><i class="fas fa-map-marker-alt"></i> Stops</a>
+            <a href="#" data-page="routes"><i class="fas fa-route"></i> Routes</a>
+            <a href="#" data-page="about"><i class="fas fa-info-circle"></i> About</a>
+        </nav>
+        
+        <div class="accessibility-tools">
+            <button id="contrast-toggle" aria-label="Toggle high contrast mode">
+                <i class="fas fa-adjust"></i>
+            </button>
+            <button id="text-size-toggle" aria-label="Toggle large text mode">
+                <i class="fas fa-text-height"></i>
+            </button>
+            <button id="read-aloud" aria-label="Read page content aloud">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+    </header>
+    
+    <main class="main" role="main">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="search-section">
+                <form class="search-form" role="search">
+                    <div>
+                        <label for="stop-search" class="screen-reader-only">Search by stop number</label>
+                        <input type="text" id="stop-search" placeholder="Enter stop number">
+                    </div>
+                    <div>
+                        <label for="route-search" class="screen-reader-only">Search by route number</label>
+                        <input type="text" id="route-search" placeholder="Enter route number">
+                    </div>
+                    <div>
+                        <label for="location-search" class="screen-reader-only">Search by location</label>
+                        <input type="text" id="location-search" placeholder="Enter location">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
+            
+            <div class="content">
+                <div class="map-container">
+                    <div class="map-loading" id="map-loading">
+                        <div class="spinner"></div>
+                    </div>
+                    <div id="map"></div>
+                </div>
+                
+                <aside class="info-panel" role="complementary">
+                    <div class="card">
+                        <h2 class="card-title">Stop Information</h2>
+                        <p><strong>Stop #:</strong> 370325689</p>
+                        <p><strong>Name:</strong> Scunthorpe Bus Station</p>
+                        <p><strong>Services:</strong> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10</p>
+                    </div>
+                    
+                    <div class="disruption-alert" role="alert">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Service Disruption</h3>
+                        <p>Route 4 is experiencing delays due to roadworks on High Street. Expected additional travel time: 15 minutes.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title">Next Arrivals</h2>
+                        <ul class="arrival-list">
+                            <li class="arrival-item">
+                                <span><span class="route-number">4</span> to Ashby</span>
+                                <span class="real-time">5 min <i class="fas fa-bus"></i></span>
+                            </li>
+                            <li class="arrival-item">
+                                <span><span class="route-number">8</span> to Bottesford</span>
+                                <span>7 min</span>
+                            </li>
+                            <li class="arrival-item">
+                                <span><span class="route-number">2</span> to Brumby</span>
+                                <span>10 min</span>
+                            </li>
+                            <li class="arrival-item">
+                                <span><span class="route-number">5</span> to Crosby</span>
+                                <span class="real-time">12 min <i class="fas fa-bus"></i></span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title">Timetables & Notices</h2>
+                        <ul class="arrival-list">
+                            <li class="arrival-item">
+                                <span><i class="fas fa-file-pdf"></i> Route 4 Timetable (Effective 10/09/2023)</span>
+                                <a href="#" aria-label="Download Route 4 timetable"><i class="fas fa-download"></i></a>
+                            </li>
+                            <li class="arrival-item">
+                                <span><i class="fas fa-file-pdf"></i> Route 8 Timetable (Effective 10/09/2023)</span>
+                                <a href="#" aria-label="Download Route 8 timetable"><i class="fas fa-download"></i></a>
+                            </li>
+                            <li class="arrival-item">
+                                <span><i class="fas fa-info-circle"></i> Holiday Service Changes</span>
+                                <a href="#" aria-label="Read more about holiday service changes"><i class="fas fa-external-link-alt"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </section>
+        
+        <!-- Stops Page -->
+        <section id="stops" class="page">
+            <h1>Bus Stops in North Lincolnshire</h1>
+            <div class="search-section">
+                <form class="search-form" role="search">
+                    <div>
+                        <label for="stop-search-2" class="screen-reader-only">Search by stop number or name</label>
+                        <input type="text" id="stop-search-2" placeholder="Enter stop number or name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search Stops
+                    </button>
+                </form>
+            </div>
+            
+            <div class="stops-list">
+                <div class="stop-card">
+                    <h3>Scunthorpe Bus Station</h3>
+                    <p><strong>Stop ID:</strong> 370325689</p>
+                    <p><strong>Services:</strong> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10</p>
+                    <p><strong>Facilities:</strong> Shelter, Seating, Timetable display</p>
+                    <button class="btn btn-primary">View Arrivals</button>
+                </div>
+                
+                <div class="stop-card">
+                    <h3>High Street</h3>
+                    <p><strong>Stop ID:</strong> 370325690</p>
+                    <p><strong>Services:</strong> 1, 3, 4, 7, 8</p>
+                    <p><strong>Facilities:</strong> Shelter, Seating</p>
+                    <button class="btn btn-primary">View Arrivals</button>
+                </div>
+                
+                <div class="stop-card">
+                    <h3>Library</h3>
+                    <p><strong>Stop ID:</strong> 370325691</p>
+                    <p><strong>Services:</strong> 2, 5, 6, 9</p>
+                    <p><strong>Facilities:</strong> Shelter, Seating, Digital display</p>
+                    <button class="btn btn-primary">View Arrivals</button>
+                </div>
+                
+                <div class="stop-card">
+                    <h3>Health Centre</h3>
+                    <p><strong>Stop ID:</strong> 370325692</p>
+                    <p><strong>Services:</strong> 1, 4, 10</p>
+                    <p><strong>Facilities:</strong> Shelter, Seating</p>
+                    <button class="btn btn-primary">View Arrivals</button>
+                </div>
+                
+                <div class="stop-card">
+                    <h3>Railway Station</h3>
+                    <p><strong>Stop ID:</strong> 370325693</p>
+                    <p><strong>Services:</strong> 2, 3, 5, 7, 8, 9</p>
+                    <p><strong>Facilities:</strong> Shelter, Seating, Timetable display</p>
+                    <button class="btn btn-primary">View Arrivals</button>
+                </div>
+                
+                <div class="stop-card">
+                    <h3>Ashby Market</h3>
+                    <p><strong>Stop ID:</strong> 370325694</p>
+                    <p><strong>Services:</strong> 4, 6, 10</p>
+                    <p><strong>Facilities:</strong> Shelter</p>
+                    <button class="btn btn-primary">View Arrivals</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Routes Page -->
+        <section id="routes" class="page">
+            <h1>Bus Routes in North Lincolnshire</h1>
+            
+            <div class="route-card">
+                <h2>Route 4 - Scunthorpe to Ashby</h2>
+                <p><strong>Service Frequency:</strong> Every 15 minutes (peak), Every 30 minutes (off-peak)</p>
+                <p><strong>First Bus:</strong> 05:30</p>
+                <p><strong>Last Bus:</strong> 23:15</p>
+                <div class="route-path"></div>
+                <button class="btn btn-primary">View Full Timetable</button>
+            </div>
+            
+            <div class="route-card">
+                <h2>Route 8 - Scunthorpe to Bottesford</h2>
+                <p><strong>Service Frequency:</strong> Every 20 minutes (peak), Every 40 minutes (off-peak)</p>
+                <p><strong>First Bus:</strong> 06:00</p>
+                <p><strong>Last Bus:</strong> 22:45</p>
+                <div class="route-path"></div>
+                <button class="btn btn-primary">View Full Timetable</button>
+            </div>
+            
+            <div class="route-card">
+                <h2>Route 2 - Scunthorpe to Brumby</h2>
+                <p><strong>Service Frequency:</strong> Every 15 minutes (peak), Every 30 minutes (off-peak)</p>
+                <p><strong>First Bus:</strong> 05:45</p>
+                <p><strong>Last Bus:</strong> 23:30</p>
+                <div class="route-path"></div>
+                <button class="btn btn-primary">View Full Timetable</button>
+            </div>
+            
+            <div class="route-card">
+                <h2>Route 5 - Scunthorpe to Crosby</h2>
+                <p><strong>Service Frequency:</strong> Every 30 minutes</p>
+                <p><strong>First Bus:</strong> 06:15</p>
+                <p><strong>Last Bus:</strong> 22:30</p>
+                <div class="route-path"></div>
+                <button class="btn btn-primary">View Full Timetable</button>
+            </div>
+        </section>
+        
+        <!-- About Page -->
+        <section id="about" class="page">
+            <div class="about-content">
+                <h1>About North Lincolnshire Bus Tracker</h1>
+                
+                <div class="card">
+                    <h2 class="card-title">Real-Time Bus Information</h2>
+                    <p>This service provides real-time bus arrival information for North Lincolnshire, helping you plan your journey with up-to-the-minute accuracy.</p>
+                    <p>Our system integrates with the Bus Open Data Service (BODS) and the Council's real-time display systems to bring you the most accurate information available.</p>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">Accessibility Commitment</h2>
+                    <p>We are committed to making our services accessible to everyone. This website meets WCAG 2.2 AA standards and includes:</p>
+                    <ul>
+                        <li>High contrast mode for visually impaired users</li>
+                        <li>Text size adjustment options</li>
+                        <li>Screen reader compatibility</li>
+                        <li>Keyboard navigation support</li>
+                        <li>Clear, consistent layout and navigation</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">Contact Us</h2>
+                    <p>If you have any questions or feedback about this service, please get in touch:</p>
+                    <p><strong>Phone:</strong> 01724 296296</p>
+                    <p><strong>Email:</strong> transport@northlincs.gov.uk</p>
+                    <p><strong>Address:</strong> North Lincolnshire Council, Church Square House, Scunthorpe, DN15 6XQ</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer" role="contentinfo">
+        <p>&copy; 2023 North Lincolnshire Council</p>
+        <p>Data provided by Bus Open Data Service (BODS)</p>
+        <p>
+            <a href="#" style="color: white;">Accessibility</a> | 
+            <a href="#" style="color: white;">Privacy Policy</a> | 
+            <a href="#" style="color: white;">Contact Us</a>
+        </p>
+    </footer>
+    
+    <div class="cms-login">
+        <button class="cms-btn" id="cms-btn" aria-label="Content Management System Login">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+    
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Council Staff Login</h2>
+                <span class="close" id="close-modal">&times;</span>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize map after a small delay to ensure the container is visible
+            setTimeout(initMap, 100);
+            
+            // Set up page navigation
+            setupNavigation();
+            
+            // Set up accessibility features
+            setupAccessibility();
+            
+            // Set up CMS modal
+            setupCMSModal();
+            
+            // Start real-time updates simulation
+            startRealTimeUpdates();
+        });
+        
+        // Initialize map
+        function initMap() {
+            // Hide loading indicator
+            document.getElementById('map-loading').style.display = 'none';
+            
+            const map = L.map('map').setView([53.5907, -0.6503], 13); // Coordinates for Scunthorpe
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add bus stop markers
+            const busStops = [
+                {lat: 53.591, lng: -0.650, name: "Scunthorpe Bus Station", id: "370325689"},
+                {lat: 53.588, lng: -0.645, name: "High Street", id: "370325690"},
+                {lat: 53.593, lng: -0.643, name: "Library", id: "370325691"},
+                {lat: 53.595, lng: -0.647, name: "Health Centre", id: "370325692"},
+                {lat: 53.587, lng: -0.652, name: "Railway Station", id: "370325693"},
+            ];
+            
+            busStops.forEach(stop => {
+                const marker = L.marker([stop.lat, stop.lng]).addTo(map);
+                marker.bindPopup(`
+                    <strong>${stop.name}</strong><br>
+                    Stop #: ${stop.id}<br>
+                    <a href="#" onclick="showStopInfo('${stop.id}')">View arrivals</a>
+                `);
+            });
+            
+            // Store map reference for later use
+            window.busMap = map;
+        }
+        
+        // Show stop info (demo function)
+        window.showStopInfo = function(stopId) {
+            alert(`This would show detailed information for stop ${stopId}. In a real implementation, this would fetch data from BODS API.`);
+        };
+        
+        // Page navigation setup
+        function setupNavigation() {
+            document.querySelectorAll('.nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Hide all pages
+                    document.querySelectorAll('.page').forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Show selected page
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // If home page, reinitialize map to ensure it displays correctly
+                    if (pageId === 'home') {
+                        // Show loading indicator
+                        document.getElementById('map-loading').style.display = 'flex';
+                        
+                        // Small delay to allow for page transition
+                        setTimeout(() => {
+                            if (window.busMap) {
+                                window.busMap.remove();
+                            }
+                            initMap();
+                        }, 300);
+                    }
+                });
+            });
+        }
+        
+        // Accessibility features setup
+        function setupAccessibility() {
+            document.getElementById('contrast-toggle').addEventListener('click', function() {
+                document.body.classList.toggle('high-contrast');
+            });
+            
+            document.getElementById('text-size-toggle').addEventListener('click', function() {
+                document.body.classList.toggle('large-text');
+            });
+            
+            document.getElementById('read-aloud').addEventListener('click', function() {
+                alert('This would activate screen reader functionality to read the page content.');
+            });
+        }
+        
+        // CMS modal setup
+        function setupCMSModal() {
+            const cmsBtn = document.getElementById('cms-btn');
+            const loginModal = document.getElementById('login-modal');
+            const closeModal = document.getElementById('close-modal');
+            const loginForm = document.getElementById('login-form');
+            
+            cmsBtn.addEventListener('click', function() {
+                loginModal.style.display = 'flex';
+            });
+            
+            closeModal.addEventListener('click', function() {
+                loginModal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === loginModal) {
+                    loginModal.style.display = 'none';
+                }
+            });
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('This would validate credentials and redirect to the CMS dashboard. For this demo, no actual login is processed.');
+                loginModal.style.display = 'none';
+            });
+        }
+        
+        // Simulate real-time updates
+        function startRealTimeUpdates() {
+            setInterval(() => {
+                const realTimeElements = document.querySelectorAll('.real-time');
+                realTimeElements.forEach(el => {
+                    const currentTime = parseInt(el.textContent);
+                    if (currentTime > 0) {
+                        el.textContent = (currentTime - 1) + ' min ';
+                        const busIcon = document.createElement('i');
+                        busIcon.className = 'fas fa-bus';
+                        el.appendChild(busIcon);
+                    } else {
+                        el.textContent = 'Due ';
+                        const busIcon = document.createElement('i');
+                        busIcon.className = 'fas fa-bus';
+                        el.appendChild(busIcon);
+                        
+                        // Reset after a minute
+                        setTimeout(() => {
+                            el.textContent = '10 min ';
+                            const newBusIcon = document.createElement('i');
+                            newBusIcon.className = 'fas fa-bus';
+                            el.appendChild(newBusIcon);
+                        }, 60000);
+                    }
+                });
+            }, 60000); // Update every minute
+        }
+    </script>
+</body>
+</html>
