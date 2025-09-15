@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>North Lincolnshire Bus Tracker - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Leaflet.js for interactive map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #map { height: 550px; }
+        .leaflet-popup-content-wrapper { border-radius: 8px; }
+
+        /* High Contrast Theme */
+        .high-contrast {
+            background-color: #000;
+            color: #fff;
+        }
+        .high-contrast .bg-white { background-color: #1a1a1a; }
+        .high-contrast .bg-gray-50 { background-color: #2b2b2b; }
+        .high-contrast .bg-gray-100 { background-color: #3c3c3c; }
+        .high-contrast .text-gray-800 { color: #fff; }
+        .high-contrast .text-gray-600 { color: #ccc; }
+        .high-contrast .text-gray-500 { color: #aaa; }
+        .high-contrast .border-gray-200 { border-color: #555; }
+        .high-contrast .ring-gray-300 { ring-color: #777; }
+        .high-contrast .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #555; }
+        .high-contrast .shadow-lg { box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05); }
+        .high-contrast .map-pin-pulse { animation: none; } /* Disable distracting animations */
+        .high-contrast .bg-blue-600 { background-color: #3b82f6; }
+        .high-contrast .hover\:bg-blue-700:hover { background-color: #2563eb; }
+        .high-contrast .bg-green-500 { background-color: #84cc16; }
+        .high-contrast .text-green-800 { color: #14532d; }
+        .high-contrast .bg-green-100 { background-color: #3f6212; }
+        .high-contrast .text-red-800 { color: #fee2e2; }
+        .high-contrast .bg-red-100 { background-color: #991b1b; }
+        .high-contrast .bg-yellow-100 { background-color: #b45309; }
+        .high-contrast .text-yellow-800 { color: #fefce8; }
+        .high-contrast img.grayscale { filter: grayscale(100%) contrast(200%); }
+        .high-contrast .leaflet-tile { filter: grayscale(100%) invert(100%) contrast(150%); }
+
+        /* Text Size Classes */
+        .text-base-size { font-size: 1rem; }
+        .text-large-size { font-size: 1.15rem; }
+        .text-xlarge-size { font-size: 1.3rem; }
+        
+        .speaking {
+            animation: speak-glow 1.5s ease-in-out infinite;
+        }
+        @keyframes speak-glow {
+            0% { box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.8); }
+            100% { box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.5); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-base-size">
+
+    <!-- Accessibility Controls -->
+    <div id="accessibility-controls" class="bg-gray-800 text-white p-2 text-sm z-[1001] fixed top-0 left-0 right-0">
+        <div class="container mx-auto flex items-center justify-end space-x-4">
+            <span class="font-semibold">Accessibility:</span>
+            <button id="contrast-toggle" class="flex items-center space-x-1 hover:underline"><i data-lucide="contrast"></i><span>High Contrast</span></button>
+            <button id="text-decrease" class="flex items-center space-x-1 hover:underline"><i data-lucide="zoom-out"></i><span>Smaller Text</span></button>
+            <button id="text-increase" class="flex items-center space-x-1 hover:underline"><i data-lucide="zoom-in"></i><span>Larger Text</span></button>
+            <button id="read-aloud" class="flex items-center space-x-1 hover:underline"><i data-lucide="volume-2"></i><span>Read Alerts</span></button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-md pt-12 sticky top-0 z-[1000]">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="https://placehold.co/150x50/003399/FFFFFF?text=N.Lincs+Council" alt="North Lincolnshire Council Logo" class="h-12 grayscale">
+                <h1 class="text-2xl font-bold text-gray-800">Bus Tracker</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-gray-600 font-medium">
+                <a href="#map-section" class="hover:text-blue-600 nav-link">Live Map</a>
+                <a href="#routes-section" id="nav-routes-link" class="hover:text-blue-600 nav-link">Routes & Timetables</a>
+                <a href="#" id="cms-login-btn" class="hover:text-blue-600 font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-md">Council CMS Login</a>
+            </nav>
+            <button class="md:hidden"><i data-lucide="menu"></i></button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <!-- Public View Container -->
+        <div id="public-view" class="space-y-12">
+            <!-- Search and Alerts Section -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Find your bus</h2>
+                <div class="relative">
+                    <input type="text" placeholder="Enter a route, stop, or postcode..." class="w-full p-4 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500">
+                    <i data-lucide="search" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Map and Real-time Arrivals -->
+            <div id="map-section" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Interactive Map Column -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Live Map</h2>
+                    <div id="map" class="rounded-md"></div>
+                </div>
+
+                <!-- Real-time Arrivals Column -->
+                <div id="arrivals-section" class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Real-time Arrivals</h2>
+                    <div class="divide-y divide-gray-200" id="realtime-arrivals-list">
+                        <!-- Arrival items will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Updates Section -->
+            <div id="alerts-section" class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold text-gray-800 mb-2 flex items-center">
+                    <i data-lucide="alert-triangle" class="text-yellow-500 mr-2"></i> Service Updates
+                </h2>
+                <div id="disruption-list" class="space-y-2">
+                    <!-- Disruption messages will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Quick Routes Section -->
+            <div id="quick-routes-section" class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Popular Routes</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <!-- Route items will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Routes & Timetables View -->
+        <div id="routes-view" class="hidden">
+             <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800">All Routes & Timetables</h2>
+                    <p class="text-gray-500">Find detailed route information and download timetables.</p>
+                </div>
+                <button id="back-to-public-from-routes-btn" class="text-blue-600 hover:underline font-semibold flex items-center space-x-2">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back to Main Site</span>
+                </button>
+            </div>
+            <div id="all-routes-list" class="space-y-4">
+                <!-- Detailed route list will be generated here -->
+            </div>
+        </div>
+
+        <!-- CMS View -->
+        <div id="cms-section" class="hidden border-t-4 border-blue-600 bg-white p-6 sm:p-8 rounded-lg shadow-lg">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Council Content Management System (CMS)</h2>
+                    <p class="text-gray-500">Manage public-facing content and service alerts.</p>
+                </div>
+                <button id="back-to-public-btn" class="text-blue-600 hover:underline font-semibold flex items-center space-x-2 flex-shrink-0">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back to Public Site</span>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+                <!-- Manage Service Disruptions -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center"><i data-lucide="megaphone" class="mr-2"></i> Manage Service Disruptions</h3>
+                    <form id="disruption-form" class="space-y-4 bg-gray-50 p-4 rounded-md border">
+                        <div>
+                            <label for="disruption-title" class="block text-sm font-medium text-gray-700">Message Title</label>
+                            <input type="text" id="disruption-title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="e.g., Road Closure on High Street">
+                        </div>
+                        <div>
+                            <label for="disruption-details" class="block text-sm font-medium text-gray-700">Details</label>
+                            <textarea id="disruption-details" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Provide details about the disruption..."></textarea>
+                        </div>
+                         <div>
+                            <label for="disruption-type" class="block text-sm font-medium text-gray-700">Disruption Type</label>
+                            <select id="disruption-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="warning">Warning (Yellow)</option>
+                                <option value="severe">Severe (Red)</option>
+                                <option value="info">Info (Blue)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Publish Disruption Message
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Manage Timetables & Routes -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center"><i data-lucide="file-up" class="mr-2"></i> Manage Timetables & Routes</h3>
+                    <div class="space-y-4 bg-gray-50 p-4 rounded-md border">
+                        <div>
+                            <label for="file-upload" class="block text-sm font-medium text-gray-700">Upload New Timetable (PDF/JPEG)</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                <div class="space-y-1 text-center">
+                                    <i data-lucide="file-text" class="mx-auto h-12 w-12 text-gray-400"></i>
+                                    <div class="flex text-sm text-gray-600">
+                                        <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                            <span>Upload a file</span>
+                                            <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                                        </label>
+                                        <p class="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">PDF, JPG up to 10MB</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="route-edit" class="block text-sm font-medium text-gray-700">Edit Route Information</label>
+                             <select id="route-edit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option>Select a route to edit...</option>
+                                <option>Route 1: Scunthorpe - Ashby</option>
+                                <option>Route 2: Town Circuit</option>
+                                <option>Route 3: Brigg Interconnect</option>
+                            </select>
+                        </div>
+                         <button type="button" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="mt-12 bg-gray-800 text-white">
+        <div class="container mx-auto px-4 py-6 text-center text-gray-400 text-sm">
+            <p>&copy; 2025 North Lincolnshire Council. This is a demonstration website.</p>
+            <p>
+                <a href="#" class="hover:underline">Privacy Policy</a> | 
+                <a href="#" class="hover:underline">Terms of Use</a> | 
+                <a href="#" class="hover:underline">Contact Us</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="hidden fixed bottom-5 right-5 text-white py-3 px-5 rounded-lg shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-[1002]">
+        <p id="notification-message"></p>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // --- MOCK DATA ---
+        const mockBuses = [
+            { id: 'BUS123', route: '1A', destination: 'Ashby', stop: 'Scunthorpe Bus Station', due: 2 },
+            { id: 'BUS456', route: '3', destination: 'Bottesford', stop: 'Hospital', due: 5 },
+            { id: 'BUS789', route: '1A', destination: 'Scunthorpe', stop: 'Brumby Corner', due: 8 },
+            { id: 'BUS101', route: '4', destination: 'Retail Park', stop: 'Scunthorpe Bus Station', due: 11, onTime: false },
+            { id: 'BUS112', route: '2', destination: 'Town Circuit', stop: 'Morrisons', due: 14, onTime: true },
+        ];
+        
+        const mockDisruptions = [
+            { title: 'Temporary Lights on Ashby Road', details: 'Delays expected on routes 1A and 3 due to temporary traffic lights near the college. Please allow extra time for your journey.', type: 'warning' },
+            { title: 'Route 4 Diversion', details: 'Due to a road closure on Doncaster Road, route 4 is diverted via Kingsway until further notice.', type: 'severe' }
+        ];
+        
+        const mockRoutes = [
+            { name: '1/1A', description: 'Scunthorpe - Ashby', color: 'bg-red-500' },
+            { name: '2', description: 'Town Circuit', color: 'bg-blue-500' },
+            { name: '3', description: 'Brigg Interconnect', color: 'bg-green-500' },
+            { name: '4', description: 'Retail Park Link', color: 'bg-yellow-500' },
+            { name: '6', description: 'Winterton Flyer', color: 'bg-purple-500' },
+            { name: 'FastLink', description: 'Humber FastLink', color: 'bg-pink-500' },
+        ];
+
+        const mockStops = [
+            { name: 'Scunthorpe Bus Station', lat: 53.587, lon: -0.652 },
+            { name: 'Bottesford, Shops', lat: 53.570, lon: -0.675 },
+            { name: 'Ashby, High Street', lat: 53.575, lon: -0.648 },
+            { name: 'Hospital', lat: 53.580, lon: -0.625 },
+        ];
+        
+        // --- DOM ELEMENTS ---
+        const arrivalsList = document.getElementById('realtime-arrivals-list');
+        const disruptionList = document.getElementById('disruption-list');
+        const disruptionForm = document.getElementById('disruption-form');
+        const quickRoutesContainer = document.querySelector('#quick-routes-section .grid');
+        const allRoutesList = document.getElementById('all-routes-list');
+
+        // --- VIEW SWITCHING ---
+        const publicView = document.getElementById('public-view');
+        const cmsView = document.getElementById('cms-section');
+        const routesView = document.getElementById('routes-view');
+        const cmsLoginBtn = document.getElementById('cms-login-btn');
+        const backToPublicBtn = document.getElementById('back-to-public-btn');
+        const backToPublicFromRoutesBtn = document.getElementById('back-to-public-from-routes-btn');
+        const navRoutesLink = document.getElementById('nav-routes-link');
+        const navLinks = document.querySelectorAll('.nav-link');
+        let map; // Leaflet map instance
+
+        function showView(viewToShow) {
+            [publicView, cmsView, routesView].forEach(view => view.classList.add('hidden'));
+            viewToShow.classList.remove('hidden');
+            window.scrollTo(0, 0);
+            lucide.createIcons();
+        }
+
+        cmsLoginBtn.addEventListener('click', (e) => { e.preventDefault(); showView(cmsView); });
+        navRoutesLink.addEventListener('click', (e) => { e.preventDefault(); showView(routesView); });
+        backToPublicBtn.addEventListener('click', () => showView(publicView));
+        backToPublicFromRoutesBtn.addEventListener('click', () => showView(publicView));
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#') && link.id !== 'nav-routes-link') {
+                    if (!publicView.classList.contains('hidden')) return; // Already on public view
+                    showView(publicView);
+                    // Use timeout to allow view to render before scrolling
+                    setTimeout(() => {
+                        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            });
+        });
+
+        // --- FUNCTIONS to render data ---
+        function renderArrivals() {
+            arrivalsList.innerHTML = '';
+            mockBuses.sort((a,b) => a.due - b.due).forEach(bus => {
+                const onTimeStatus = bus.onTime === false 
+                    ? `<span class="text-xs font-semibold bg-red-100 text-red-800 px-2 py-1 rounded-full">Delayed</span>` 
+                    : `<span class="text-xs font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">On Time</span>`;
+                
+                const dueText = bus.due <= 1 ? `<span class="font-bold text-red-600">Due</span>` : `${bus.due} min`;
+
+                const arrivalHTML = `
+                <div class="py-3 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-xl mr-4">
+                            ${bus.route}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800">${bus.destination}</p>
+                            <p class="text-sm text-gray-500">From: ${bus.stop}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-lg text-blue-600">${dueText}</p>
+                        ${onTimeStatus}
+                    </div>
+                </div>`;
+                arrivalsList.innerHTML += arrivalHTML;
+            });
+        }
+        
+        function renderDisruptions() {
+            disruptionList.innerHTML = '';
+            mockDisruptions.forEach(d => {
+                let colors = 'bg-yellow-100 text-yellow-800';
+                if (d.type === 'severe') colors = 'bg-red-100 text-red-800';
+                if (d.type === 'info') colors = 'bg-blue-100 text-blue-800';
+            
+                const disruptionHTML = `
+                <div class="${colors} p-3 rounded-lg">
+                    <p class="font-bold">${d.title}</p>
+                    <p class="text-sm">${d.details}</p>
+                </div>`;
+                disruptionList.innerHTML += disruptionHTML;
+            });
+        }
+        
+        function renderQuickRoutes() {
+            quickRoutesContainer.innerHTML = '';
+            mockRoutes.forEach(route => {
+                const routeHTML = `
+                <a href="#" class="block p-4 rounded-lg text-center text-white transition hover:scale-105 ${route.color}" onclick="event.preventDefault(); showView(routesView);">
+                    <p class="text-3xl font-extrabold">${route.name}</p>
+                    <p class="text-sm font-medium">${route.description}</p>
+                </a>`;
+                quickRoutesContainer.innerHTML += routeHTML;
+            });
+        }
+        
+        function renderAllRoutes() {
+            allRoutesList.innerHTML = '';
+            mockRoutes.forEach(route => {
+                const routeHTML = `
+                <div class="bg-white p-4 rounded-lg shadow-md border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center">
+                         <div class="w-16 h-16 rounded-lg ${route.color} text-white flex items-center justify-center font-bold text-2xl mr-4 flex-shrink-0">
+                            ${route.name}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xl text-gray-800">${route.description}</h3>
+                            <p class="text-gray-500">Serving key areas including downtown and the retail park.</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 flex-shrink-0">
+                        <button class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-md hover:bg-blue-200 flex items-center space-x-2"><i data-lucide="map"></i><span>View on Map</span></button>
+                        <button class="bg-gray-100 text-gray-700 font-semibold px-4 py-2 rounded-md hover:bg-gray-200 flex items-center space-x-2"><i data-lucide="file-text"></i><span>Timetable (PDF)</span></button>
+                    </div>
+                </div>`;
+                allRoutesList.innerHTML += routeHTML;
+            });
+            lucide.createIcons();
+        }
+
+        // --- CMS FUNCTIONALITY ---
+        disruptionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('disruption-title').value;
+            const details = document.getElementById('disruption-details').value;
+            const type = document.getElementById('disruption-type').value;
+
+            if (title && details) {
+                mockDisruptions.unshift({ title, details, type });
+                renderDisruptions();
+                disruptionForm.reset();
+                showNotification('Disruption message published successfully!', 'success');
+            } else {
+                showNotification('Please fill in all the fields.', 'error');
+            }
+        });
+
+        // --- NOTIFICATION FUNCTION ---
+        function showNotification(message, type = 'success') {
+            const toast = document.getElementById('notification-toast');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            toast.className = 'fixed bottom-5 right-5 text-white py-3 px-5 rounded-lg shadow-xl transition-all duration-300 transform z-[1002]'; // Reset classes and add z-index
+            
+            if(type === 'error') {
+                toast.classList.add('bg-red-600');
+            } else {
+                toast.classList.add('bg-green-600');
+            }
+
+            toast.classList.remove('hidden', 'translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        // --- MAP INITIALIZATION ---
+        function initMap() {
+            map = L.map('map').setView([53.58, -0.65], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            // Add stop markers
+            mockStops.forEach(stop => {
+                const stopArrivals = mockBuses.filter(bus => bus.due < 15)
+                                          .map(bus => `<p><strong>Route ${bus.route}</strong> - ${bus.due} min</p>`)
+                                          .join('') || '<p>No immediate arrivals.</p>';
+
+                const popupContent = `
+                    <div class="font-sans">
+                        <h3 class="font-bold text-base mb-1">${stop.name}</h3>
+                        <p class="text-sm text-gray-600 border-b pb-1 mb-1">Next arrivals:</p>
+                        <div class="text-sm">${stopArrivals}</div>
+                    </div>
+                `;
+                L.marker([stop.lat, stop.lon]).addTo(map).bindPopup(popupContent);
+            });
+        }
+
+        // --- ACCESSIBILITY CONTROLS ---
+        const body = document.body;
+        const contrastToggle = document.getElementById('contrast-toggle');
+        const textIncrease = document.getElementById('text-increase');
+        const textDecrease = document.getElementById('text-decrease');
+        const readAloudBtn = document.getElementById('read-aloud');
+
+        contrastToggle.addEventListener('click', () => body.classList.toggle('high-contrast'));
+        
+        textIncrease.addEventListener('click', () => {
+            if (body.classList.contains('text-base-size')) {
+                body.classList.remove('text-base-size');
+                body.classList.add('text-large-size');
+            } else if (body.classList.contains('text-large-size')) {
+                body.classList.remove('text-large-size');
+                body.classList.add('text-xlarge-size');
+            }
+        });
+
+        textDecrease.addEventListener('click', () => {
+            if (body.classList.contains('text-xlarge-size')) {
+                body.classList.remove('text-xlarge-size');
+                body.classList.add('text-large-size');
+            } else if (body.classList.contains('text-large-size')) {
+                body.classList.remove('text-large-size');
+                body.classList.add('text-base-size');
+            }
+        });
+        
+        // --- NARRATION ---
+        readAloudBtn.addEventListener('click', () => {
+            if ('speechSynthesis' in window) {
+                const synth = window.speechSynthesis;
+                if (synth.speaking) {
+                    synth.cancel();
+                    readAloudBtn.classList.remove('speaking');
+                    return;
+                }
+                const textToRead = "Current service updates. " + mockDisruptions.map(d => `${d.title}. ${d.details}`).join('. ');
+                const utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.onstart = () => readAloudBtn.classList.add('speaking');
+                utterance.onend = () => readAloudBtn.classList.remove('speaking');
+                synth.speak(utterance);
+            } else {
+                showNotification('Sorry, your browser does not support text-to-speech.', 'error');
+            }
+        });
+
+
+        // --- SIMULATE REAL-TIME UPDATES ---
+        setInterval(() => {
+            mockBuses.forEach(bus => {
+                bus.due = Math.max(0, bus.due - 1);
+                if (bus.due === 0) {
+                    bus.due = Math.floor(Math.random() * 15) + 10; // Reset bus for another loop
+                }
+            });
+            renderArrivals();
+        }, 15000); // Update every 15 seconds
+
+        // --- INITIAL RENDER ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderArrivals();
+            renderDisruptions();
+            renderQuickRoutes();
+            renderAllRoutes();
+            initMap();
+        });
+    </script>
+</body>
+</html>
+
+
