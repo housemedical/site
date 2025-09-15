@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>North Lincolnshire Buses — Demo (Single File)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --brand-1:#065f46; --brand-2:#059669; --brand-3:#10b981;
+    }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.6rem 1rem; border-radius:12px; border:1px solid #d1d5db; transition:.2s; }
+    .btn-ghost{ background:#fff; }
+    .btn-ghost:hover{ background:#f9fafb; }
+    .btn-primary{ color:#fff; border-color:#047857; background-image:linear-gradient(90deg,var(--brand-2),var(--brand-3)); }
+    .chip{ font-size:.75rem; padding:.125rem .5rem; border-radius:999px; border:1px solid #e5e7eb; background:#f9fafb; }
+    .card{ border:1px solid rgb(229 231 235); border-radius:16px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.04); background:#fff; }
+    .card-body{ padding:12px; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    :focus { outline:2px solid #3b82f6; outline-offset:2px; }
+    .tab[aria-selected="true"]{ background:#ecfdf5; color:#065f46; font-weight:600; }
+    /* Ensure header is above Leaflet panes/controls */
+    header.sticky { position: sticky; top: 0; z-index: 4000; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+    .leaflet-container { z-index: 0 !important; }
+    .leaflet-top, .leaflet-bottom { z-index: 1000 !important; }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body class="min-h-screen bg-white text-gray-900 antialiased" data-contrast="off" data-large="off">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-yellow-400 text-black px-3 py-2 rounded">Skip to main content</a>
+
+  <header class="w-full sticky backdrop-blur">
+    <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-600 text-white">
+      <div class="mx-auto max-w-[1200px] px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span aria-hidden="true" class="text-2xl">🚌</span>
+          <div>
+            <h1 class="text-lg md:text-xl font-bold">North Lincolnshire Buses</h1>
+            <p class="text-xs opacity-90">Interactive map, arrivals, routes & timetables</p>
+          </div>
+          <span class="ml-2 text-[11px] bg-white/20 rounded px-2 py-0.5">demo</span>
+        </div>
+        <nav class="flex items-center gap-1" aria-label="Primary">
+          <button id="tab-home" class="tab px-3 py-2 rounded-lg hover:bg-emerald-50" aria-selected="true" data-view="home">Home</button>
+          <button id="tab-routes" class="tab px-3 py-2 rounded-lg hover:bg-emerald-50" aria-selected="false" data-view="routes">Routes & Timetables</button>
+          <button id="btn-contrast" class="px-3 py-2 rounded-lg hover:bg-emerald-50" aria-pressed="false" title="High contrast"><span class="sr-only">High contrast</span>◐</button>
+          <button id="btn-large" class="px-3 py-2 rounded-lg hover:bg-emerald-50" aria-pressed="false" title="Large text"><span class="sr-only">Large text</span>A<sup>+</sup></button>
+          <button id="btn-narration" class="px-3 py-2 rounded-lg hover:bg-emerald-50" aria-pressed="false" title="Narration"><span class="sr-only">Narration</span>🔈</button>
+          <button id="btn-auth" class="btn btn-primary" aria-label="Log in as admin">Log in</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="mx-auto max-w-[1200px] p-4 space-y-6">
+    <!-- HOME VIEW -->
+    <section id="view-home" class="grid grid-cols-1 lg:grid-cols-3 gap-4" role="tabpanel" aria-labelledby="tab-home">
+      <section class="lg:col-span-2">
+        <h2 class="flex items-center gap-2 text-xl font-semibold mb-2">📍 Interactive map</h2>
+        <div class="card">
+          <div id="map" style="height:460px" role="region" aria-label="Bus map for North Lincolnshire"></div>
+          <div class="p-3 border-t bg-emerald-50/40 flex items-center justify-between gap-3">
+            <div id="legend" class="flex items-center gap-2 flex-wrap" aria-label="Routes legend"></div>
+            <div class="text-sm opacity-70">Click a route line, stop marker, or a 🚌 bus.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lg:col-span-1">
+        <h2 class="flex items-center gap-2 text-xl font-semibold mb-2">🕑 Real-time arrivals</h2>
+        <div class="card">
+          <div class="card-body">
+            <label for="stop-select" class="block text-sm font-medium">Choose a stop</label>
+            <div class="flex items-center gap-2 mt-1">
+              <select id="stop-select" class="w-full border rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-400"></select>
+              <button id="btn-refresh" class="btn btn-ghost">Refresh</button>
+            </div>
+            <ul id="arrivals" class="mt-3 divide-y"></ul>
+            <p id="narration-hint" class="mt-2 text-sm opacity-80 hidden">Narration enabled: updates will be announced.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lg:col-span-3">
+        <h2 class="flex items-center gap-2 text-xl font-semibold mb-2">⚠️ Service & stop disruptions</h2>
+        <div class="card">
+          <div class="card-body">
+            <form id="form-disruption" class="grid md:grid-cols-4 gap-2 items-end hidden" aria-label="Add disruption">
+              <div class="md:col-span-1">
+                <label class="block text-sm font-medium">Title</label>
+                <input id="dis-title" required class="w-full border rounded-xl px-3 py-2" />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium">Details</label>
+                <input id="dis-body" required class="w-full border rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Severity</label>
+                <select id="dis-sev" class="w-full border rounded-xl px-3 py-2">
+                  <option value="minor">Minor</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="major">Major</option>
+                </select>
+              </div>
+              <button class="md:col-span-4 btn btn-primary">Publish disruption</button>
+            </form>
+            <ul id="disruptions" class="mt-4 divide-y"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lg:col-span-3">
+        <h2 class="flex items-center gap-2 text-xl font-semibold mb-2">🛑 Stop details</h2>
+        <div id="stop-cards" class="grid md:grid-cols-3 gap-2"></div>
+      </section>
+    </section>
+
+    <!-- ROUTES & TIMETABLES VIEW -->
+    <section id="view-routes" class="hidden space-y-6" role="tabpanel" aria-labelledby="tab-routes">
+      <section class="card">
+        <div class="card-body">
+          <form id="filter-form" class="grid md:grid-cols-4 gap-2 items-end">
+            <div class="md:col-span-3">
+              <label class="block text-sm font-medium" for="q">Search routes or stops</label>
+              <input id="q" class="w-full border rounded-xl px-3 py-2" placeholder="e.g. 100, Brigg, Scunthorpe" />
+            </div>
+            <button class="btn btn-ghost">Search</button>
+          </form>
+        </div>
+      </section>
+
+      <section aria-labelledby="routes-title">
+        <h2 id="routes-title" class="flex items-center gap-2 text-xl font-semibold mb-2">All Routes</h2>
+        <div id="route-cards" class="grid md:grid-cols-3 gap-3"></div>
+        <ul id="route-list" class="mt-2 divide-y"></ul>
+      </section>
+
+      <section aria-labelledby="tt-title">
+        <h2 id="tt-title" class="flex items-center gap-2 text-xl font-semibold mb-2">Timetables</h2>
+        <div class="card">
+          <div class="card-body">
+            <div id="upload-row" class="flex items-center gap-3 hidden">
+              <label class="inline-flex items-center gap-2 px-4 py-3 rounded-xl border bg-white hover:bg-gray-50 cursor-pointer">
+                <span aria-hidden="true">⬆️</span><span>Upload PDF/JPEG</span>
+                <input id="file-input" type="file" accept="application/pdf,image/*" class="sr-only" />
+              </label>
+              <p class="text-sm opacity-70">Files are stored locally in your browser for this demo.</p>
+            </div>
+            <ul id="tt-list" class="mt-4 grid md:grid-cols-3 gap-3"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="edit-title">
+        <h2 id="edit-title" class="flex items-center gap-2 text-xl font-semibold mb-2">Add or Edit Routes</h2>
+        <div class="card">
+          <div class="card-body">
+            <form id="form-route" class="grid md:grid-cols-3 gap-3 items-start hidden">
+              <div>
+                <label class="block text-sm font-medium">Name</label>
+                <input id="r-name" class="w-full border rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Colour</label>
+                <input id="r-colour" type="color" class="w-full border rounded-xl h-10" value="#059669" />
+              </div>
+              <div class="md:col-span-3">
+                <label class="block text-sm font-medium">Polyline points (lat,lon per line)</label>
+                <textarea id="r-points" class="w-full border rounded-xl px-3 py-2 h-28" placeholder="53.5862,-0.652&#10;53.5719,-0.6516"></textarea>
+              </div>
+              <div class="md:col-span-3 flex items-center gap-2">
+                <button class="btn btn-primary">Add route</button>
+                <button id="btn-show-map" class="btn btn-ghost" type="button">Show on map</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="border-t mt-8">
+    <div class="mx-auto max-w-[1200px] p-4 text-sm opacity-80">
+      Built to meet WCAG 2.2 AA: keyboard accessible, visible focus, high contrast & large-text modes, narration (aria-live + speech), and target sizes ≥44px.
+    </div>
+  </footer>
+
+  <div id="live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <script>
+  // -------- Real North Lincolnshire stops (ATCO/NaPTAN codes; coordinates approximate for demo) --------
+  const STOPS = [
+    { id:"SCN_BS_H", name:"Scunthorpe Bus Station (Stand H)", lat:53.5865, lon:-0.6515, atco:"227000010732", bearing:"SE" },
+    { id:"ASH_BROADWAY_OPP", name:"Ashby, Broadway (opp)", lat:53.5715, lon:-0.6547, atco:"227000010357", bearing:"W" },
+    { id:"BRG_CARY_LANE", name:"Brigg, Cary Lane (adj)", lat:53.5518, lon:-0.4873, atco:"227000010121", bearing:"W" },
+    { id:"WIN_POST_OFFICE_OPP", name:"Winterton, opposite Post Office", lat:53.6549, lon:-0.5985, atco:"227000010695", bearing:"W" },
+    { id:"CROWLE_MARKET_PLACE_ADJ", name:"Crowle, Market Place (adj)", lat:53.6120, lon:-0.8330, atco:"227000010171", bearing:"N" },
+    { id:"BAR_MARKET_PLACE_ADJ", name:"Barton-upon-Humber, Market Place (adj)", lat:53.6826, lon:-0.4380, atco:"227000010061", bearing:"E" },
+    { id:"GAI_BS_S4", name:"Gainsborough Bus Station (Stand 4)", lat:53.4020, lon:-0.7765, atco:"270002702215", bearing:"NE" },
+    { id:"GOO_BOOTHFERRY_RD", name:"Goole, Boothferry Road", lat:53.7035, lon:-0.8740, atco:"2200YEA00096", bearing:"W" },
+    { id:"KIR_SOUTHCLIFF_OPP", name:"Kirton in Lindsey, Southcliff Road (opp)", lat:53.4840, lon:-0.5920, atco:"227000010812", bearing:"N" }
+  ];
+
+  // -------- Demo route polylines (schematic) --------
+  const DEFAULT_ROUTES = [
+    { id:"R100", line:"100", name:"100: Scunthorpe → Gainsborough", colour:"#2563eb",
+      points:[[53.5865,-0.6515],[53.5715,-0.6547],[53.5283,-0.6539],[53.4975,-0.6661],[53.4020,-0.7765]],
+      stops:["SCN_BS_H","ASH_BROADWAY_OPP","GAI_BS_S4"] },
+    { id:"R350", line:"350", name:"350: Scunthorpe → Winterton → Barton", colour:"#059669",
+      points:[[53.5865,-0.6515],[53.6549,-0.5985],[53.6826,-0.4380]],
+      stops:["SCN_BS_H","WIN_POST_OFFICE_OPP","BAR_MARKET_PLACE_ADJ"] },
+    { id:"R361", line:"361", name:"361: Scunthorpe → Crowle → Goole", colour:"#e11d48",
+      points:[[53.5865,-0.6515],[53.5871,-0.7371],[53.6167,-0.7107],[53.6120,-0.8330],[53.7035,-0.8740]],
+      stops:["SCN_BS_H","CROWLE_MARKET_PLACE_ADJ","GOO_BOOTHFERRY_RD"] },
+    { id:"R103", line:"103", name:"103: Scunthorpe → Kirton in Lindsey", colour:"#f59e0b",
+      points:[[53.5865,-0.6515],[53.5715,-0.6547],[53.5283,-0.6539],[53.4840,-0.5920]],
+      stops:["SCN_BS_H","ASH_BROADWAY_OPP","KIR_SOUTHCLIFF_OPP"] },
+    { id:"R96", line:"96", name:"96: Barton → Brigg (via South Ferriby)", colour:"#9333ea",
+      points:[[53.6826,-0.4380],[53.6860,-0.5125],[53.5518,-0.4873]],
+      stops:["BAR_MARKET_PLACE_ADJ","BRG_CARY_LANE"] },
+    { id:"R4", line:"4", name:"4: Scunthorpe → Broughton → Brigg", colour:"#22c55e",
+      points:[[53.5865,-0.6515],[53.5775,-0.6090],[53.5670,-0.5950],[53.5518,-0.4873]],
+      stops:["SCN_BS_H","BRG_CARY_LANE"] },
+    { id:"R94", line:"94", name:"94: Brigg → Kirton in Lindsey", colour:"#ef4444",
+      points:[[53.5518,-0.4873],[53.5410,-0.5300],[53.5185,-0.5450],[53.5010,-0.5530],[53.4840,-0.5920]],
+      stops:["BRG_CARY_LANE","KIR_SOUTHCLIFF_OPP"] },
+  ];
+
+  // -------- State --------
+  const LS = { AUTH:"nlincs_auth_v1", SETTINGS:"nlincs_settings_v1", CONTENT:"nlincs_content_v1", VIEW:"nlincs_view_v1" };
+  const state = {
+    auth: loadLS(LS.AUTH,{loggedIn:false}),
+    settings: loadLS(LS.SETTINGS,{ highContrast:false, largeText:false, narration:false }),
+    content: loadLS(LS.CONTENT, {
+      disruptions:[{ id:"d1", title:"Roadworks on Ashby High St", body:"Minor delays expected 09:00–16:00 from 15–19 Sep.", severity:"moderate", routes:["R100"] }],
+      routes: DEFAULT_ROUTES,
+      timetables: []
+    }),
+    selectedStopId: "SCN_BS_H",
+    highlightedRouteId: null,
+    view: (loadLS(LS.VIEW, { current: "home" })||{}).current || "home"
+  };
+  function loadLS(k, fb){ try{ const r=localStorage.getItem(k); return r?JSON.parse(r):fb; }catch{ return fb; } }
+  function save(){ localStorage.setItem(LS.AUTH,JSON.stringify(state.auth)); localStorage.setItem(LS.SETTINGS,JSON.stringify(state.settings)); localStorage.setItem(LS.CONTENT,JSON.stringify(state.content)); localStorage.setItem(LS.VIEW,JSON.stringify({current:state.view})); }
+
+  // -------- Elements --------
+  const btnContrast = document.getElementById("btn-contrast");
+  const btnLarge    = document.getElementById("btn-large");
+  const btnNarr     = document.getElementById("btn-narration");
+  const btnAuth     = document.getElementById("btn-auth");
+  const tabHome     = document.getElementById("tab-home");
+  const tabRoutes   = document.getElementById("tab-routes");
+  const viewHome    = document.getElementById("view-home");
+  const viewRoutes  = document.getElementById("view-routes");
+  const live        = document.getElementById("live");
+  const narrationHint = document.getElementById("narration-hint");
+  const stopSelect  = document.getElementById("stop-select");
+  const arrivals    = document.getElementById("arrivals");
+  const btnRefresh  = document.getElementById("btn-refresh");
+  const disForm     = document.getElementById("form-disruption");
+  const disList     = document.getElementById("disruptions");
+  const stopCards   = document.getElementById("stop-cards");
+  const legend      = document.getElementById("legend");
+  const routeCards  = document.getElementById("route-cards");
+  const routeList   = document.getElementById("route-list");
+  const filterForm  = document.getElementById("filter-form");
+  const q           = document.getElementById("q");
+  const uploadRow   = document.getElementById("upload-row");
+  const fileInput   = document.getElementById("file-input");
+  const ttList      = document.getElementById("tt-list");
+  const formRoute   = document.getElementById("form-route");
+  const rName       = document.getElementById("r-name");
+  const rColour     = document.getElementById("r-colour");
+  const rPoints     = document.getElementById("r-points");
+  const btnShowMap  = document.getElementById("btn-show-map");
+
+  // -------- A11y & auth --------
+  function applyA11y(){
+    document.body.classList.toggle("bg-black", state.settings.highContrast);
+    document.body.classList.toggle("text-white", state.settings.highContrast);
+    document.body.classList.toggle("text-[18px]", state.settings.largeText);
+    btnContrast.setAttribute("aria-pressed", state.settings.highContrast);
+    btnLarge.setAttribute("aria-pressed", state.settings.largeText);
+    btnNarr.setAttribute("aria-pressed", state.settings.narration);
+    narrationHint.classList.toggle("hidden", !state.settings.narration);
+  }
+  function announce(msg){
+    live.textContent = msg;
+    if(state.settings.narration && "speechSynthesis" in window){
+      const u = new SpeechSynthesisUtterance(msg); u.rate=1; speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }
+  }
+  function applyAuth(){
+    const on = !!state.auth.loggedIn;
+    btnAuth.textContent = on ? "Log out" : "Log in";
+    btnAuth.setAttribute("aria-label", on ? "Log out" : "Log in as admin");
+    disForm.classList.toggle("hidden", !on);
+    uploadRow.classList.toggle("hidden", !on);
+    formRoute.classList.toggle("hidden", !on);
+  }
+  btnContrast.addEventListener("click",()=>{ state.settings.highContrast=!state.settings.highContrast; save(); applyA11y(); });
+  btnLarge.addEventListener("click",()=>{ state.settings.largeText=!state.settings.largeText; save(); applyA11y(); });
+  btnNarr.addEventListener("click",()=>{ state.settings.narration=!state.settings.narration; save(); applyA11y(); announce("Narration " + (state.settings.narration?"on":"off")); });
+  btnAuth.addEventListener("click",()=>{ state.auth.loggedIn=!state.auth.loggedIn; save(); applyAuth(); announce(state.auth.loggedIn?"Admin logged in":"Logged out"); });
+
+  // -------- View switching --------
+  function setView(v){
+    state.view = v; save();
+    const home = v==="home";
+    viewHome.classList.toggle("hidden", !home);
+    viewRoutes.classList.toggle("hidden", home);
+    tabHome.setAttribute("aria-selected", home?"true":"false");
+    tabRoutes.setAttribute("aria-selected", home?"false":"true");
+  }
+  tabHome.addEventListener("click",()=> setView("home"));
+  tabRoutes.addEventListener("click",()=> setView("routes"));
+  if(location.hash==="#routes"){ state.view="routes"; }
+  if(location.hash==="#home"){ state.view="home"; }
+
+  // -------- Map, routes, stops, buses --------
+  let map, markersLayer, routesLayer, busesLayer;
+  const routePolys = new Map();
+  const BUS_EMOJI_ICON = L.divIcon({ html:"<div style='font-size:20px'>🚌</div>", className:"", iconSize:[20,20], iconAnchor:[10,10] });
+  const vehicles = []; // {routeId, marker, t, speed, dir}
+
+  function initMap(){
+    map = L.map("map").setView([53.5865,-0.6515], 12);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{ attribution:"&copy; OpenStreetMap contributors"}).addTo(map);
+    routesLayer = L.layerGroup().addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
+    busesLayer = L.layerGroup().addTo(map);
+    drawRoutes(); drawStops(); spawnBuses(); drawLegend();
+    // URL param focus: ?route=R100 or ?stop=SCN_BS_H
+    const u = new URL(location.href);
+    const rid = u.searchParams.get("route"); const sid = u.searchParams.get("stop");
+    if(rid){ focusRoute(rid); }
+    if(sid){ selectStop(sid); }
+  }
+  function drawRoutes(){
+    routesLayer.clearLayers(); routePolys.clear();
+    (state.content.routes||[]).forEach(r=>{
+      const poly = L.polyline(r.points, { color:r.colour, weight:5, opacity:0.85 }).addTo(routesLayer);
+      poly.on("click", (e)=>{
+        focusRoute(r.id);
+        L.popup().setLatLng(e.latlng).setContent(`<strong>${r.name}</strong><br/>Stops: ${(r.stops||[]).map(stopName).join(", ")}`).openOn(map);
+      });
+      routePolys.set(r.id, poly);
+    });
+  }
+  function drawStops(){
+    markersLayer.clearLayers();
+    STOPS.forEach(s=>{
+      const m = L.marker([s.lat,s.lon]).addTo(markersLayer);
+      m.bindPopup(`<strong>${s.name}</strong><br/>ATCO: ${s.atco} • Bearing: ${s.bearing}<br/><button class="underline" data-stop="${s.id}">View arrivals</button>`);
+      m.on("click",()=> selectStop(s.id));
+    });
+    // cards
+    stopCards.innerHTML = "";
+    STOPS.forEach(s=>{
+      const b = document.createElement("button");
+      b.className="text-left border rounded-xl p-3 hover:bg-gray-50";
+      b.innerHTML = `<div class="font-semibold">${s.name}</div>
+        <div class="text-sm opacity-80">ATCO: ${s.atco} • Bearing: ${s.bearing}</div>
+        <div class="text-sm opacity-80">Lat/Lon: ${s.lat.toFixed(4)}, ${s.lon.toFixed(4)}</div>`;
+      b.addEventListener("click",()=> selectStop(s.id));
+      stopCards.appendChild(b);
+    });
+  }
+  function drawLegend(){
+    legend.innerHTML = "";
+    (state.content.routes||[]).forEach(r=>{
+      const a = document.createElement("button");
+      a.className = "chip hover:bg-emerald-50";
+      a.style.borderColor=r.colour; a.innerHTML = `<span class="inline-block w-3 h-3 rounded-full mr-1" style="background:${r.colour}"></span>${r.name}`;
+      a.addEventListener("click", ()=> focusRoute(r.id));
+      legend.appendChild(a);
+    });
+    renderLegendSelection();
+  }
+  function renderLegendSelection(){
+    const id = state.highlightedRouteId;
+    [...legend.children].forEach((ch, idx)=>{
+      const r = (state.content.routes||[])[idx];
+      ch.setAttribute("aria-pressed", r && r.id===id ? "true" : "false");
+      ch.style.outline = (r && r.id===id) ? "2px solid #10b981" : "none";
+    });
+  }
+  function focusRoute(id){
+    state.highlightedRouteId = id;
+    (state.content.routes||[]).forEach(r=>{
+      const poly = routePolys.get(r.id);
+      if(!poly) return;
+      if(r.id===id){ poly.setStyle({ weight:8, opacity:1.0 }); map.fitBounds(poly.getBounds(), { padding:[20,20] }); }
+      else { poly.setStyle({ weight:4, opacity:0.4 }); }
+    });
+    renderLegendSelection();
+  }
+  function spawnBuses(){
+    busesLayer.clearLayers(); vehicles.length = 0;
+    (state.content.routes||[]).forEach(r=>{
+      if(!r.points || r.points.length<2) return;
+      const count = 2 + Math.floor(Math.random()*2); // 2-3 buses per route
+      for(let i=0;i<count;i++){
+        const t = Math.random() * (r.points.length-1);
+        const speed = 0.005 + Math.random()*0.01;
+        const dir = Math.random()<0.5 ? 1 : -1;
+        const latlng = pointAt(r.points, t);
+        const marker = L.marker(latlng, { icon: BUS_EMOJI_ICON }).addTo(busesLayer);
+        marker.on("click", ()=>{
+          const nearest = nearestStopOnRoute(r, latlng);
+          const eta = 2 + Math.floor(Math.random()*12);
+          marker.bindPopup(`<strong>Bus on ${r.name}</strong><br/>Next: ${nearest ? stopName(nearest) : "—"}<br/>ETA: ${eta} min<br/><button class="underline" data-stop="${nearest||'SCN_BS_H'}">View arrivals</button>`).openPopup();
+        });
+        vehicles.push({ routeId:r.id, marker, t, speed, dir });
+      }
+    });
+    setInterval(tickBuses, 1500);
+  }
+  function tickBuses(){
+    vehicles.forEach(v=>{
+      const r = (state.content.routes||[]).find(x=>x.id===v.routeId); if(!r) return;
+      v.t += v.speed * v.dir;
+      const maxT = r.points.length-1;
+      if(v.t < 0){ v.t = maxT; } if(v.t > maxT){ v.t = 0; }
+      const latlng = pointAt(r.points, v.t);
+      v.marker.setLatLng(latlng);
+    });
+  }
+  function pointAt(points, t){
+    const i = Math.max(0, Math.min(points.length-2, Math.floor(t)));
+    const f = t - i;
+    const [lat1,lon1] = points[i]; const [lat2,lon2] = points[i+1];
+    return [lat1 + (lat2-lat1)*f, lon1 + (lon2-lon1)*f];
+  }
+  function nearestStopOnRoute(r, latlng){
+    let best=null, bestD=1e9;
+    (r.stops||[]).forEach(id=>{
+      const s = STOPS.find(x=>x.id===id); if(!s) return;
+      const d = Math.hypot((s.lat-latlng[0])*111, (s.lon-latlng[1])*71);
+      if(d<bestD){ bestD=d; best=id; }
+    });
+    return best;
+  }
+  function stopName(id){ const s = STOPS.find(x=>x.id===id); return s? s.name : id; }
+
+  // -------- Arrivals (mock) --------
+  btnRefresh.addEventListener("click", refreshDepartures);
+  function populateStops(){
+    stopSelect.innerHTML = "";
+    STOPS.forEach(s=>{
+      const opt = document.createElement("option");
+      opt.value = s.id; opt.textContent = `${s.name} (${s.atco})`;
+      stopSelect.appendChild(opt);
+    });
+    stopSelect.value = state.selectedStopId;
+    stopSelect.addEventListener("change", e=> selectStop(e.target.value));
+    // cards
+    stopCards.innerHTML = "";
+    STOPS.forEach(s=>{
+      const b = document.createElement("button");
+      b.className="text-left border rounded-xl p-3 hover:bg-gray-50";
+      b.innerHTML = `<div class="font-semibold">${s.name}</div>
+        <div class="text-sm opacity-80">ATCO: ${s.atco} • Bearing: ${s.bearing}</div>
+        <div class="text-sm opacity-80">Lat/Lon: ${s.lat.toFixed(4)}, ${s.lon.toFixed(4)}</div>`;
+      b.addEventListener("click",()=> selectStop(s.id));
+      stopCards.appendChild(b);
+    });
+  }
+  function selectStop(id){
+    state.selectedStopId = id; save();
+    const s = STOPS.find(x=>x.id===id);
+    if(s && map){ map.flyTo([s.lat,s.lon], Math.max(map.getZoom(), 13), { animate:true }); }
+    refreshDepartures();
+    announce(`Stop selected: ${s ? s.name : id}`);
+    const u = new URL(location.href); u.searchParams.set("stop", id); history.replaceState(null,"", u.toString());
+  }
+  async function fetchMockDepartures(stopId){
+    const routes = (state.content.routes||[]).filter(r=> (r.stops||[]).includes(stopId));
+    const sample = [
+      { line:"100", dest:"Gainsborough" },
+      { line:"350", dest:"Barton" },
+      { line:"361", dest:"Goole" },
+      { line:"103", dest:"Kirton in Lindsey" },
+      { line:"96",  dest:"Brigg" },
+      { line:"4",   dest:"Brigg" },
+      { line:"94",  dest:"Kirton in Lindsey" }
+    ];
+    const pool = routes.length ? routes.map(r=>({ line:r.line, dest:r.name.split(':')[1].trim() })) : sample;
+    const n = 4 + Math.floor(Math.random()*3);
+    const out = [];
+    for(let i=0;i<n;i++){
+      const pick = pool[i % pool.length];
+      out.push({ line: pick.line, destination: pick.dest, dueMins: 1 + Math.floor(Math.random()*25) });
+    }
+    return out.sort((a,b)=>a.dueMins-b.dueMins);
+  }
+  async function refreshDepartures(){
+    const s = STOPS.find(x=>x.id===state.selectedStopId); if(!s) return;
+    const data = await fetchMockDepartures(s.id);
+    arrivals.innerHTML = "";
+    if(!data.length){
+      const li = document.createElement("li"); li.className="py-3 text-sm opacity-70"; li.textContent="No upcoming departures."; arrivals.appendChild(li);
+    } else {
+      data.forEach(d=>{
+        const li = document.createElement("li"); li.className="py-3 flex items-center justify-between";
+        li.innerHTML = `<div>
+            <div class="font-semibold text-base">${d.line} → ${d.destination}</div>
+            <div class="text-sm opacity-70">Stop: ${s.name}</div>
+          </div>
+          <div class="text-right"><span class="text-2xl font-extrabold tabular-nums" aria-label="${d.dueMins} minutes">${d.dueMins}m</span></div>`;
+        arrivals.appendChild(li);
+      });
+    }
+  }
+  setInterval(refreshDepartures, 60000);
+
+  // -------- Disruptions --------
+  disForm.addEventListener("submit", e=>{
+    e.preventDefault();
+    const item = { id:crypto.randomUUID(), title:document.getElementById("dis-title").value.trim(),
+      body:document.getElementById("dis-body").value.trim(), severity:document.getElementById("dis-sev").value, routes:[] };
+    state.content.disruptions.unshift(item); save(); renderDisruptions(); e.target.reset();
+  });
+  function renderDisruptions(){
+    disList.innerHTML = "";
+    if(!state.content.disruptions.length){
+      const li=document.createElement("li"); li.className="py-3 text-sm opacity-70"; li.textContent="No current disruptions."; disList.appendChild(li); return;
+    }
+    state.content.disruptions.forEach(d=>{
+      const li=document.createElement("li"); li.className="py-3 flex items-start justify-between gap-3";
+      const badge = d.severity==="major" ? "bg-red-600 text-white" : (d.severity==="moderate" ? "bg-amber-500 text-black" : "bg-gray-200 text-gray-800");
+      li.innerHTML = `<div>
+        <div class="font-semibold flex items-center gap-2">⚠️ ${d.title} <span class="chip ${badge}">${d.severity}</span></div>
+        <p class="text-sm opacity-80 mt-1">${d.body}</p>
+      </div>`;
+      if(state.auth.loggedIn){
+        const del=document.createElement("button"); del.className="text-sm underline"; del.textContent="Delete";
+        del.addEventListener("click",()=>{ state.content.disruptions = state.content.disruptions.filter(x=>x.id!==d.id); save(); renderDisruptions(); });
+        li.appendChild(del);
+      }
+      disList.appendChild(li);
+    });
+  }
+
+  // -------- Routes & Timetables view --------
+  filterForm.addEventListener("submit", e=>{ e.preventDefault(); renderRoutesAndList(); });
+  formRoute.addEventListener("submit", e=>{
+    e.preventDefault();
+    const name = (rName.value||"New Route").trim();
+    const colour = rColour.value || "#059669";
+    const text = rPoints.value || "";
+    const pts = text.split(/\n|;|\|/).map(s=>s.trim()).filter(Boolean).map(l=>l.split(/,|\s+/).map(Number)).filter(p=>p.length>=2 && !p.some(Number.isNaN)).map(([lat,lon])=>[lat,lon]);
+    const r = { id: crypto.randomUUID(), line: name.split(':')[0].trim(), name, colour, points: pts, stops: [] };
+    state.content.routes.push(r); save(); rName.value=""; rPoints.value=""; renderRoutesAndList(); drawRoutes(); drawLegend(); spawnBuses();
+  });
+  btnShowMap.addEventListener("click", ()=>{ setView("home"); });
+
+  function renderRoutesAndList(){
+    const list = state.content.routes || [];
+    const term = (q.value||"").trim().toLowerCase();
+    const filtered = term ? list.filter(r => (r.name||"").toLowerCase().includes(term)) : list;
+    // Cards
+    routeCards.innerHTML = "";
+    if(!filtered.length){ routeCards.innerHTML = '<p class="text-sm opacity-70">No routes yet.</p>'; }
+    filtered.forEach(r => {
+      const div = document.createElement("div"); div.className = "card";
+      const body = document.createElement("div"); body.className = "card-body space-y-2";
+      body.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="font-semibold">${r.name}</div>
+          <span class="chip" style="border-color:${r.colour}"><span class="inline-block w-3 h-3 rounded-full mr-1" style="background:${r.colour}"></span>route</span>
+        </div>
+        <div class="text-sm opacity-80">Stops: ${(r.stops||[]).map(stopName).join(", ") || "(none)"}</div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-ghost" data-focus="${r.id}">Focus on map</button>
+          ${ state.auth.loggedIn ? `<button class="btn btn-ghost" data-del="${r.id}">Delete</button>` : ""}
+        </div>`;
+      div.appendChild(body); routeCards.appendChild(div);
+    });
+    // List
+    routeList.innerHTML = "";
+    filtered.forEach(r=>{
+      const li = document.createElement("li"); li.className="py-3 flex items-center justify-between";
+      li.innerHTML = '<div class="font-semibold">'+r.name+'</div><div class="text-sm opacity-80">'+r.points.length+' points</div>';
+      routeList.appendChild(li);
+    });
+    // Bind actions
+    routeCards.querySelectorAll("button[data-focus]").forEach(b=> b.addEventListener("click", ()=>{ setView("home"); focusRoute(b.getAttribute("data-focus")); }));
+    routeCards.querySelectorAll("button[data-del]").forEach(b=> b.addEventListener("click", ()=>{ state.content.routes = state.content.routes.filter(x=>x.id!==b.getAttribute("data-del")); save(); renderRoutesAndList(); drawRoutes(); drawLegend(); spawnBuses(); }));
+  }
+
+  // Timetables
+  fileInput.addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const url = URL.createObjectURL(f);
+    state.content.timetables.unshift({ id: crypto.randomUUID(), fileName: f.name, url, type: f.type, routeId: null });
+    save(); renderTimetables(); e.target.value = ""; announce("Timetable uploaded");
+  });
+  function renderTimetables(){
+    ttList.innerHTML = "";
+    const list = state.content.timetables || [];
+    if(!list.length){ ttList.innerHTML = '<li class="text-sm opacity-70">No timetables uploaded yet.</li>'; return; }
+    list.forEach(t => {
+      const li = document.createElement("li"); li.className="card";
+      const body = document.createElement("div"); body.className="card-body";
+      const select = (state.content.routes||[]).map(r=>`<option value="${r.id}" ${t.routeId===r.id?'selected':''}>${r.name}</option>`).join("");
+      body.innerHTML = `
+        <div class="font-semibold text-sm break-all">${t.fileName}</div>
+        <div class="mt-2">
+          ${ (t.type||'').includes('pdf') ? `<object data="${t.url}" type="application/pdf" class="w-full h-48 rounded border" aria-label="Timetable ${t.fileName}"></object>` : `<img src="${t.url}" alt="${t.fileName}" class="w-full h-48 object-contain rounded border" />` }
+        </div>
+        ${ state.auth.loggedIn ? `
+          <div class="mt-2 grid md:grid-cols-2 gap-2 items-center">
+            <label class="text-sm">Assign to route
+              <select data-assign="${t.id}" class="w-full border rounded-xl px-3 py-2 mt-1">
+                <option value="">(none)</option>
+                ${select}
+              </select>
+            </label>
+            <div class="flex items-center justify-end gap-2">
+              <a href="${t.url}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Open</a>
+              <button data-del="${t.id}" class="btn btn-ghost">Remove</button>
+            </div>
+          </div>` : `<div class="mt-2 flex items-center justify-between"><a href="${t.url}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Open</a></div>` }
+      `;
+      li.appendChild(body); ttList.appendChild(li);
+    });
+    // handlers
+    ttList.querySelectorAll("button[data-del]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        state.content.timetables = state.content.timetables.filter(x=>x.id!==b.getAttribute("data-del")); save(); renderTimetables();
+      });
+    });
+    ttList.querySelectorAll("select[data-assign]").forEach(sel=>{
+      sel.addEventListener("change", ()=>{
+        const id = sel.getAttribute("data-assign");
+        const item = state.content.timetables.find(x=>x.id===id);
+        item.routeId = sel.value || null; save();
+      });
+    });
+  }
+
+  // -------- Init --------
+  function init(){
+    applyA11y(); applyAuth();
+    setView(state.view);
+    populateStops(); renderDisruptions(); renderRoutesAndList(); renderTimetables();
+    initMap(); selectStop(state.selectedStopId);
+    // delegate popup button clicks
+    document.addEventListener("click",(e)=>{
+      const btn = e.target.closest("button[data-stop]");
+      if(btn){ selectStop(btn.getAttribute("data-stop")); }
+    });
+  }
+  init();
+  </script>
+</body>
+</html>
