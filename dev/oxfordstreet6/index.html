@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OSDC — Heritage Luxe Preview</title>
+  <meta name="description" content="Oxford Street Development Corporation — Heritage Luxe demo preview (single-file HTML).">
+  <meta name="theme-color" content="#0A3D2E">
+  <style>
+    /* Optional self-host fonts (place files in ./fonts) */
+    @font-face { font-family:"InterVar"; src: url("./fonts/Inter-Variable.woff2") format("woff2"); font-weight:100 900; font-style:normal; font-display:swap; }
+    @font-face { font-family:"LibreCaslonDisplayVar"; src: url("./fonts/LibreCaslonDisplay-Variable.woff2") format("woff2"); font-weight:400 900; font-style:normal; font-display:swap; }
+
+    :root {
+      --heritage-green:#0A3D2E;
+      --heritage-green-900:#06261C;
+      --gold:#C1A24A;
+      --ivory:#FAF7EF;
+      --ink:#111316;
+      --stone:#EDE7DA;
+      --hairline-ivory: color-mix(in srgb, var(--ink) 14%, var(--ivory));
+      --border-ivory: color-mix(in srgb, var(--ink) 10%, var(--ivory));
+      --radius-xl:16px;
+      --radius-2xl:24px;
+      --shadow-ambient:0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);background:var(--ivory);font-family:var(--font-inter,InterVar),system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";line-height:1.6}
+    img{display:block;max-width:100%;height:auto}
+    a{text-decoration:none;color:inherit}
+    .container{max-width:1200px;margin:0 auto;padding:0 16px}
+    .section{padding:48px 0}
+    .kicker{font-variant-caps:small-caps;letter-spacing:.08em;color:var(--heritage-green);font-weight:600}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .card{background:#fff;border:1px solid var(--border-ivory);border-radius:var(--radius-xl);box-shadow:var(--shadow-ambient)}
+    .hairline{border-top:1px solid var(--hairline-ivory)}
+    h1,h2,h3,h4{font-family:var(--font-serif,LibreCaslonDisplayVar),Georgia,'Times New Roman',serif;line-height:1.2;scroll-margin-top:80px}
+    h1{font-size:clamp(2rem,3vw,3rem);font-weight:600;letter-spacing:-.015em}
+    h2{font-size:clamp(1.5rem,2.25vw,2.25rem);font-weight:600;letter-spacing:-.01em}
+    h3{font-size:clamp(1.25rem,1.75vw,1.5rem);font-weight:600}
+    .btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 16px;border-radius:999px;border:1px solid var(--heritage-green);transition:transform .2s ease,box-shadow .2s ease;cursor:pointer;will-change:transform}
+    .btn-solid{background:var(--heritage-green);color:#fff}
+    .btn-ghost{background:transparent;color:var(--heritage-green)}
+    .btn:hover,.btn:focus-visible{box-shadow:0 8px 18px rgba(10,61,46,.15);transform:translateY(-2px)}
+    .site-header{background:var(--ivory);border-bottom:1px solid var(--hairline-ivory);position:sticky;top:0;z-index:20}
+    .site-footer{background:var(--heritage-green-900);color:#F2EFE6;padding:48px 0}
+    .site-footer a{text-decoration:underline}
+    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{position:fixed;left:16px;top:16px;padding:8px 12px;background:var(--gold);color:#111;border-radius:8px;z-index:1000}
+    :focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+    .reveal{opacity:0;transform:translateY(10px)}
+    .reveal.in{opacity:1;transform:none;transition:opacity .42s ease,transform .42s ease}
+    @media (prefers-reduced-motion:reduce){.reveal,.reveal.in{opacity:1;transform:none;transition:none}.btn{transition:none}}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+    .modal{background:#fff;border-radius:var(--radius-2xl);max-width:720px;width:96vw;overflow:hidden;box-shadow:var(--shadow-ambient);border:1px solid var(--border-ivory)}
+    .modal-open .modal-overlay{display:flex}
+    .footer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+    @media (max-width:900px){.footer-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:600px){.footer-grid{grid-template-columns:1fr}}
+    .to-top{position:fixed;right:16px;bottom:84px;opacity:0;pointer-events:none;transition:opacity .2s ease}
+    .to-top.show{opacity:1;pointer-events:auto}
+    .dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+    @media (max-width:900px){.dir-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:600px){.dir-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body id="top">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+      <nav aria-label="Top bar" class="kicker" style="display:flex;gap:16px;flex-wrap:wrap">
+        <!-- New Home item + corrected Departments anchor -->
+        <button class="btn btn-ghost" data-nav="home" data-page="home" data-anchor="#top">Home</button>
+        <button class="btn btn-ghost" data-nav="home" data-anchor="#departments">Departments</button>
+        <button class="btn btn-ghost" data-nav="directory" data-page="directory">Shops</button>
+        <button class="btn btn-ghost" data-nav="home" data-anchor="#latest-news">News</button>
+        <button class="btn btn-ghost" data-nav="home" data-anchor="#directions">Visiting</button>
+      </nav>
+      <div style="text-align:center">
+        <button class="kicker btn btn-ghost" aria-label="OSDC home" data-nav="home" data-page="home" data-anchor="#top" style="font-size:18px;letter-spacing:.08em">OSDC</button>
+      </div>
+      <button class="btn btn-ghost" id="menuToggle" aria-expanded="false" aria-controls="mega">Menu</button>
+    </div>
+    <div id="mega" class="hairline" role="navigation" aria-label="Primary navigation" hidden>
+      <div class="container" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:16px 0">
+        <div>
+          <h4>Visit</h4>
+          <ul>
+            <li><a href="#" data-nav="home" data-anchor="#latest-news">What’s on</a></li>
+            <li><a href="#" data-nav="directory" data-page="directory">Shops directory</a></li>
+            <li><a href="#directions" data-nav="home" data-anchor="#directions">Directions & Maps</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>About & Governance</h4>
+          <ul>
+            <li><a href="#" onclick="event.preventDefault()">About OSDC</a></li>
+            <li><a href="#" onclick="event.preventDefault()">Governance</a></li>
+            <li><a href="#" onclick="event.preventDefault()">Planning</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Policies</h4>
+          <ul>
+            <li><a href="#" onclick="event.preventDefault()">Accessibility & Privacy</a></li>
+            <li><a href="#" onclick="event.preventDefault()">Contact & Newsletter</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HOME VIEW -->
+    <section id="view-home" aria-label="Home">
+      <section aria-label="Hero" style="background:var(--ivory);border-top:1px solid var(--hairline-ivory);border-bottom:1px solid var(--hairline-ivory)">
+        <div class="container section" style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px">
+          <figure class="card reveal" style="overflow:hidden;position:relative;min-height:280px;margin:0">
+            <img src="https://source.unsplash.com/1200x800/?oxford-street,london,evening" alt="Oxford Street at dusk with light trails" width="1200" height="800">
+            <figcaption class="sr-only">Hero image: Oxford Street at dusk</figcaption>
+            <div style="position:absolute;bottom:16px;left:16px;color:var(--gold);font-size:24px">Oxford Street</div>
+          </figure>
+          <div class="reveal" style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+            <div class="kicker">Seasonal highlights</div>
+            <h1>Heritage Luxe on Oxford Street</h1>
+            <p>Welcome to OSDC — your guide to visiting, news and planning across the district.</p>
+            <button class="btn btn-solid" id="browseDirectory">Browse shops</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="departments">
+        <div class="container">
+          <h2 id="departments">Departments</h2>
+          <div class="reveal" style="display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:16px;margin-top:16px">
+            <div class="card" style="padding:16px">
+              <div class="kicker">Explore</div><h3 style="margin-top:8px">Fashion</h3>
+              <button class="btn btn-ghost">Browse</button>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="kicker">Explore</div><h3 style="margin-top:8px">Beauty</h3>
+              <button class="btn btn-ghost">Browse</button>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="kicker">Explore</div><h3 style="margin-top:8px">Home</h3>
+              <button class="btn btn-ghost">Browse</button>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="kicker">Explore</div><h3 style="margin-top:8px">Food Hall</h3>
+              <button class="btn btn-ghost">Browse</button>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="kicker">Explore</div><h3 style="margin-top:8px">Gifts</h3>
+              <button class="btn btn-ghost">Browse</button>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="kicker">Explore</div><h3 style="margin-top:8px">Kids</h3>
+              <button class="btn btn-ghost">Browse</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-label="Highlights">
+        <div class="container" style="display:grid;gap:24px">
+          <div class="card reveal" style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px;overflow:hidden">
+            <figure style="margin:0">
+              <img loading="lazy" src="https://source.unsplash.com/1200x800/?london,shopping,evening" alt="Evening shoppers in central London" width="1200" height="800">
+            </figure>
+            <div style="display:flex;flex-direction:column;justify-content:center;padding:24px">
+              <h3>Winter windows</h3><p>Heritage craft meets modern retail staging across the district.</p>
+            </div>
+          </div>
+          <div class="card reveal" style="display:grid;grid-template-columns:1fr 1.2fr;gap:16px;overflow:hidden">
+            <figure style="margin:0">
+              <img loading="lazy" src="https://source.unsplash.com/1200x800/?london,sunset,street" alt="Sunset along a London street" width="1200" height="800">
+            </figure>
+            <div style="display:flex;flex-direction:column;justify-content:center;padding:24px">
+              <h3>Dining & delights</h3><p>From patisserie to plant-forward plates in our Food Hall.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section hairline" aria-labelledby="services">
+        <div class="container">
+          <h2 id="services">Services</h2>
+          <div class="reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+            <div class="card" style="padding:16px"><div class="kicker">Service</div><h3 style="margin-top:8px">Concierge</h3><p>Wayfinding, reservations and accessibility support.</p></div>
+            <div class="card" style="padding:16px"><div class="kicker">Service</div><h3 style="margin-top:8px">Personal Shopping</h3><p>Appointments with stylists across flagship stores.</p></div>
+            <div class="card" style="padding:16px"><div class="kicker">Service</div><h3 style="margin-top:8px">Gifting</h3><p>Wrapped by hand with recycled materials.</p></div>
+            <div class="card" style="padding:16px"><div class="kicker">Service</div><h3 style="margin-top:8px">Events</h3><p>Talks, tastings and late openings.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="latest-news">
+        <div class="container">
+          <div style="display:flex;align-items:baseline;justify-content:space-between">
+            <h2 id="latest-news">News & Updates</h2>
+            <div id="newsCounter" class="kicker" aria-live="polite">Item 1 of 3</div>
+          </div>
+          <div class="card reveal" style="padding:16px">
+            <div id="newsList" role="listbox" aria-label="Latest news" style="display:grid;gap:12px"></div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button class="btn btn-ghost" id="newsPrev" aria-label="Previous news">‹</button>
+              <button class="btn btn-solid" id="newsNext" aria-label="Next news">›</button>
+              <button class="btn btn-ghost" aria-label="View all news" onclick="alert('This is a demo. In production this links to /news');">View all</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="directions" class="section">
+        <div class="container">
+          <h2>Directions</h2>
+          <div class="card reveal" style="overflow:hidden">
+            <figure style="margin:0">
+              <img loading="lazy" src="https://source.unsplash.com/1200x800/?oxford-street,london,night" alt="Oxford Street lights at night" width="1200" height="800">
+            </figure>
+          </div>
+
+          <!-- Directions image gallery -->
+          <div class="dir-grid">
+            <figure class="card reveal" style="margin:0;overflow:hidden">
+              <img loading="lazy" src="https://source.unsplash.com/1200x800/?oxford-circus,underground,station" alt="Oxford Circus Underground Station entrance" width="1200" height="800">
+              <figcaption class="sr-only">Underground access</figcaption>
+            </figure>
+            <figure class="card reveal" style="margin:0;overflow:hidden">
+              <img loading="lazy" src="https://source.unsplash.com/1200x800/?london,red,bus,oxford-street" alt="London red bus on Oxford Street" width="1200" height="800">
+              <figcaption class="sr-only">Buses on Oxford Street</figcaption>
+            </figure>
+            <figure class="card reveal" style="margin:0;overflow:hidden">
+              <img loading="lazy" src="https://source.unsplash.com/1200x800/?london,cycle,lane" alt="Cycle lane and bikes in central London" width="1200" height="800">
+              <figcaption class="sr-only">Cycling routes</figcaption>
+            </figure>
+          </div>
+
+          <div class="reveal" style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+            <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=Oxford%20Street%20London" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+            <a class="btn btn-ghost" href="https://maps.apple.com/?q=Oxford%20Street%2C%20London%20W1" target="_blank" rel="noopener noreferrer">Open in Apple Maps</a>
+            <a class="btn btn-ghost" href="https://tfl.gov.uk/plan-a-journey/" target="_blank" rel="noopener noreferrer">Plan with TfL</a>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- DIRECTORY VIEW -->
+    <section id="view-directory" aria-label="Directory" hidden>
+      <section class="section">
+        <div class="container">
+          <h1>Shops Directory</h1>
+          <div class="card reveal" style="padding:16px">
+            <form role="search" aria-label="Search shops" class="hairline" style="display:grid;grid-template-columns:1fr auto;gap:12px;padding-top:12px" onsubmit="event.preventDefault()">
+              <input aria-label="Search by name" id="q" placeholder="Search by name…" style="padding:12px;border-radius:12px;border:1px solid var(--border-ivory)" />
+              <select aria-label="Filter by category" id="cat" style="padding:12px;border-radius:12px;border:1px solid var(--border-ivory)">
+                <option value="">All categories</option>
+              </select>
+            </form>
+            <ul id="shopList" aria-live="polite" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px;padding:0;list-style:none"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Modal -->
+      <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mName" aria-describedby="mDesc" aria-hidden="true">
+        <div class="modal card" role="document">
+          <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:0">
+            <figure style="margin:0">
+              <img loading="lazy" src="https://source.unsplash.com/1200x800/?oxford-street,lights" alt="Festive lights in central London" width="1200" height="800">
+            </figure>
+            <div style="padding:16px">
+              <div class="kicker">Shop</div>
+              <h3 id="mName" tabindex="-1" style="margin-top:8px">Shop Name</h3>
+              <p id="mDesc"></p>
+              <p><strong>Category:</strong> <span id="mCat"></span></p>
+              <p><strong>Address:</strong> <span id="mAddress"></span></p>
+              <p><strong>Hours:</strong> <span id="mHours"></span></p>
+              <p><strong>Phone:</strong> <a id="mPhone" href="#"></a></p>
+              <p><a id="mWebsite" class="btn btn-ghost" href="#" target="_blank" rel="noopener noreferrer">Website</a></p>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <a id="mGMap" class="btn btn-solid" href="#" target="_blank" rel="noopener noreferrer">Google Maps</a>
+                <a id="mAMap" class="btn btn-ghost" href="#" target="_blank" rel="noopener noreferrer">Apple Maps</a>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-solid" id="mClose">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <a href="#top" class="btn btn-solid to-top" id="toTop" aria-label="Back to top">Top</a>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4 style="margin-top:0">About OSDC</h4>
+          <p>Oxford Street Development Corporation — stewarding the district’s heritage and future.</p>
+        </div>
+        <div>
+          <h4>Visit</h4>
+          <ul>
+            <li><a href="#" data-nav="home" data-anchor="#latest-news">What’s on</a></li>
+            <li><a href="#" data-nav="directory" data-page="directory">Shops directory</a></li>
+            <li><a href="#directions" data-nav="home" data-anchor="#directions">Directions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Governance</h4>
+          <ul>
+            <li><a href="#" onclick="event.preventDefault()">Modern.Gov</a></li>
+            <li><a href="#" onclick="event.preventDefault()">Planning (Arcus)</a></li>
+            <li><a href="#" onclick="event.preventDefault()">Accessibility & Privacy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="#" onclick="event.preventDefault()">General enquiries</a></li>
+            <li><a href="mailto:info@example-osdc.gov.uk">info@example-osdc.gov.uk</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;border-top:1px solid rgba(255,255,255,.15);padding-top:12px">
+        <small>© <span id="year"></span> Oxford Street Development Corporation</small>
+        <small><a href="#" onclick="event.preventDefault()">Accessibility & Privacy</a></small>
+      </div>
+    </div>
+  </footer>
+
+  <div id="cookieBanner" class="card" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position:fixed;bottom:16px;right:16px;max-width:360px;padding:16px;background:#fff;z-index:100;display:none">
+    <p>We use only essential cookies to operate this site. No analytics without your consent.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" id="cookieDecline">Decline</button>
+      <button class="btn btn-solid" id="cookieAccept">Accept</button>
+    </div>
+  </div>
+
+<script>
+  const qs = (s, r=document) => r.querySelector(s);
+  const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  // Reveal animation
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); observer.unobserve(e.target); } });
+  }, { rootMargin: "0px 0px -10% 0px", threshold: 0.15 });
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    qsa('.reveal').forEach(el => observer.observe(el));
+  } else { qsa('.reveal').forEach(el => el.classList.add('in')); }
+
+  // Nav switching with anchors
+  function setView(view) {
+    const home = qs('#view-home'), dir = qs('#view-directory');
+    home.hidden = view !== 'home';
+    dir.hidden = view !== 'directory';
+    document.title = 'OSDC — ' + (view === 'home' ? 'Home' : 'Shops Directory');
+    // Mark only Home (page) and Shops (directory) as aria-current=page
+    qsa('[data-page]').forEach(b => b.setAttribute('aria-current', b.dataset.page === view ? 'page' : 'false'));
+  }
+  function handleNavClick(el) {
+    const v = el.getAttribute('data-nav');
+    const anchor = el.getAttribute('data-anchor');
+    if (v) setView(v);
+    if (anchor) {
+      requestAnimationFrame(() => {
+        const target = qs(anchor);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+    history.replaceState(null, '', anchor || (v === 'directory' ? '#directory' : '#'));
+  }
+  qsa('[data-nav]').forEach(el => el.addEventListener('click', (e) => {
+    if (el.tagName !== 'A') e.preventDefault();
+    handleNavClick(el);
+  }));
+  qs('#browseDirectory').addEventListener('click', () => setView('directory'));
+
+  // Mega menu
+  const menuToggle = qs('#menuToggle');
+  const mega = qs('#mega');
+  menuToggle.addEventListener('click', () => {
+    const open = !mega.hasAttribute('hidden');
+    if (open) { mega.setAttribute('hidden',''); menuToggle.setAttribute('aria-expanded','false'); }
+    else { mega.removeAttribute('hidden'); menuToggle.setAttribute('aria-expanded','true'); }
+  });
+
+  // News carousel
+  const newsItems = [
+    { slug:'winter-windows-2025', title:'Winter Windows 2025 unveiled on Oxford Street', date:'2025-11-15', excerpt:'A luminous trail of heritage-inspired displays celebrates artisans and makers across the district.', category:"What’s On" },
+    { slug:'pilot-pedestrian-priority', title:'Pilot pedestrian-priority weekend continues', date:'2025-10-03', excerpt:'Safer, cleaner and more enjoyable — pilot expands eastward following strong public feedback.', category:'Transport' },
+    { slug:'heritage-grants-q4', title:'Q4 applications open for Heritage Shopfront Grants', date:'2025-09-01', excerpt:'Independent retailers can apply for matched funding to restore historic façades and signage.', category:'Business' }
+  ];
+  let newsIndex = 0;
+  const newsList = qs('#newsList'), newsCounter = qs('#newsCounter');
+  function renderNews() {
+    newsList.innerHTML = '';
+    newsItems.forEach((n, i) => {
+      const a = document.createElement('a');
+      a.href = '#'; a.className = 'card';
+      a.setAttribute('role','option');
+      a.setAttribute('data-idx', i);
+      a.setAttribute('aria-selected', i === newsIndex ? 'true' : 'false');
+      a.tabIndex = i === newsIndex ? 0 : -1;
+      a.style.padding = '16px';
+      a.style.borderWidth = i === newsIndex ? '2px' : '1px';
+      a.style.borderStyle = 'solid';
+      a.style.borderColor = i === newsIndex ? 'var(--gold)' : 'var(--border-ivory)';
+      a.innerHTML = `
+        <div class="kicker">${n.category}</div>
+        <h3 style="margin:8px 0">${n.title}</h3>
+        <p>${n.excerpt}</p>
+        <time dateTime="${n.date}" class="kicker">${new Date(n.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</time>
+      `;
+      a.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') { newsIndex = (newsIndex + 1) % newsItems.length; updateNews(); }
+        if (e.key === 'ArrowLeft') { newsIndex = (newsIndex - 1 + newsItems.length) % newsItems.length; updateNews(); }
+      });
+      newsList.appendChild(a);
+    });
+    updateNewsCounter();
+  }
+  function updateNewsCounter() {
+    newsCounter.textContent = `Item ${newsIndex+1} of ${newsItems.length}`;
+    const selected = qs('[data-idx="'+newsIndex+'"]', newsList);
+    if (selected) selected.focus();
+  }
+  function updateNews(){ renderNews(); }
+  qs('#newsPrev').addEventListener('click', () => { newsIndex = (newsIndex - 1 + newsItems.length) % newsItems.length; updateNews(); });
+  qs('#newsNext').addEventListener('click', () => { newsIndex = (newsIndex + 1) % newsItems.length; updateNews(); });
+
+  // Directory — real Oxford Street stores (addresses & websites; hours -> 'See website')
+  const shops = [
+    {id:1,name:'Selfridges London',category:'Department Store',address:'400 Oxford Street, London W1A 1AB',hours:'See website',phone:'',website:'https://www.selfridges.com/GB/en/stores/london/',description:'Iconic department store with fashion, beauty, home and an acclaimed Foodhall.'},
+    {id:2,name:'John Lewis & Partners',category:'Department Store',address:'300 Oxford Street, London W1C 1DX',hours:'See website',phone:'',website:'https://www.johnlewis.com/our-shops/oxford-street',description:'Flagship department store for home, fashion, tech and services.'},
+    {id:3,name:'UNIQLO ONE Oxford Street',category:'Fashion',address:'1 Soho Place, Oxford Street, London W1D 2DA',hours:'See website',phone:'',website:'https://map.uniqlo.com/uk/en/detail/10700052',description:'UNIQLO’s flagship offering LifeWear across 8 floors.'},
+    {id:4,name:'ZARA (Oxford Street)',category:'Fashion',address:'333 Oxford Street, London W1C 2HY',hours:'See website',phone:'',website:'https://www.zara.com/uk/en/stores-locator/zara-london-oxford-s1377',description:'High-street fashion for women, men and kids.'},
+    {id:5,name:'adidas Flagship London',category:'Fashion',address:'425 Oxford Street, London W1C',hours:'See website',phone:'',website:'https://www.adidas.co.uk/stores/london-oxford-street-425/9990043889',description:'Brand flagship with trainers, performance and Originals.'},
+    {id:6,name:'H&M Oxford Street East',category:'Fashion',address:'174–176 Oxford Street, London W1D 1NX',hours:'See website',phone:'',website:'https://www2.hm.com/en_gb/customer-service/shopping-at-hm/store-locator/uk/london/hm-oxford-street-east/gb0351.html',description:'Wardrobe essentials plus H&M Home and Beauty.'},
+    {id:7,name:'Primark Tottenham Court Road',category:'Fashion',address:'14–28 Oxford Street, London W1D 1AU',hours:'See website',phone:'',website:'https://www.primark.com/en-gb/stores/london/14-28-oxford-street',description:'Affordable fashion and home across multiple floors.'},
+    {id:8,name:'JD Sports (West One)',category:'Fashion',address:'375–381 Oxford Street, London W1C 2JS',hours:'See website',phone:'',website:'https://www.jdsports.co.uk/store-locator/oxford-street/118/',description:'Trainers, athleisure and sportswear from leading brands.'},
+    {id:9,name:'Foot Locker Oxford Street',category:'Fashion',address:'283 Oxford Street, London',hours:'See website',phone:'',website:'https://stores.footlocker.co.uk/gb-lnd/london/283-oxford-street-185_31_04198.html',description:'Sneakers and streetwear.'},
+    {id:10,name:'Lush Spa Oxford Street',category:'Beauty',address:'175–179 Oxford Street, London W1D 2JS',hours:'See website',phone:'',website:'https://www.lush.com/uk/en/shops/lush-spa-oxford-street?id=UK130',description:'Three floors of fresh handmade cosmetics and spa treatments.'},
+    {id:11,name:'Boots (Sedley Place)',category:'Beauty',address:'355–361 Oxford Street, London W1C 2JL',hours:'See website',phone:'',website:'https://www.boots.com/',description:'Pharmacy, beauty and health.'},
+    {id:12,name:'HMV Oxford Street',category:'Gifts',address:'363 Oxford Street, London W1C 2LA',hours:'See website',phone:'',website:'https://www.hmv.com/',description:'Flagship for music, film, and pop culture merchandise.'},
+    {id:13,name:'Vans — West End',category:'Fashion',address:'214 Oxford Street, London W1D 1LA',hours:'See website',phone:'',website:'https://www.vans.com/en-gb/westend',description:'Footwear and apparel with Customs Lab.'},
+    {id:14,name:'Reserved',category:'Fashion',address:'252–258 Oxford Street, London W1C 1DL',hours:'See website',phone:'',website:'https://www.reserved.com/gb/en',description:'Contemporary fashion for women, men and kids.'},
+    {id:15,name:'Samsung Experience Store',category:'Technology',address:'125 Oxford Street, London W1D 2HS',hours:'See website',phone:'',website:'https://www.samsung.com/uk/samsung-experience-store/locations/',description:'Immersive brand experience with latest devices.'}
+  ];
+  const shopList = qs('#shopList'), q = qs('#q'), cat = qs('#cat');
+  Array.from(new Set(shops.map(s=>s.category))).forEach(c=>{
+    const o = document.createElement('option'); o.value=c; o.textContent=c; cat.appendChild(o);
+  });
+  function renderShops() {
+    const query = q.value.trim().toLowerCase();
+    const category = cat.value;
+    const filtered = shops.filter(s => (!category || s.category===category) && (query==='' || s.name.toLowerCase().includes(query)));
+    shopList.innerHTML = '';
+    filtered.forEach(s => {
+      const li = document.createElement('li'); li.className='card reveal'; li.style.overflow='hidden';
+      li.innerHTML = `
+        <button class="btn btn-ghost" style="width:100%;border:none;border-radius:0;padding:0" aria-label="Open details for ${s.name}">
+          <img loading="lazy" src="https://source.unsplash.com/1200x800/?storefront,shop,london" alt="" width="1200" height="800">
+        </button>
+        <div style="padding:16px">
+          <div class="kicker">${s.category}</div>
+          <h3 style="margin-top:8px">${s.name}</h3>
+          <p>${s.address}</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-solid" data-action="details">Details</button>
+            <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address)}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
+          </div>
+        </div>`;
+      const imgBtn = li.querySelector('button.btn-ghost');
+      const detailsBtn = li.querySelector('[data-action="details"]');
+      [imgBtn, detailsBtn].forEach(btn => btn.addEventListener('click', () => openModal(s)));
+      shopList.appendChild(li);
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) observer.observe(li); else li.classList.add('in');
+    });
+  }
+  q.addEventListener('input', renderShops);
+  cat.addEventListener('change', renderShops);
+
+  // Modal
+  const modalOverlay = qs('#modalOverlay');
+  const mClose = qs('#mClose');
+  let lastFocus = null;
+  function focusableWithin(root){ return qsa('a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])', root).filter(el=>el.offsetParent!==null); }
+  function trapTab(e, root){
+    if (e.key!=='Tab') return;
+    const nodes = focusableWithin(root);
+    if (!nodes.length) return;
+    const first = nodes[0], last = nodes[nodes.length-1];
+    if (e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
+    else if (!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
+  }
+  function openModal(s){
+    lastFocus = document.activeElement;
+    qs('#mName').textContent = s.name;
+    qs('#mDesc').textContent = s.description;
+    qs('#mCat').textContent = s.category;
+    qs('#mAddress').textContent = s.address;
+    qs('#mHours').textContent = s.hours || 'See website';
+    const phoneLink = qs('#mPhone'); phoneLink.textContent = s.phone || '—'; phoneLink.href = s.phone ? 'tel:'+s.phone : '#';
+    qs('#mWebsite').href = s.website;
+    qs('#mGMap').href = 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(s.address);
+    qs('#mAMap').href = 'https://maps.apple.com/?q='+encodeURIComponent(s.address);
+    document.body.classList.add('modal-open');
+    modalOverlay.removeAttribute('aria-hidden');
+    const doc = qs('.modal');
+    const trap = e=>trapTab(e,doc);
+    doc.addEventListener('keydown', trap);
+    qs('#mName').focus();
+    function cleanup(){ doc.removeEventListener('keydown', trap); }
+    modalOverlay._cleanup = cleanup;
+    document.addEventListener('keydown', escClose);
+  }
+  function closeModal(){
+    modalOverlay.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    document.removeEventListener('keydown', escClose);
+    if (modalOverlay._cleanup) modalOverlay._cleanup();
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function escClose(e){ if (e.key==='Escape') closeModal(); }
+  modalOverlay.addEventListener('click',(e)=>{ if (e.target===modalOverlay) closeModal(); });
+  mClose.addEventListener('click', closeModal);
+
+  // Cookie banner
+  const cookieBanner = qs('#cookieBanner'), cookieAccept = qs('#cookieAccept'), cookieDecline = qs('#cookieDecline');
+  const consent = localStorage.getItem('cookie-consent');
+  if (!consent) cookieBanner.style.display = 'block';
+  cookieAccept?.addEventListener('click', () => { localStorage.setItem('cookie-consent','accept'); cookieBanner.style.display = 'none'; });
+  cookieDecline?.addEventListener('click', () => { localStorage.setItem('cookie-consent','decline'); cookieBanner.style.display = 'none'; });
+
+  // Back to top visibility
+  const toTop = qs('#toTop');
+  window.addEventListener('scroll', ()=>{ if (window.scrollY>600) toTop.classList.add('show'); else toTop.classList.remove('show'); });
+
+  // Init
+  (function init(){
+    document.documentElement.style.setProperty('--font-inter','InterVar');
+    document.documentElement.style.setProperty('--font-serif','LibreCaslonDisplayVar');
+    qs('#year').textContent = new Date().getFullYear();
+    renderNews();
+    renderShops();
+    if (location.hash==='#directory') setView('directory'); else setView('home');
+  })();
+</script>
+</body>
+</html>
