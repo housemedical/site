@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1,
+    "name": "Albion Outfitters",
+    "category": "Fashion",
+    "address": "123 Oxford St, London W1",
+    "hours": "10:00\u201320:00",
+    "phone": "+44 20 7946 001",
+    "website": "https://example.com",
+    "lat": 51.5154,
+    "lng": -0.142,
+    "description": "Heritage menswear with British tailoring.",
+    "image": "/images/shop-fashion.avif"
+  },
+  {
+    "id": 2,
+    "name": "Bramble Beauty Hall",
+    "category": "Beauty",
+    "address": "155 Oxford St, London W1",
+    "hours": "09:00\u201319:00",
+    "phone": "+44 20 7946 002",
+    "website": "https://example.com",
+    "lat": 51.5145,
+    "lng": -0.144,
+    "description": "Skincare and fragrance with in-house consultants.",
+    "image": "/images/shop-beauty.avif"
+  },
+  {
+    "id": 3,
+    "name": "Cornice Homewares",
+    "category": "Home",
+    "address": "201 Oxford St, London W1",
+    "hours": "10:00\u201319:00",
+    "phone": "+44 20 7946 003",
+    "website": "https://example.com",
+    "lat": 51.514,
+    "lng": -0.146,
+    "description": "Natural materials, calm palettes, timeless fixtures.",
+    "image": "/images/shop-home.avif"
+  },
+  {
+    "id": 4,
+    "name": "Gilded Gifts",
+    "category": "Gifts",
+    "address": "87 Oxford St, London W1",
+    "hours": "10:00\u201318:00",
+    "phone": "+44 20 7946 004",
+    "website": "https://example.com",
+    "lat": 51.516,
+    "lng": -0.14,
+    "description": "Stationery, books and objects from local makers.",
+    "image": "/images/shop-gifts.avif"
+  },
+  {
+    "id": 5,
+    "name": "Thyme & Table",
+    "category": "Food Hall",
+    "address": "310 Oxford St, London W1",
+    "hours": "11:00\u201322:00",
+    "phone": "+44 20 7946 005",
+    "website": "https://example.com",
+    "lat": 51.5135,
+    "lng": -0.147,
+    "description": "Seasonal plates, deli and patisserie.",
+    "image": "/images/shop-food.avif"
+  },
+  {
+    "id": 6,
+    "name": "Little Arcadia",
+    "category": "Kids",
+    "address": "52 Oxford St, London W1",
+    "hours": "10:00\u201318:00",
+    "phone": "+44 20 7946 006",
+    "website": "https://example.com",
+    "lat": 51.517,
+    "lng": -0.139,
+    "description": "Playful apparel and story-time corner.",
+    "image": "/images/shop-kids.avif"
+  }
+]
