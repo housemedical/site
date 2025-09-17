@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oxford Street Development Corporation | The World's High Street</title>
+    <meta name="description" content="The official website for the Oxford Street Development Corporation, guiding the future of London's most iconic destination.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <style>
+        /* FONT IMPORTS */
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+
+        /* CSS VARIABLES & RESET */
+        :root {
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Lato', sans-serif;
+
+            --color-ivory: #FDFDF5;
+            --color-deep-green: #0F2D24;
+            --color-gold: #BFA170;
+            --color-dark-text: #1a1a1a;
+            --color-light-text: #f0f0f0;
+            --color-subtle-grey: #666;
+
+            --container-width: 1280px;
+            --spacing-unit: 1rem;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-ivory);
+            color: var(--color-dark-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body.mobile-nav-active {
+            overflow: hidden;
+        }
+
+        /* ACCESSIBILITY & UTILITIES */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--color-gold);
+            outline-offset: 4px;
+            border-radius: 2px;
+        }
+        
+        /* GENERAL STYLING */
+        h1, h2, h3, h4 {
+            font-family: var(--font-serif);
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--color-dark-text);
+        }
+
+        h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 5vw, 3rem); }
+        h3 { font-size: clamp(1.5rem, 4vw, 2rem); }
+        p { margin-bottom: var(--spacing-unit); max-width: 65ch; }
+        a { color: var(--color-dark-text); text-decoration: none; transition: color 0.3s ease; }
+        a:hover { color: var(--color-gold); }
+
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 calc(var(--spacing-unit) * 2);
+        }
+
+        section {
+            padding: calc(var(--spacing-unit) * 5) 0;
+        }
+
+        .gold-hairline {
+            border: 0;
+            height: 1px;
+            background: var(--color-gold);
+            opacity: 0.5;
+            margin: var(--spacing-unit) 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: transparent;
+            border: 1px solid var(--color-dark-text);
+            padding: 0.75rem 1.5rem;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--color-dark-text);
+            color: var(--color-ivory);
+        }
+        
+        /* 1. HeritageHeader */
+        .heritage-header {
+            background-color: var(--color-ivory);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-top-bar {
+            background-color: #f5f5f0;
+            padding: 0.5rem 0;
+            font-size: 0.8rem;
+        }
+        .header-top-bar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-top-bar nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+        }
+        .header-main {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(191, 161, 112, 0.3);
+        }
+        .header-main .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-wordmark {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .header-wordmark a { text-decoration: none; }
+        .main-nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
+            font-weight: 700;
+        }
+        .mobile-menu-toggle { display: none; }
+        
+        /* Mobile Navigation */
+        .mobile-nav-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: var(--color-deep-green);
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .mobile-nav-overlay.active {
+            transform: translateY(0);
+        }
+        .mobile-nav-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        #mobile-nav-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-light-text);
+        }
+        .mobile-nav-overlay ul {
+            list-style: none;
+            text-align: center;
+        }
+        .mobile-nav-overlay ul li a {
+            color: var(--color-light-text);
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            padding: 0.5rem 1rem;
+            display: block;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-nav-overlay ul li a:hover {
+            opacity: 1;
+            color: var(--color-gold);
+        }
+
+        /* 2. HeritageHero */
+        .heritage-hero {
+            position: relative;
+            height: 85vh;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('https://images.unsplash.com/photo-1543359904-87a41d9435b8?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=3600') center center/cover no-repeat;
+            padding: 0;
+        }
+        .hero-overlay {
+            background-color: rgba(253, 253, 245, 0.85); /* Ivory with opacity */
+            backdrop-filter: blur(5px);
+            padding: 3rem 4rem;
+            text-align: center;
+            border: 1px solid var(--color-gold);
+        }
+        .hero-overlay::before, .hero-overlay::after {
+            content: '';
+            position: absolute;
+            background: var(--color-gold);
+        }
+        .hero-overlay::before { top: 1.5rem; bottom: 1.5rem; left: 1.5rem; width: 1px; }
+        .hero-overlay::after { left: 1.5rem; right: 1.5rem; top: 1.5rem; height: 1px; }
+        .hero-title {
+            margin: 0;
+        }
+        .hero-subtitle {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        /* 3. HeritageDepartments */
+        .heritage-departments h2, .heritage-services h2 { text-align: center; margin-bottom: 3rem; }
+        .departments-grid, .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .department-tile, .service-tile {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 4 / 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.5rem;
+            color: var(--color-light-text);
+            text-align: left;
+        }
+        .department-tile::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+            z-index: 1;
+        }
+        .department-tile > * { position: relative; z-index: 2; }
+        .department-tile img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .department-tile:hover img { transform: scale(1.05); }
+        .department-tile h3 {
+            color: var(--color-light-text);
+            margin-bottom: 0.5rem;
+        }
+        .department-cta {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-decoration: underline;
+            text-decoration-color: var(--color-gold);
+            text-underline-offset: 4px;
+        }
+
+        /* 4. HeritageFeatureRows */
+        .feature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+        .feature-row:nth-child(even) .feature-image { order: 2; }
+        .feature-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 1px solid rgba(191, 161, 112, 0.3);
+            padding: 1rem;
+        }
+        .feature-content h2 { margin-bottom: 1.5rem; }
+
+        /* 5. HeritageServices */
+        .service-tile {
+            background-color: #f5f5f0;
+            aspect-ratio: 1 / 1;
+            align-items: center;
+            text-align: center;
+            color: var(--color-dark-text);
+        }
+        .service-icon { margin-bottom: 1.5rem; }
+        .service-icon svg { width: 48px; height: 48px; color: var(--color-gold); }
+        .service-tile h3 { color: var(--color-dark-text); margin-bottom: 1rem; }
+        .service-tile p { font-size: 0.9rem; max-width: 30ch; }
+        
+        /* 6. NewsCarousel */
+        .news-carousel-section { background-color: #f5f5f0; }
+        .news-carousel-section h2 { text-align: center; margin-bottom: 3rem; }
+        .news-carousel-container { position: relative; }
+        .news-carousel {
+            display: flex;
+            overflow-x: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth; /* JS will handle this, but good fallback */
+            -webkit-overflow-scrolling: touch; /* for smooth scrolling on iOS */
+        }
+        .news-slide {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            padding: 0 1rem;
+        }
+        @media (min-width: 768px) {
+            .news-slide { flex: 0 0 50%; }
+        }
+        @media (min-width: 1024px) {
+            .news-slide { flex: 0 0 33.333%; }
+        }
+        .news-card {
+            background-color: var(--color-ivory);
+            border: 1px solid rgba(191, 161, 112, 0.3);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .news-card img {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+        }
+        .news-card-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .news-card-content .date {
+            font-size: 0.8rem;
+            color: var(--color-subtle-grey);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .news-card-content h3 { margin-bottom: auto; }
+        .news-card-content a {
+            margin-top: 1rem;
+            font-weight: 700;
+        }
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .carousel-button {
+            background: none;
+            border: 1px solid var(--color-gold);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .carousel-button:hover { background-color: rgba(191, 161, 112, 0.1); }
+        .carousel-button svg { width: 20px; height: 20px; color: var(--color-gold); }
+
+        /* 7. ShopDirectory */
+        .shop-directory-section { text-align: center; }
+        .directory-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .directory-controls input, .directory-controls select {
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(191, 161, 112, 0.5);
+            background-color: var(--color-ivory);
+        }
+        .directory-controls input { min-width: 300px; }
+        .directory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            text-align: left;
+        }
+        .shop-card {
+            border: 1px solid rgba(191, 161, 112, 0.3);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+        .shop-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .shop-card h4 { font-family: var(--font-sans); font-weight: 700; margin-bottom: 0.25rem; }
+        .shop-card .category {
+            font-size: 0.8rem;
+            color: var(--color-subtle-grey);
+            text-transform: uppercase;
+        }
+        #shop-modal {
+            max-width: 600px;
+            width: 90vw;
+            border: 1px solid var(--color-gold);
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        #shop-modal::backdrop {
+            background-color: rgba(15, 45, 36, 0.7); /* Deep Green with opacity */
+            backdrop-filter: blur(5px);
+        }
+        #shop-modal h3 { margin-bottom: 0.5rem; }
+        #shop-modal .category {
+            font-size: 0.9rem;
+            color: var(--color-subtle-grey);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+        #shop-modal p { margin-bottom: 1.5rem; }
+        .modal-buttons { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        
+        /* 8. DirectionsMap */
+        .directions-map {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        @media (min-width: 768px) {
+            .directions-map { grid-template-columns: 1.5fr 1fr; gap: 4rem; }
+        }
+        .map-iframe-container {
+            aspect-ratio: 16 / 10;
+            border: 1px solid rgba(191, 161, 112, 0.3);
+            padding: 1rem;
+        }
+        .map-iframe-container iframe { width: 100%; height: 100%; border: 0; }
+        .directions-links { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        
+        /* 9. HeritageFooter */
+        .heritage-footer {
+            background-color: var(--color-deep-green);
+            color: var(--color-light-text);
+            padding: 4rem 0 2rem 0;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .footer-column h4 {
+            font-family: var(--font-serif);
+            color: var(--color-gold);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .footer-column ul { list-style: none; }
+        .footer-column ul li { margin-bottom: 0.5rem; }
+        .footer-column ul a {
+            color: var(--color-light-text);
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .footer-column ul a:hover { opacity: 1; }
+        .footer-bottom {
+            border-top: 1px solid rgba(191, 161, 112, 0.2);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        /* GDPR Cookie Banner */
+        .cookie-consent-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--color-deep-green);
+            color: var(--color-light-text);
+            padding: 1.5rem;
+            z-index: 2000;
+            transform: translateY(100%);
+            transition: transform 0.5s ease-in-out;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        }
+        .cookie-consent-banner.active { transform: translateY(0); }
+        .cookie-consent-banner .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .cookie-consent-banner p { margin: 0; max-width: 80ch; }
+        .cookie-consent-banner p a { color: var(--color-gold); text-decoration: underline; }
+        .cookie-buttons { display: flex; gap: 1rem; }
+        .cookie-button {
+            background: var(--color-gold);
+            color: var(--color-deep-green);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .cookie-button.decline {
+            background: transparent;
+            color: var(--color-light-text);
+            border: 1px solid var(--color-light-text);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .main-nav { display: none; }
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                cursor: pointer;
+            }
+            .mobile-menu-toggle svg {
+                width: 32px;
+                height: 32px;
+            }
+            .feature-row, .feature-row:nth-child(even) {
+                grid-template-columns: 1fr;
+            }
+            .feature-row:nth-child(even) .feature-image { order: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="heritage-header" id="top">
+        <div class="header-top-bar">
+            <div class="container">
+                <nav aria-label="Departments">
+                    <ul>
+                        <li><a href="#">Departments</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">News</a></li>
+                        <li><a href="#">Visiting</a></li>
+                    </ul>
+                </nav>
+                <a href="#newsletter">Sign up for updates</a>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="container">
+                <div class="header-wordmark">
+                    <a href="#top" aria-label="Oxford Street Development Corporation Home">OSDC</a>
+                </div>
+                <nav class="main-nav" aria-label="Main navigation">
+                    <ul>
+                        <li><a href="#visit">Visit</a></li>
+                        <li><a href="#shops">Shops Directory</a></li>
+                        <li><a href="#about">About OSDC</a></li>
+                        <li><a href="#governance">Governance</a></li>
+                        <li><a href="#planning">Planning</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open main menu" aria-expanded="false" aria-controls="mobile-nav">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="mobile-nav-overlay" id="mobile-nav" role="dialog" aria-modal="true" aria-labelledby="mobile-nav-title">
+        <div class="mobile-nav-header">
+             <button id="mobile-nav-close" aria-label="Close main menu">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="40" height="40"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+        <h2 id="mobile-nav-title" class="visually-hidden">Main Menu</h2>
+        <nav>
+            <ul>
+                <li><a href="#visit">Visit</a></li>
+                <li><a href="#shops">Shops Directory</a></li>
+                <li><a href="#news">News & Updates</a></li>
+                <li><a href="#about">About OSDC</a></li>
+                <li><a href="#governance">Governance</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+
+        <section class="heritage-hero" aria-labelledby="hero-title">
+            <div class="hero-overlay">
+                <h1 id="hero-title" class="hero-title">The Future of an Icon</h1>
+                <p class="hero-subtitle">Guiding the evolution of the world's high street.</p>
+            </div>
+        </section>
+
+        <section class="heritage-feature-rows container">
+            <div class="feature-row">
+                <div class="feature-image">
+                    <img src="https://images.unsplash.com/photo-1570857502907-06f565123160?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" alt="Elegant winter window display on Oxford Street with golden lights.">
+                </div>
+                <div class="feature-content" id="about">
+                    <h2>A Vision for Tomorrow</h2>
+                    <p>The Oxford Street Development Corporation is committed to enhancing the district for generations to come. We are overseeing a landmark programme of public realm improvements, sustainability initiatives, and cultural partnerships to ensure Oxford Street remains London’s premier destination for retail, leisure, and culture.</p>
+                    <a href="#" class="cta-button">Learn About Our Mission</a>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-image">
+                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" alt="A beautifully presented plate of gourmet food at an upscale restaurant.">
+                </div>
+                <div class="feature-content">
+                    <h2>Dining & Delights</h2>
+                    <p>From Michelin-starred establishments to artisanal food halls, the culinary landscape of Oxford Street offers an unparalleled journey for the senses. Indulge in global cuisines and unforgettable dining experiences.</p>
+                    <a href="#" class="cta-button">Find a Restaurant</a>
+                </div>
+            </div>
+        </section>
+        
+        <section class="heritage-departments container">
+            <h2>Our Departments</h2>
+            <div class="departments-grid">
+                <a href="#" class="department-tile">
+                    <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800" alt="Luxury fashion items displayed in a boutique.">
+                    <h3>Fashion</h3>
+                    <span class="department-cta">Discover More</span>
+                </a>
+                <a href="#" class="department-tile">
+                    <img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800" alt="High-end beauty products and cosmetics arranged neatly.">
+                    <h3>Beauty</h3>
+                    <span class="department-cta">Discover More</span>
+                </a>
+                <a href="#" class="department-tile">
+                    <img src="https://images.unsplash.com/photo-1618220179428-22790b461013?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800" alt="A stylish and modern living room with designer furniture.">
+                    <h3>Home</h3>
+                    <span class="department-cta">Discover More</span>
+                </a>
+                <a href="#" class="department-tile">
+                    <img src="https://images.unsplash.com/photo-1556911220-bff31c812dba?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800" alt="A busy food hall with various artisanal food stalls.">
+                    <h3>Food Hall</h3>
+                    <span class="department-cta">Discover More</span>
+                </a>
+                <a href="#" class="department-tile">
+                    <img src="https://images.unsplash.com/photo-1513222488835-978c2536b856?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800" alt="Beautifully wrapped gifts with elegant ribbons.">
+                    <h3>Gifts</h3>
+                    <span class="department-cta">Discover More</span>
+                </a>
+                <a href="#" class="department-tile">
+                    <img src="https://images.unsplash.com/photo-1526498319044-3c399e4a3e2e?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800" alt="Colourful and high-quality children's toys and clothing.">
+                    <h3>Kids</h3>
+                    <span class="department-cta">Discover More</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="heritage-services container">
+            <h2>Signature Services</h2>
+            <div class="services-grid">
+                <div class="service-tile">
+                    <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-3.082a.563.563 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.563.563 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg></div>
+                    <h3>Concierge</h3>
+                    <p>Your guide to the best of Oxford Street. From reservations to recommendations.</p>
+                </div>
+                <div class="service-tile">
+                    <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.658-.463 1.243-1.117 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.117 1.007Z" /></svg></div>
+                    <h3>Personal Shopping</h3>
+                    <p>A tailored shopping experience with our expert stylists. By appointment only.</p>
+                </div>
+                <div class="service-tile">
+                    <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></div>
+                    <h3>Corporate Gifting</h3>
+                    <p>Find the perfect gesture with our curated selection of luxury corporate gifts.</p>
+                </div>
+                <div class="service-tile">
+                    <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0h18M12 15.75h.008v.008H12v-.008Z" /></svg></div>
+                    <h3>Events</h3>
+                    <p>Host your next memorable occasion in one of our exclusive, elegant venues.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="news-carousel-section" id="news" aria-labelledby="news-heading">
+            <div class="container">
+                <h2 id="news-heading">News & Updates</h2>
+                <div class="news-carousel-container">
+                    <div class="news-carousel" id="news-carousel" aria-live="polite">
+                        </div>
+                </div>
+                <div class="carousel-controls">
+                    <button id="prev-btn" class="carousel-button" aria-label="Previous news article">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+                    </button>
+                    <button id="next-btn" class="carousel-button" aria-label="Next news article">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="shop-directory-section container" id="shops" aria-labelledby="directory-heading">
+            <h2 id="directory-heading">Shops Directory</h2>
+            <p style="margin: 0 auto 3rem auto;">Explore over 300 flagships, boutiques, and heritage brands.</p>
+            <div class="directory-controls">
+                <label for="shop-search" class="visually-hidden">Search for a shop</label>
+                <input type="search" id="shop-search" placeholder="Search by name (e.g., 'Selfridges')">
+                <label for="category-filter" class="visually-hidden">Filter by category</label>
+                <select id="category-filter">
+                    <option value="all">All Categories</option>
+                    <option value="Department Store">Department Store</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Jewellery">Jewellery</option>
+                    <option value="Beauty">Beauty</option>
+                </select>
+            </div>
+            <div class="directory-grid" id="directory-grid">
+                </div>
+        </section>
+        
+        <dialog id="shop-modal">
+            <h3 id="modal-title">Shop Name</h3>
+            <div id="modal-category" class="category">Category</div>
+            <p id="modal-description">Description goes here.</p>
+            <p><strong>Opening Hours:</strong> <span id="modal-hours">10:00 AM - 9:00 PM</span></p>
+            <hr class="gold-hairline">
+            <div class="modal-buttons">
+                <a href="#" id="modal-maps-link" class="cta-button" target="_blank" rel="noopener noreferrer">Open in Maps</a>
+                <button class="cta-button" onclick="document.getElementById('shop-modal').close()">Close</button>
+            </div>
+        </dialog>
+
+        <section class="directions-map-section container" id="visit" aria-labelledby="directions-heading">
+             <div class="directions-map">
+                <div class="map-iframe-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2482.9064734688523!2d-0.15393522361668832!3d51.51525230953158!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761ad554c335c1%3A0x2669a531398c211a!2sOxford%20St%2C%20London!5e0!3m2!1sen!2suk!4v1700000000000"
+                        width="600" 
+                        height="450" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Map of Oxford Street, London">
+                    </iframe>
+                </div>
+                <div class="directions-content">
+                    <h2 id="directions-heading">Getting Here</h2>
+                    <p>Located in the heart of London's West End, Oxford Street is easily accessible by public transport.</p>
+                    <p><strong>By Tube:</strong> Oxford Circus (Central, Victoria, Bakerloo), Bond Street (Central, Jubilee, Elizabeth), and Tottenham Court Road (Central, Northern, Elizabeth) stations.</p>
+                    <div class="directions-links">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=Oxford+Street,+London" target="_blank" rel="noopener noreferrer" class="cta-button">Google Maps</a>
+                        <a href="http://maps.apple.com/?daddr=Oxford+Street,+London" target="_blank" rel="noopener noreferrer" class="cta-button">Apple Maps</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="heritage-footer" id="contact" aria-labelledby="footer-heading">
+        <div class="container">
+            <h2 id="footer-heading" class="visually-hidden">Footer</h2>
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>About OSDC</h4>
+                    <ul>
+                        <li><a href="#">Our Mission</a></li>
+                        <li><a href="#">Leadership</a></li>
+                        <li><a href="#">Transparency</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column" id="governance">
+                    <h4>Governance</h4>
+                    <ul>
+                        <li><a href="#">Latest Decisions</a></li>
+                        <li><a href="#">Board Meetings</a></li>
+                        <li><a href="#">Modern.Gov Portal</a></li>
+                        <li><a href="#">Reports</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column" id="planning">
+                    <h4>Planning</h4>
+                    <ul>
+                        <li><a href="#">Submit an Application</a></li>
+                        <li><a href="#">Planning Policy</a></li>
+                        <li><a href="#">Arcus System</a></li>
+                        <li><a href="#">Guidance for Developers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column" id="newsletter">
+                    <h4>Contact & Updates</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Press Office</a></li>
+                        <li><a href="#">Newsletter</a></li>
+                        <li><a href="#">Accessibility & Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Oxford Street Development Corporation. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <div id="cookie-banner" class="cookie-consent-banner" role="dialog" aria-modal="true" aria-labelledby="cookie-heading" aria-describedby="cookie-description">
+        <div class="container">
+            <div class="cookie-text">
+                <h3 id="cookie-heading" class="visually-hidden">Cookie Consent</h3>
+                <p id="cookie-description">We use cookies to enhance your experience and for analytics purposes. See our <a href="#">Privacy Policy</a> for more.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button id="cookie-decline" class="cookie-button decline">Decline</button>
+                <button id="cookie-accept" class="cookie-button">Accept</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script id="newsData" type="application/json">
+    [
+      {
+        "id": 1,
+        "date": "18 Sep 2025",
+        "title": "OSDC Announces New Public Realm Vision",
+        "image": "https://images.unsplash.com/photo-1620050212803-a7575363e800?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800",
+        "alt": "An architectural rendering of a pedestrian-friendly street with green spaces.",
+        "link": "#"
+      },
+      {
+        "id": 2,
+        "date": "02 Sep 2025",
+        "title": "Partnership with Local Artists to Enhance Streetscape",
+        "image": "https://images.unsplash.com/photo-1549492423-4002122c3855?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800",
+        "alt": "A colourful modern sculpture installed on a public plaza.",
+        "link": "#"
+      },
+      {
+        "id": 3,
+        "date": "21 Aug 2025",
+        "title": "Seasonal 'Luxe London' Festival Kicks Off",
+        "image": "https://images.unsplash.com/photo-1572088452331-7e268a05504d?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800",
+        "alt": "A crowd of people enjoying an outdoor festival at dusk.",
+        "link": "#"
+      },
+      {
+        "id": 4,
+        "date": "10 Aug 2025",
+        "title": "New Sustainability Guidelines for Retail Partners",
+        "image": "https://images.unsplash.com/photo-1593113646773-7b3c647b98a8?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800",
+        "alt": "A green living wall on the side of a modern building.",
+        "link": "#"
+      },
+      {
+        "id": 5,
+        "date": "28 Jul 2025",
+        "title": "Digital Transformation Project Reaches Milestone",
+        "image": "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=800",
+        "alt": "A person interacting with a large digital touchscreen map.",
+        "link": "#"
+      }
+    ]
+    </script>
+
+    <script id="shopData" type="application/json">
+    [
+        { "id": 1, "name": "Selfridges & Co", "category": "Department Store", "description": "An iconic London landmark offering an extraordinary edit of fashion, beauty, and home, complete with a world-famous Foodhall and unique customer experiences.", "mapLink": "https://www.google.com/maps/search/?api=1&query=Aura+London+Oxford+Street" },
+        { "id": 2, "name": "Apple Oxford Street", "category": "Technology", "description": "A temple to technology and design. Discover the full range of Apple products, get expert advice, and attend inspiring 'Today at Apple' sessions.", "mapLink": "https://www.google.com/maps/search/?api=1&query=TechNova+Oxford+Street" },
+        { "id": 3, "name": "Liberty London", "category": "Department Store", "description": "Famed for its mock-Tudor facade and avant-garde luxury, Liberty offers a curated selection of designer fashion, homeware, and its iconic Liberty fabrics.", "mapLink": "https://www.google.com/maps/search/?api=1&query=The+Gilded+Cage+Oxford+Street" },
+        { "id": 4, "name": "Nike Town", "category": "Fashion", "description": "The ultimate destination for athletic apparel and footwear. Four floors of innovation, customisation services, and the latest product launches.", "mapLink": "https://www.google.com/maps/search/?api=1&query=Hearth+%26+Home+Oxford+Street" },
+        { "id": 5, "name": "Lush", "category": "Beauty", "description": "The flagship store for fresh, handmade cosmetics. An immersive, three-floor experience featuring exclusive products, a spa, and a perfume library.", "mapLink": "https://www.google.com/maps/search/?api=1&query=Elysian+Cosmetics+Oxford+Street" },
+        { "id": 6, "name": "John Lewis & Partners", "category": "Department Store", "description": "A cherished British retailer known for its quality, value, and service. Offering everything from fashion and technology to homeware and nursery goods.", "mapLink": "https://www.google.com/maps/search/?api=1&query=Verdant+Apparel+Oxford+Street" },
+        { "id": 7, "name": "The Swatch Group", "category": "Jewellery", "description": "A showcase of world-renowned Swiss watchmaking, featuring brands like Omega, Longines, and Tissot alongside the iconic Swatch collections.", "mapLink": "https://www.google.com/maps/search/?api=1&query=Chronos+Watches+Oxford+Street" },
+        { "id": 8, "name": "Zara", "category": "Fashion", "description": "The global fashion giant's major flagship store, presenting the latest trends in womenswear, menswear, and children's clothing at a rapid pace.", "mapLink": "https://www.google.com/maps/search/?api=1&query=Innovate+Hub+Oxford+Street" }
+    ]
+    </script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // --- 1. Mobile Header Logic ---
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+        const mobileNavClose = document.getElementById('mobile-nav-close');
+        const mobileNavLinks = mobileNav.querySelectorAll('a');
+
+        function openMobileMenu() {
+            mobileNav.classList.add('active');
+            document.body.classList.add('mobile-nav-active');
+            mobileMenuToggle.setAttribute('aria-expanded', 'true');
+            mobileNavClose.focus();
+        }
+
+        function closeMobileMenu() {
+            mobileNav.classList.remove('active');
+            document.body.classList.remove('mobile-nav-active');
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenuToggle.focus();
+        }
+
+        mobileMenuToggle.addEventListener('click', openMobileMenu);
+        mobileNavClose.addEventListener('click', closeMobileMenu);
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
+
+        // --- 6. NewsCarousel Logic ---
+        const newsData = JSON.parse(document.getElementById('newsData').textContent);
+        const carousel = document.getElementById('news-carousel');
+        let currentIndex = 0;
+
+        function renderCarousel() {
+            carousel.innerHTML = newsData.map(article => `
+                <div class="news-slide" role="group" aria-label="Article ${article.id} of ${newsData.length}">
+                    <div class="news-card">
+                        <img src="${article.image}" alt="${article.alt}">
+                        <div class="news-card-content">
+                            <span class="date">${article.date}</span>
+                            <h3>${article.title}</h3>
+                            <a href="${article.link}" class="cta-button">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateCarouselPosition() {
+            const slideWidth = carousel.querySelector('.news-slide')?.offsetWidth || 0;
+            if (slideWidth > 0) {
+                carousel.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+                carousel.style.transition = 'transform 0.5s ease-in-out';
+            }
+        }
+        
+        document.getElementById('next-btn').addEventListener('click', () => {
+            const slidesPerView = Math.round(carousel.offsetWidth / carousel.querySelector('.news-slide').offsetWidth);
+            currentIndex = (currentIndex + 1) > (newsData.length - slidesPerView) ? 0 : currentIndex + 1;
+            updateCarouselPosition();
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+             const slidesPerView = Math.round(carousel.offsetWidth / carousel.querySelector('.news-slide').offsetWidth);
+            currentIndex = (currentIndex - 1) < 0 ? (newsData.length - slidesPerView) : currentIndex - 1;
+            updateCarouselPosition();
+        });
+        
+        renderCarousel();
+        window.addEventListener('resize', updateCarouselPosition);
+
+
+        // --- 7. ShopDirectory Logic ---
+        const shopData = JSON.parse(document.getElementById('shopData').textContent);
+        const searchInput = document.getElementById('shop-search');
+        const categoryFilter = document.getElementById('category-filter');
+        const directoryGrid = document.getElementById('directory-grid');
+        const shopModal = document.getElementById('shop-modal');
+
+        function renderDirectory(filteredShops) {
+            if (filteredShops.length === 0) {
+                directoryGrid.innerHTML = `<p>No shops found matching your criteria.</p>`;
+                return;
+            }
+            directoryGrid.innerHTML = filteredShops.map(shop => `
+                <div class="shop-card" data-shop-id="${shop.id}" tabindex="0" role="button" aria-haspopup="dialog">
+                    <h4>${shop.name}</h4>
+                    <span class="category">${shop.category}</span>
+                </div>
+            `).join('');
+        }
+
+        function filterShops() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilter.value;
+
+            const filteredShops = shopData.filter(shop => {
+                const nameMatch = shop.name.toLowerCase().includes(searchTerm);
+                const categoryMatch = selectedCategory === 'all' || shop.category === selectedCategory;
+                return nameMatch && categoryMatch;
+            });
+            renderDirectory(filteredShops);
+        }
+
+        function openShopModal(shopId) {
+            const shop = shopData.find(s => s.id === parseInt(shopId));
+            if (!shop) return;
+            
+            document.getElementById('modal-title').textContent = shop.name;
+            document.getElementById('modal-category').textContent = shop.category;
+            document.getElementById('modal-description').textContent = shop.description;
+            document.getElementById('modal-maps-link').href = shop.mapLink;
+            
+            shopModal.showModal();
+        }
+
+        searchInput.addEventListener('input', filterShops);
+        categoryFilter.addEventListener('change', filterShops);
+        
+        directoryGrid.addEventListener('click', (e) => {
+            const card = e.target.closest('.shop-card');
+            if (card) {
+                openShopModal(card.dataset.shopId);
+            }
+        });
+        
+        directoryGrid.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const card = e.target.closest('.shop-card');
+                if (card) {
+                    e.preventDefault();
+                    openShopModal(card.dataset.shopId);
+                }
+            }
+        });
+
+        // Initial render
+        filterShops();
+
+        // --- GDPR Cookie Banner Logic ---
+        const cookieBanner = document.getElementById('cookie-banner');
+        const acceptBtn = document.getElementById('cookie-accept');
+        const declineBtn = document.getElementById('cookie-decline');
+
+        // For demo purposes, we'll use localStorage to remember the choice.
+        if (!localStorage.getItem('cookieConsent')) {
+            setTimeout(() => {
+                cookieBanner.classList.add('active');
+            }, 1500);
+        }
+
+        function handleConsent(consent) {
+            localStorage.setItem('cookieConsent', consent);
+            cookieBanner.classList.remove('active');
+            // In a real app, you would initialize tracking scripts here if consent === 'accepted'.
+            console.log(`Cookie consent: ${consent}`);
+        }
+
+        acceptBtn.addEventListener('click', () => handleConsent('accepted'));
+        declineBtn.addEventListener('click', () => handleConsent('declined'));
+
+    });
+    </script>
+</body>
+</html>
