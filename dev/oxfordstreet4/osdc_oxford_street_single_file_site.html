@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OSDC — Oxford Street Development Corporation</title>
+  <meta name="description" content="OSDC: Oxford Street Development Corporation — Shops, news, travel, and the story of London's most iconic shopping boulevard." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0b0b;               /* near-black */
+      --panel: #121212;            /* onyx */
+      --soft: #1a1a1a;             /* soft panels */
+      --text: #f3f3f0;             /* ivory */
+      --muted: #c8c3b7;            /* warm grey */
+      --line: #2a2a2a;             /* subtle line */
+      --gold: #bfa45b;             /* antique gold */
+      --gold-2: #d8c27a;           /* lighter gold */
+      --focus: #e8d79b;            /* focus ring */
+      --maxw: 1200px;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; color: var(--text); background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+      line-height: 1.6;
+      /* subtle noise + vignette for an old-school luxe vibe */
+      background-image:
+        radial-gradient(100vmax 100vmax at 50% -20%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%),
+        radial-gradient(100vmax 100vmax at 50% 120%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,0));
+    }
+
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+    /* Top Announcement / Ribbon */
+    .ribbon { background: linear-gradient(90deg, rgba(191,164,91,.15), rgba(191,164,91,.03)); color: var(--muted); font-size: 14px; }
+    .ribbon .container { display: flex; gap: 16px; align-items: center; justify-content: center; padding: 10px 20px; }
+    .ribbon strong { color: var(--gold-2); letter-spacing: .12em; font-weight: 600; }
+
+    /* Header / Nav */
+    header.site-header { position: sticky; top: 0; z-index: 80; backdrop-filter: saturate(120%) blur(8px); background: rgba(11,11,11,.55); border-bottom: 1px solid var(--line); transition: background .3s ease, box-shadow .3s ease; }
+    header.site-header.scrolled { background: rgba(11,11,11,.9); box-shadow: 0 6px 30px rgba(0,0,0,.35); }
+    .brand { display:flex; align-items:center; gap:14px; text-decoration:none; color: var(--text); padding: 14px 0; }
+    .monogram { width: 44px; aspect-ratio: 1; display:grid; place-items:center; border-radius: 999px; position: relative; }
+    .monogram::before { content: ""; position:absolute; inset: -2px; border-radius: 999px; background: conic-gradient(from 120deg, var(--gold), var(--gold-2), var(--gold)); filter: blur(.5px); }
+    .monogram span { position: relative; z-index: 1; font-family: "Playfair Display", serif; font-weight: 700; letter-spacing: .06em; color: #101010; background: linear-gradient(180deg, #fff3, rgba(0,0,0,0)); border-radius: 999px; width: 100%; height: 100%; display:grid; place-items:center; border: 2px solid rgba(0,0,0,.6); box-shadow: inset 0 2px 6px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.05);
+      background-color: var(--gold); }
+    .brand-text { display:flex; flex-direction:column; }
+    .brand-text b { font-family: "Playfair Display", serif; font-size: 18px; letter-spacing:.06em; }
+    .brand-text small { color: var(--muted); font-size: 12px; letter-spacing:.14em; text-transform: uppercase; }
+
+    nav.primary { display:flex; align-items:center; justify-content: space-between; gap: 20px; }
+    .nav-links { display:flex; gap: 18px; align-items:center; }
+    .nav-links a { color: var(--muted); text-decoration:none; font-weight: 500; letter-spacing:.06em; text-transform: uppercase; font-size: 13px; padding: 10px 8px; border-radius: 8px; }
+    .nav-links a:hover, .nav-links a:focus-visible { color: var(--text); outline: none; background: rgba(191,164,91,.08); box-shadow: 0 0 0 2px rgba(191,164,91,.15) inset; }
+
+    .nav-cta { padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(191,164,91,.5); color: var(--gold); background: linear-gradient(180deg, rgba(191,164,91,.12), rgba(191,164,91,.02)); text-decoration:none; font-weight: 600; letter-spacing:.04em; }
+    .nav-cta:hover, .nav-cta:focus-visible { background: linear-gradient(180deg, rgba(191,164,91,.2), rgba(191,164,91,.06)); outline: none; box-shadow: 0 0 0 3px rgba(191,164,91,.2); }
+
+    .nav-toggle { display:none; background:none; border:1px solid var(--line); color:var(--text); padding:10px 12px; border-radius:10px; }
+
+    @media (max-width: 900px) {
+      .nav-links { display:none; position: absolute; left: 20px; right: 20px; top: 72px; background: #0e0e0e; border: 1px solid var(--line); box-shadow: var(--shadow); padding: 8px; border-radius: 12px; flex-direction: column; }
+      .nav-links.show { display:flex; }
+      .nav-toggle { display:block; }
+    }
+
+    /* Hero */
+    .hero { position: relative; min-height: 68vh; display:grid; place-items:center; text-align:center; overflow:hidden; }
+    .hero::before { content:""; position:absolute; inset:0; background: url('https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat; filter: saturate(.7) contrast(.9) brightness(.8); transform: scale(1.02); }
+    .hero::after { content:""; position:absolute; inset:0; background: radial-gradient(1200px 1200px at 50% 10%, rgba(0,0,0,.2), rgba(0,0,0,.75) 60%, rgba(0,0,0,.9) 85%); }
+    .hero-inner { position:relative; z-index:1; padding: 80px 0; }
+    .kicker { color: var(--gold-2); letter-spacing:.24em; text-transform: uppercase; font-weight:600; font-size: 12px; }
+    h1.display { font-family: "Playfair Display", serif; font-size: clamp(38px, 6vw, 68px); line-height: 1.05; margin: 10px auto 10px; max-width: 18ch; }
+    .subhead { color: var(--muted); max-width: 60ch; margin: 0 auto 28px; }
+    .cta-row { display:flex; gap: 12px; justify-content:center; flex-wrap:wrap; }
+    .btn { display:inline-flex; align-items:center; gap:10px; padding: 12px 18px; border-radius: 999px; border: 1px solid var(--line); text-decoration:none; font-weight:600; }
+    .btn.primary { border-color: rgba(191,164,91,.6); color: #101010; background: linear-gradient(180deg, var(--gold), var(--gold-2)); }
+    .btn.primary:hover { filter: brightness(1.05); }
+    .btn.secondary { color: var(--text); background: rgba(255,255,255,.02); }
+    .btn.secondary:hover { background: rgba(255,255,255,.06); }
+
+    /* Section base */
+    section { padding: 80px 0; position: relative; }
+    section:nth-child(odd) { background: linear-gradient(180deg, rgba(255,255,255,.01), rgba(0,0,0,0)); }
+    .section-title { display:flex; align-items:center; gap:10px; margin-bottom: 28px; }
+    .section-title h2 { font-family: "Playfair Display", serif; font-size: clamp(24px, 4vw, 40px); margin:0; letter-spacing:.02em; }
+    .ornament { height:1px; flex:1; background: linear-gradient(90deg, rgba(191,164,91,.35), rgba(191,164,91,.05)); border-radius: 2px; }
+    .section-intro { color: var(--muted); max-width: 70ch; margin-bottom: 30px; }
+
+    /* Shops */
+    .shop-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 900px) { .shop-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .shop-grid { grid-template-columns: 1fr; } }
+    .shop-card { background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); display:flex; flex-direction:column; }
+    .shop-card img { width:100%; height: 200px; object-fit: cover; filter: saturate(.9) contrast(1.1); }
+    .shop-body { padding: 16px; display:grid; gap: 8px; }
+    .shop-name { font-weight:700; letter-spacing: .02em; }
+    .shop-meta { color: var(--muted); font-size: 14px; }
+    .shop-card .tag { display:inline-block; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(191,164,91,.5); color: var(--gold); background: rgba(191,164,91,.08); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+
+    /* News */
+    .news-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 900px) { .news-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .news-grid { grid-template-columns: 1fr; } }
+    .news-card { background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,0)); border: 1px solid var(--line); border-radius: var(--radius); overflow:hidden; box-shadow: var(--shadow); display:flex; flex-direction:column; }
+    .news-img { width:100%; height: 160px; object-fit: cover; }
+    .news-body { padding: 16px; display:grid; gap: 10px; }
+    .news-date { color: var(--gold-2); letter-spacing:.18em; text-transform: uppercase; font-weight:600; font-size: 11px; }
+    .news-title { font-family: "Playfair Display", serif; font-weight: 600; font-size: 18px; line-height: 1.25; }
+    .news-desc { color: var(--muted); }
+    .readmore { color: var(--gold-2); text-decoration: none; font-weight: 600; }
+    .readmore:hover { text-decoration: underline; }
+
+    /* Travel */
+    .travel { display:grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items:start; }
+    @media (max-width: 900px) { .travel { grid-template-columns: 1fr; } }
+    .travel-panel { background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+    .travel-list { display:grid; gap: 14px; padding-left: 0; margin: 0; list-style: none; }
+    .travel-list li { display:grid; gap:6px; border-left: 2px solid rgba(191,164,91,.35); padding-left: 12px; }
+    .travel-list .muted { color: var(--muted); font-size: 14px; }
+
+    .map-card { background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,0)); border: 1px solid var(--line); border-radius: var(--radius); overflow:hidden; }
+    .map-placeholder { width: 100%; aspect-ratio: 16/10; display:grid; place-items:center; color: var(--muted); background: repeating-linear-gradient(45deg, #0f0f0f, #0f0f0f 10px, #101010 10px, #101010 20px); }
+
+    /* About */
+    .about { display:grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items:center; }
+    @media (max-width: 900px) { .about { grid-template-columns: 1fr; } }
+    .about p { color: var(--muted); }
+    .about-crest { display:grid; place-items:center; }
+    .crest {
+      width: 240px; aspect-ratio: 1; border-radius: 20px; position:relative; background: radial-gradient(60% 60% at 50% 40%, rgba(191,164,91,.16), rgba(0,0,0,0)); border: 1px solid var(--line);
+      box-shadow: inset 0 8px 30px rgba(191,164,91,.08), 0 10px 30px rgba(0,0,0,.25);
+    }
+    .crest::before, .crest::after { content:""; position:absolute; inset: 10px; border-radius: 16px; border: 1px dashed rgba(191,164,91,.25); }
+    .crest::after { inset: 18px; border-style: solid; border-color: rgba(191,164,91,.2); }
+    .crest b { position:absolute; inset: 0; display:grid; place-items:center; font-family: "Playfair Display", serif; font-size: 46px; letter-spacing:.18em; color: var(--gold-2); text-shadow: 0 1px 0 #000; }
+
+    /* Newsletter */
+    .newsletter { background: linear-gradient(180deg, rgba(191,164,91,.08), rgba(191,164,91,.02)); border: 1px solid rgba(191,164,91,.28); border-radius: var(--radius); padding: 18px; display:grid; gap: 10px; }
+    .newsletter form { display:flex; gap: 10px; flex-wrap: wrap; }
+    .newsletter input[type=email] { flex: 1 1 260px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: #0f0f0f; color: var(--text); }
+    .newsletter button { padding: 12px 16px; border-radius: 10px; background: linear-gradient(180deg, var(--gold), var(--gold-2)); border: 1px solid rgba(191,164,91,.6); color: #101010; font-weight: 700; cursor: pointer; }
+    .newsletter button:hover { filter: brightness(1.05); }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--line); background: #0a0a0a; }
+    .footer-grid { display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 24px; padding: 40px 0; }
+    @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr; } }
+    .footer-title { font-family: "Playfair Display", serif; margin: 0 0 10px; }
+    .footer-links { list-style: none; padding: 0; margin: 0; display:grid; gap: 8px; }
+    .footer-links a { color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
+    .legal { color: var(--muted); font-size: 13px; padding: 16px 0 32px; border-top: 1px solid var(--line); }
+
+    /* Reveal-on-scroll (disabled with prefers-reduced-motion) */
+    .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) { .reveal, .reveal.visible { opacity: 1; transform: none; transition: none; } }
+
+    /* Focus styles */
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="ribbon" aria-label="Site announcement">
+    <div class="container">
+      <span>Welcome to</span>
+      <strong>OSDC — Oxford Street Development Corporation</strong>
+      <span>Est. 2025</span>
+    </div>
+  </div>
+
+  <header class="site-header" id="top">
+    <div class="container">
+      <nav class="primary" aria-label="Primary">
+        <a class="brand" href="#top">
+          <div class="monogram" aria-hidden="true"><span>OSDC</span></div>
+          <span class="brand-text"><b>Oxford Street</b><small>Development Corporation</small></span>
+        </a>
+
+        <button class="nav-toggle" aria-controls="navmenu" aria-expanded="false">Menu</button>
+
+        <div id="navmenu" class="nav-links" role="menu">
+          <a href="#shops" role="menuitem">Shops</a>
+          <a href="#news" role="menuitem">News</a>
+          <a href="#travel" role="menuitem">Travel</a>
+          <a href="#about" role="menuitem">About</a>
+          <a class="nav-cta" href="#newsletter">Subscribe</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" role="region" aria-label="Welcome">
+    <div class="hero-inner container">
+      <div class="kicker">Oxford Street • London W1</div>
+      <h1 class="display">A heritage boulevard for the modern age</h1>
+      <p class="subhead">Discover flagship boutiques, legendary department stores, cultural moments and the latest openings — curated by the Oxford Street Development Corporation.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#shops" aria-label="Explore the Shops">Explore the Shops</a>
+        <a class="btn secondary" href="#news" aria-label="Read the latest news">Read the News</a>
+      </div>
+    </div>
+  </section>
+
+  <main id="content">
+    <!-- Shops -->
+    <section id="shops" class="reveal">
+      <div class="container">
+        <div class="section-title">
+          <h2>Shops &amp; Houses</h2>
+          <div class="ornament" aria-hidden="true"></div>
+        </div>
+        <p class="section-intro">From storied institutions to contemporary flagships, Oxford Street offers a world of choice. Browse a selection below — a full directory is coming soon.</p>
+
+        <div class="shop-grid" role="list">
+          <article class="shop-card" role="listitem">
+            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop" alt="Elegant department store interior with chandeliers" />
+            <div class="shop-body">
+              <div class="shop-name">Selfridges</div>
+              <div class="shop-meta">Department Store • Fashion • Home</div>
+              <span class="tag">Iconic</span>
+            </div>
+          </article>
+
+          <article class="shop-card" role="listitem">
+            <img src="https://images.unsplash.com/photo-1520975922284-85d0072ea3a5?q=80&w=1200&auto=format&fit=crop" alt="Timber storefront with floral displays" />
+            <div class="shop-body">
+              <div class="shop-name">Liberty London</div>
+              <div class="shop-meta">Design • Fabrics • Beauty</div>
+              <span class="tag">Heritage</span>
+            </div>
+          </article>
+
+          <article class="shop-card" role="listitem">
+            <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop" alt="Minimal tech boutique with bright displays" />
+            <div class="shop-body">
+              <div class="shop-name">Apple</div>
+              <div class="shop-meta">Technology • Accessories</div>
+              <span class="tag">Flagship</span>
+            </div>
+          </article>
+
+          <article class="shop-card" role="listitem">
+            <img src="https://images.unsplash.com/photo-1515984977862-1c7201ef6ab7?q=80&w=1200&auto=format&fit=crop" alt="Menswear boutique with suits on display" />
+            <div class="shop-body">
+              <div class="shop-name">John Lewis</div>
+              <div class="shop-meta">Home • Fashion • Electricals</div>
+              <span class="tag">Department</span>
+            </div>
+          </article>
+
+          <article class="shop-card" role="listitem">
+            <img src="https://images.unsplash.com/photo-1556906781-9a412961c28e?q=80&w=1200&auto=format&fit=crop" alt="Sportswear wall with trainers" />
+            <div class="shop-body">
+              <div class="shop-name">Nike Town</div>
+              <div class="shop-meta">Sports • Footwear</div>
+              <span class="tag">Lifestyle</span>
+            </div>
+          </article>
+
+          <article class="shop-card" role="listitem">
+            <img src="https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?q=80&w=1200&auto=format&fit=crop" alt="Contemporary fashion rails and mirrors" />
+            <div class="shop-body">
+              <div class="shop-name">Zara</div>
+              <div class="shop-meta">Fashion • Accessories</div>
+              <span class="tag">Contemporary</span>
+            </div>
+          </article>
+        </div>
+
+        <p style="margin-top:20px"><a class="btn secondary" href="#" aria-label="View full directory">View full directory</a></p>
+      </div>
+    </section>
+
+    <!-- News -->
+    <section id="news" class="reveal">
+      <div class="container">
+        <div class="section-title">
+          <h2>News &amp; Happenings</h2>
+          <div class="ornament" aria-hidden="true"></div>
+        </div>
+        <p class="section-intro">Announcements, openings and stories from across Oxford Street. These are sample articles — connect your CMS at launch.</p>
+
+        <div class="news-grid" role="list">
+          <article class="news-card" role="listitem">
+            <img class="news-img" src="https://images.unsplash.com/photo-1518112166137-85f9979a43a5?q=80&w=1200&auto=format&fit=crop" alt="Evening street scene with warm lights" />
+            <div class="news-body">
+              <div class="news-date">11 September 2025</div>
+              <div class="news-title">Night Shopping Hours Extend Through Autumn</div>
+              <p class="news-desc">Selected stores will operate late openings on Thursdays with live music and seasonal menus along the street.</p>
+              <a class="readmore" href="#">Read more →</a>
+            </div>
+          </article>
+
+          <article class="news-card" role="listitem">
+            <img class="news-img" src="https://images.unsplash.com/photo-1511974035430-5de47d3b95da?q=80&w=1200&auto=format&fit=crop" alt="Art installation in a shop window" />
+            <div class="news-body">
+              <div class="news-date">30 August 2025</div>
+              <div class="news-title">Public Art Programme: Windows on Oxford</div>
+              <p class="news-desc">A new series of installations brings contemporary artists into dialogue with the street’s heritage storefronts.</p>
+              <a class="readmore" href="#">Read more →</a>
+            </div>
+          </article>
+
+          <article class="news-card" role="listitem">
+            <img class="news-img" src="https://images.unsplash.com/photo-1575517111478-7f6ae807f4d2?q=80&w=1200&auto=format&fit=crop" alt="Cafe terrace with people enjoying coffee" />
+            <div class="news-body">
+              <div class="news-date">12 August 2025</div>
+              <div class="news-title">Summer Terraces Return to the West End</div>
+              <p class="news-desc">Outdoor dining pop-ups and terrace seating appear along side streets for the season, in partnership with local cafes.</p>
+              <a class="readmore" href="#">Read more →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Travel -->
+    <section id="travel" class="reveal">
+      <div class="container">
+        <div class="section-title">
+          <h2>Travel &amp; Getting Around</h2>
+          <div class="ornament" aria-hidden="true"></div>
+        </div>
+        <p class="section-intro">Oxford Street is served by multiple Underground lines and bus routes, with step‑free access at several stations. Plan ahead and check live service updates on the day of travel.</p>
+
+        <div class="travel">
+          <div class="travel-panel">
+            <ul class="travel-list">
+              <li>
+                <strong>Underground</strong>
+                <span class="muted">Nearby stations: Oxford Circus (Bakerloo/Central/Victoria), Bond Street (Central/Elizabeth), Tottenham Court Road (Central/Elizabeth), Marble Arch (Central).</span>
+              </li>
+              <li>
+                <strong>Bus</strong>
+                <span class="muted">Frequent routes along and around Oxford Street throughout the day and night. Use TfL for the latest information.</span>
+              </li>
+              <li>
+                <strong>Cycle</strong>
+                <span class="muted">Cycle parking on side streets; Santander Cycles docking nearby. Please ride with care—busy pedestrian areas.</span>
+              </li>
+              <li>
+                <strong>Accessibility</strong>
+                <span class="muted">Step‑free access at Bond Street and Tottenham Court Road (Elizabeth line). Many stores offer assisted entry—contact in advance.</span>
+              </li>
+              <li>
+                <strong>From the Airports</strong>
+                <span class="muted">Elizabeth line connects directly from Heathrow to Bond Street &amp; Tottenham Court Road.</span>
+              </li>
+            </ul>
+          </div>
+
+          <aside class="map-card" aria-label="Map placeholder">
+            <div class="map-placeholder">Map embed placeholder (replace with your preferred provider)</div>
+          </aside>
+        </div>
+
+        <div id="newsletter" class="newsletter" style="margin-top: 22px;">
+          <h3 class="footer-title" style="margin:0">Stay in the know</h3>
+          <p style="margin:0 0 6px" class="muted">Events, openings and seasonal guides from OSDC.</p>
+          <form action="#" method="post" onsubmit="event.preventDefault(); alert('Thank you — please check your inbox to confirm.');">
+            <label for="email" class="visually-hidden">Email address</label>
+            <input id="email" type="email" name="email" placeholder="you@example.com" required>
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="reveal">
+      <div class="container about">
+        <div>
+          <div class="section-title">
+            <h2>About OSDC</h2>
+            <div class="ornament" aria-hidden="true"></div>
+          </div>
+          <p>Oxford Street Development Corporation (OSDC) champions the evolution of Oxford Street as a world‑class destination — celebrating heritage while welcoming innovation. We convene retailers, cultural partners, landlords and the local community to create a street that is vibrant, safe and inclusive.</p>
+          <p>Our work spans public realm improvements, programming and placemaking, business engagement, and strategic partnerships that support a thriving West End.</p>
+          <p><a class="btn secondary" href="#contact">Get in touch</a></p>
+        </div>
+        <div class="about-crest">
+          <div class="crest" aria-hidden="true"><b>OSDC</b></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="container footer-grid">
+      <div>
+        <h3 class="footer-title">Oxford Street Development Corporation</h3>
+        <p class="muted">Oxford Street, London W1<br>United Kingdom</p>
+        <p><a class="btn secondary" href="mailto:info@osdc.uk">info@osdc.uk</a></p>
+      </div>
+
+      <div>
+        <h4 class="footer-title" style="font-size:18px">Explore</h4>
+        <ul class="footer-links">
+          <li><a href="#shops">Shops</a></li>
+          <li><a href="#news">News</a></li>
+          <li><a href="#travel">Travel</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-title" style="font-size:18px">Follow</h4>
+        <ul class="footer-links">
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">X (Twitter)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container legal">
+      © <span id="year"></span> OSDC — Oxford Street Development Corporation. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    // Current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Sticky header shadow on scroll
+    const header = document.querySelector('header.site-header');
+    const onScroll = () => {
+      if (window.scrollY > 8) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    };
+    document.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile nav toggle
+    const toggleBtn = document.querySelector('.nav-toggle');
+    const navmenu = document.getElementById('navmenu');
+    toggleBtn?.addEventListener('click', () => {
+      const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      toggleBtn.setAttribute('aria-expanded', String(!expanded));
+      navmenu.classList.toggle('show');
+      toggleBtn.textContent = navmenu.classList.contains('show') ? 'Close' : 'Menu';
+    });
+
+    // Reveal on scroll (respect reduced motion)
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!prefersReduced && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      }, { threshold: .2 });
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    } else {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    }
+
+    // Accessibility: close menu when a link is clicked on mobile
+    document.querySelectorAll('#navmenu a').forEach(a => a.addEventListener('click', () => {
+      if (window.getComputedStyle(toggleBtn).display !== 'none' && navmenu.classList.contains('show')) {
+        navmenu.classList.remove('show');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        toggleBtn.textContent = 'Menu';
+      }
+    }));
+  </script>
+
+  <!-- Basic visually-hidden utility for labels -->
+  <style>
+    .visually-hidden { position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
+  </style>
+</body>
+</html>
