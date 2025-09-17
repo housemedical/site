@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSDC - Oxford Street Development Corporation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark: #1a1a1a;
+            --light: #f8f8f8;
+            --accent: #8B4513;
+            --gray: #555;
+            --light-gray: #f0f0f0;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--dark);
+            background-color: var(--light);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--gold);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            border: 2px solid var(--gold);
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            background-color: transparent;
+            color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .btn-light {
+            background-color: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            margin-left: 15px;
+        }
+        
+        .btn-light:hover {
+            background-color: var(--gold);
+            color: white;
+        }
+        
+        section {
+            padding: 100px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.8rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--gold);
+        }
+        
+        .section-title p {
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            margin-left: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .logo span {
+            color: var(--gold);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 30px;
+            position: relative;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 0;
+        }
+        
+        nav ul li a:hover {
+            color: var(--gold);
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--gold);
+            transition: var(--transition);
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        
+        nav ul li.active a {
+            color: var(--gold);
+        }
+        
+        nav ul li.active a::after {
+            width: 100%;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1581578021424-ebdc09fff80e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/cubes.png');
+            opacity: 0.05;
+        }
+        
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            z-index: 2;
+            animation: fadeInUp 1s ease;
+        }
+        
+        .hero h2 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            line-height: 1.2;
+            animation: fadeIn 1s ease 0.3s both;
+        }
+        
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 1s ease 0.5s both;
+        }
+        
+        .hero-btns {
+            margin-top: 30px;
+            animation: fadeIn 1s ease 0.7s both;
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, var(--accent), #5D2E0F);
+            color: white;
+            padding: 70px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png');
+            opacity: 0.05;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stat-item {
+            padding: 20px;
+            flex: 1;
+            min-width: 200px;
+            transition: var(--transition);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-10px);
+        }
+        
+        .stat-item h3 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: var(--gold);
+        }
+        
+        .stat-item p {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        /* Shops Section */
+        .shops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 35px;
+        }
+        
+        .shop-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .shop-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .shop-img {
+            height: 220px;
+            background: linear-gradient(45deg, var(--accent), #5D2E0F);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shop-img::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80') no-repeat center center/cover;
+            opacity: 0.3;
+        }
+        
+        .shop-content {
+            padding: 25px;
+        }
+        
+        .shop-content h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+        
+        .shop-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        /* News Section */
+        .news-section {
+            background-color: var(--light-gray);
+        }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
+        }
+        
+        .news-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .news-img {
+            height: 220px;
+            background: linear-gradient(45deg, #333, #000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .news-img::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80') no-repeat center center/cover;
+            opacity: 0.3;
+        }
+        
+        .news-content {
+            padding: 25px;
+        }
+        
+        .news-date {
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+            font-size: 0.9rem;
+        }
+        
+        .news-content h3 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .news-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        /* Travel Section */
+        .travel-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .travel-info {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .travel-info h3 {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+        }
+        
+        .travel-info p {
+            margin-bottom: 30px;
+            color: var(--gray);
+        }
+        
+        .travel-options {
+            margin-top: 30px;
+        }
+        
+        .travel-option {
+            display: flex;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+        
+        .travel-icon {
+            background-color: var(--gold);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .travel-option:hover .travel-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        .travel-text h4 {
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+        
+        .travel-text p {
+            margin-bottom: 0;
+            color: var(--gray);
+        }
+        
+        .travel-map {
+            flex: 1;
+            min-width: 300px;
+            height: 450px;
+            background: linear-gradient(45deg, #2c3e50, #4a6491);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .travel-map::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1526772662000-3f88f10405ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80') no-repeat center center/cover;
+            opacity: 0.2;
+        }
+        
+        /* About Section */
+        .about-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .about-text h3 {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+        }
+        
+        .about-text p {
+            margin-bottom: 20px;
+            color: var(--gray);
+        }
+        
+        .about-image {
+            flex: 1;
+            min-width: 300px;
+            height: 450px;
+            background: linear-gradient(45deg, var(--accent), #5D2E0F);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .about-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1581578021424-ebdc09fff80e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80') no-repeat center center/cover;
+            opacity: 0.3;
+        }
+        
+        /* Newsletter Section */
+        .newsletter {
+            background: linear-gradient(135deg, var(--dark), #333);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .newsletter h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .newsletter p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .newsletter-form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+        }
+        
+        .newsletter-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 30px 0 0 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+        }
+        
+        .newsletter-form button {
+            background: var(--gold);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 0 30px 30px 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .newsletter-form button:hover {
+            background: #c09d2a;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 80px 0 40px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            color: var(--gold);
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--gold);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-column ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+        
+        .footer-column ul li a i {
+            margin-right: 10px;
+            color: var(--gold);
+            width: 20px;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--gold);
+            transform: translateX(5px);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--gold);
+            transform: translateY(-5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .fade-in.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 3rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+            
+            nav ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 5px 10px;
+            }
+            
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 25px;
+            }
+            
+            nav {
+                display: none;
+                width: 100%;
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            nav.active {
+                display: block;
+            }
+            
+            nav ul {
+                flex-direction: column;
+            }
+            
+            nav ul li {
+                margin: 10px 0;
+            }
+            
+            .hero-btns .btn {
+                display: block;
+                margin: 15px auto;
+                width: 80%;
+                max-width: 250px;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .stat-item {
+                margin: 15px 0;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+            }
+            
+            .newsletter-form input {
+                border-radius: 30px;
+                margin-bottom: 10px;
+            }
+            
+            .newsletter-form button {
+                border-radius: 30px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <h1>OSDC<span>.</span></h1>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav>
+                <ul>
+                    <li class="active"><a href="#home">Home</a></li>
+                    <li><a href="#shops">Shops</a></li>
+                    <li><a href="#news">News</a></li>
+                    <li><a href="#travel">Travel</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2>Oxford Street Development Corporation</h2>
+            <p>Pioneering the future of London's most iconic shopping destination</p>
+            <div class="hero-btns">
+                <a href="#shops" class="btn">Explore Retailers</a>
+                <a href="#about" class="btn btn-light">Our Vision</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container stats-container">
+            <div class="stat-item fade-in">
+                <h3>300+</h3>
+                <p>Premium Retailers</p>
+            </div>
+            <div class="stat-item fade-in">
+                <h3>250M</h3>
+                <p>Annual Visitors</p>
+            </div>
+            <div class="stat-item fade-in">
+                <h3>150</h3>
+                <p>Years of Heritage</p>
+            </div>
+            <div class="stat-item fade-in">
+                <h3>98%</h3>
+                <p>Satisfaction Rate</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shops Section -->
+    <section id="shops">
+        <div class="container">
+            <div class="section-title">
+                <h2>Premium Retailers</h2>
+                <p>Discover world-class shopping experiences on London's most famous street</p>
+            </div>
+            <div class="shops-grid">
+                <div class="shop-card fade-in">
+                    <div class="shop-img">Luxury Fashion</div>
+                    <div class="shop-content">
+                        <h3>High-End Fashion</h3>
+                        <p>Discover the latest collections from world-renowned designers and luxury brands.</p>
+                        <a href="#" class="btn">Explore</a>
+                    </div>
+                </div>
+                <div class="shop-card fade-in">
+                    <div class="shop-img">Technology Hub</div>
+                    <div class="shop-content">
+                        <h3>Tech & Innovation</h3>
+                        <p>Cutting-edge electronics, smart devices, and the latest in digital innovation.</p>
+                        <a href="#" class="btn">Explore</a>
+                    </div>
+                </div>
+                <div class="shop-card fade-in">
+                    <div class="shop-img">Gourmet Dining</div>
+                    <div class="shop-content">
+                        <h3>Gourmet Experiences</h3>
+                        <p>Indulge in culinary excellence from Michelin-starred restaurants to artisanal cafes.</p>
+                        <a href="#" class="btn">Explore</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section id="news" class="news-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Latest News</h2>
+                <p>Stay updated with the latest developments and initiatives on Oxford Street</p>
+            </div>
+            <div class="news-grid">
+                <div class="news-card fade-in">
+                    <div class="news-img">Development Update</div>
+                    <div class="news-content">
+                        <span class="news-date">June 15, 2023</span>
+                        <h3>New Luxury Retail Complex Opening</h3>
+                        <p>The iconic Selfridges building expansion will introduce 50 new premium brands by autumn.</p>
+                        <a href="#" class="btn">Read More</a>
+                    </div>
+                </div>
+                <div class="news-card fade-in">
+                    <div class="news-img">Sustainability Initiative</div>
+                    <div class="news-content">
+                        <span class="news-date">May 28, 2023</span>
+                        <h3>Green Oxford Street Initiative</h3>
+                        <p>OSDC announces comprehensive sustainability program to reduce carbon footprint by 2025.</p>
+                        <a href="#" class="btn">Read More</a>
+                    </div>
+                </div>
+                <div class="news-card fade-in">
+                    <div class="news-img">Cultural Events</div>
+                    <div class="news-content">
+                        <span class="news-date">May 10, 2023</span>
+                        <h3>Summer Cultural Festival</h3>
+                        <p>Three months of art exhibitions, live performances, and cultural celebrations planned.</p>
+                        <a href="#" class="btn">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Travel Section -->
+    <section id="travel">
+        <div class="container">
+            <div class="section-title">
+                <h2>Getting Here & Around</h2>
+                <p>Your journey to Oxford Street made simple and convenient</p>
+            </div>
+            <div class="travel-container">
+                <div class="travel-info fade-in">
+                    <h3>Plan Your Journey</h3>
+                    <p>Oxford Street is easily accessible by public transport, with several Underground stations nearby. Experience seamless connectivity with our comprehensive travel guide.</p>
+                    
+                    <div class="travel-options">
+                        <div class="travel-option">
+                            <div class="travel-icon">
+                                <i class="fas fa-subway"></i>
+                            </div>
+                            <div class="travel-text">
+                                <h4>Underground</h4>
+                                <p>Central Line (Oxford Circus, Bond Street, Tottenham Court Road)</p>
+                            </div>
+                        </div>
+                        <div class="travel-option">
+                            <div class="travel-icon">
+                                <i class="fas fa-bus"></i>
+                            </div>
+                            <div class="travel-text">
+                                <h4>Bus Services</h4>
+                                <p>Numerous bus routes serve Oxford Street. Key stops include Oxford Circus and Marble Arch.</p>
+                            </div>
+                        </div>
+                        <div class="travel-option">
+                            <div class="travel-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="travel-text">
+                                <h4>By Car</h4>
+                                <p>Parking available at nearby multi-story car parks. Limited street parking.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="travel-map fade-in">
+                    Interactive Map of Oxford Street Area
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>About OSDC</h2>
+                <p>Shaping the future of retail excellence since 2010</p>
+            </div>
+            <div class="about-content">
+                <div class="about-text fade-in">
+                    <h3>Preserving Heritage, Embracing Innovation</h3>
+                    <p>Established in 2010, the Oxford Street Development Corporation (OSDC) is dedicated to maintaining Oxford Street as London's premier retail destination while embracing innovation and sustainability.</p>
+                    <p>Our mission is to balance heritage with modernity, ensuring that Oxford Street remains a world-class shopping experience for generations to come.</p>
+                    <p>We work closely with retailers, local authorities, and community stakeholders to create an environment that fosters economic growth while preserving the area's historical significance.</p>
+                    <a href="#" class="btn">Our Vision</a>
+                </div>
+                <div class="about-image fade-in">
+                    OSDF Headquarters
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="container">
+            <h2>Stay Updated</h2>
+            <p>Subscribe to our newsletter for the latest news, events, and developments on Oxford Street.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>OSDC</h3>
+                    <p>Oxford Street Development Corporation is committed to maintaining Oxford Street as London's premier retail destination.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#shops"><i class="fas fa-chevron-right"></i> Shops</a></li>
+                        <li><a href="#news"><i class="fas fa-chevron-right"></i> News</a></li>
+                        <li><a href="#travel"><i class="fas fa-chevron-right"></i> Travel</a></li>
+                        <li><a href="#about"><i class="fas fa-chevron-right"></i> About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Oxford Street, London W1D 1AB</a></li>
+                        <li><a href="#"><i class="fas fa-phone"></i> +44 20 7123 4567</a></li>
+                        <li><a href="#"><i class="fas fa-envelope"></i> info@osdc.org.uk</a></li>
+                        <li><a href="#"><i class="fas fa-clock"></i> Mon-Fri: 9:00 AM - 6:00 PM</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Oxford Street Development Corporation. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const nav = document.querySelector('nav');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            nav.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            if (nav.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (nav.classList.contains('active')) {
+                        nav.classList.remove('active');
+                        const icon = mobileMenuBtn.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                    
+                    // Update active link
+                    document.querySelectorAll('nav ul li').forEach(li => {
+                        li.classList.remove('active');
+                    });
+                    this.parentElement.classList.add('active');
+                }
+            });
+        });
+        
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.1)';
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+            }
+            
+            // Update active link based on scroll position
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav ul li');
+            
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (pageYOffset >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(li => {
+                li.classList.remove('active');
+                if (li.querySelector('a').getAttribute('href') === `#${current}`) {
+                    li.classList.add('active');
+                }
+            });
+        });
+        
+        // Fade-in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+        
+        const fadeInObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('appear');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        fadeElements.forEach(el => {
+            fadeInObserver.observe(el);
+        });
+        
+        // Newsletter form submission
+        const newsletterForm = document.querySelector('.newsletter-form');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = this.querySelector('input').value;
+                alert(`Thank you for subscribing with ${email}! You'll receive our updates soon.`);
+                this.reset();
+            });
+        }
+    </script>
+</body>
+</html>
