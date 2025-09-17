@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oxford Street Development Corporation | The Future of London's High Street</title>
+    <meta name="description" content="Welcome to the official destination for visiting, shopping, and discovering the ambitious future of London's most iconic street.">
+    
+    <!-- Google Fonts: Cormorant Garamond & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Theme Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'heritage-green': '#0A3D2E',
+                        'heritage-green-900': '#06261C',
+                        'gold': '#C1A24A',
+                        'ivory': '#FAF7EF',
+                        'ink': '#111316',
+                        'stone': '#EDE7DA',
+                    },
+                    fontFamily: {
+                        'display': ['Cormorant Garamond', 'serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                    },
+                    spacing: {
+                        '8': '2rem',
+                        '12': '3rem',
+                        '16': '4rem',
+                        '24': '6rem',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                           '0%': { opacity: 0 },
+                           '100%': { opacity: 1 },
+                        }
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 1s ease-in-out forwards',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .kicker { font-feature-settings: 'tnum'; letter-spacing: 0.05em; }
+        .group:hover .group-hover-arrow { transform: translateX(4px); }
+        .header-link::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 1px;
+            background-color: #C1A24A; transform: scaleX(0); transform-origin: right;
+            transition: transform 250ms ease-in-out;
+        }
+        .header-link:hover::after { transform: scaleX(1); transform-origin: left; }
+        .animated-border { animation-delay: 300ms; }
+        :focus-visible { outline: 2px solid #C1A24A; outline-offset: 4px; }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body x-data="osdcApp" class="bg-ivory font-body text-ink antialiased" :class="{'overflow-hidden': isModalOpen}">
+
+    <div id="root">
+
+        <!-- 1. HeritageHeader -->
+        <header id="main-header" class="sticky top-0 z-40 bg-ivory/80 backdrop-blur-md transition-shadow duration-300">
+            <div class="bg-heritage-green text-ivory/80">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="flex h-10 items-center justify-end space-x-6 text-sm font-medium">
+                        <a href="#" class="transition hover:text-white">Stakeholders</a>
+                        <a href="#" class="transition hover:text-white">Planning</a>
+                        <a href="#" class="transition hover:text-white">Governance</a>
+                    </div>
+                </div>
+            </div>
+            <nav aria-label="Primary" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-20 items-center justify-between">
+                    <div class="flex items-center">
+                        <a href="#home" @click="currentPage = 'home'" class="text-3xl font-display font-bold text-ink">OSDC</a>
+                    </div>
+                    <div class="hidden lg:flex lg:items-center lg:space-x-8">
+                        <a href="#home" @click="scrollToSection('#visit')" class="header-link relative font-semibold transition hover:text-black">Visit</a>
+                        <a href="#shops" class="header-link relative font-semibold transition hover:text-black">Shops Directory</a>
+                        <a href="#news" class="header-link relative font-semibold transition hover:text-black">News & Updates</a>
+                        <a href="#home" @click="scrollToSection('#about')" class="header-link relative font-semibold transition hover:text-black">About</a>
+                    </div>
+                    <div class="hidden lg:flex lg:items-center">
+                        <a href="#" class="rounded-full bg-heritage-green px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-heritage-green-900">Contact Us</a>
+                    </div>
+                    <div class="lg:hidden">
+                        <button @click="mobileMenuOpen = true" type="button" class="inline-flex items-center justify-center rounded-md p-2 text-gray-400">
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" x-transition class="fixed inset-0 z-50 bg-heritage-green/95 backdrop-blur-sm lg:hidden" x-cloak>
+            <div class="fixed top-0 right-0 h-full w-full max-w-xs p-6">
+                <div class="flex items-center justify-between">
+                    <a href="#home" @click="mobileMenuOpen = false; currentPage = 'home'" class="text-3xl font-display font-bold text-ivory">OSDC</a>
+                    <button @click="mobileMenuOpen = false" type="button" class="-m-2.5 rounded-md p-2.5 text-ivory/80">
+                        <span class="sr-only">Close menu</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div class="mt-12 flow-root">
+                    <div class="-my-6 divide-y divide-gold/20">
+                        <div class="space-y-4 py-6">
+                            <a href="#home" @click="mobileMenuOpen = false; scrollToSection('#visit')" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-ivory hover:bg-heritage-green-900">Visit</a>
+                            <a href="#shops" @click="mobileMenuOpen = false" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-ivory hover:bg-heritage-green-900">Shops Directory</a>
+                            <a href="#news" @click="mobileMenuOpen = false" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-ivory hover:bg-heritage-green-900">News & Updates</a>
+                            <a href="#home" @click="mobileMenuOpen = false; scrollToSection('#about')" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-ivory hover:bg-heritage-green-900">About</a>
+                        </div>
+                        <div class="py-6">
+                            <a href="#" @click="mobileMenuOpen = false" class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-ivory hover:bg-heritage-green-900">Contact Us</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <!-- VIEW: HOMEPAGE -->
+            <div x-show="currentPage === 'home'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                <!-- 2. HeritageHero -->
+                <section class="relative overflow-hidden pt-16 pb-24">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+                            <div class="text-center lg:text-left">
+                                <h1 class="font-display text-5xl font-bold tracking-tight text-ink sm:text-7xl">London's Iconic Heart, Reimagined.</h1>
+                                <p class="mt-6 text-lg leading-8 text-ink/80">This Autumn, experience the magnificent transformation of the world's greatest high street. Discover new flagships, exclusive events, and a vibrant public space designed for the future.</p>
+                                <div class="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+                                    <a href="#" class="rounded-full bg-gold px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">Discover What's On</a>
+                                    <a href="#about" @click="scrollToSection('#about')" class="group text-sm font-semibold leading-6 text-ink">Learn about our mission <span class="group-hover-arrow transition-transform duration-200" aria-hidden="true">→</span></a>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="animated-border absolute -top-8 -right-8 w-24 h-24 border-t-2 border-r-2 border-gold/50 rounded-tr-2xl animate-fadeIn opacity-0"></div>
+                                <div class="animated-border absolute -bottom-8 -left-8 w-24 h-24 border-b-2 border-l-2 border-gold/50 rounded-bl-2xl animate-fadeIn opacity-0"></div>
+                                <img src="https://images.pexels.com/photos/2224741/pexels-photo-2224741.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="An iconic photograph of Oxford Street with its famous red double-decker buses and historic architecture under a dramatic sky." class="rounded-2xl shadow-2xl">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 3. Interactive Shops Directory Section -->
+                <section class="py-24 bg-stone/50">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="text-center max-w-2xl mx-auto">
+                            <p class="kicker text-sm font-semibold uppercase tracking-wider text-gold">Explore the District</p>
+                            <h2 class="mt-2 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">A Curated Destination</h2>
+                            <p class="mt-6 text-lg leading-8 text-ink/70">From global fashion houses to independent boutiques and culinary delights, discover a world of unparalleled choice and quality.</p>
+                        </div>
+
+                        <!-- Shop Grid (Preview) -->
+                        <div class="mt-16 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6 lg:gap-6">
+                            <template x-for="shop in allShops.slice(0, 6)" :key="shop.id">
+                                 <div>
+                                    <a href="#shops" @click="activeCategory = shop.category" class="group w-full h-full aspect-w-1 aspect-h-1 relative flex items-end justify-center rounded-2xl overflow-hidden text-center text-white p-4 shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                                        <img :src="shop.image" :alt="`Exterior of ${shop.name}`" class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-110">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                        <h3 class="relative z-10 font-display text-2xl font-bold" x-text="shop.name"></h3>
+                                    </a>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="mt-12 text-center">
+                            <a href="#shops" class="rounded-full bg-heritage-green px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-heritage-green-900">Explore All Shops & Boutiques</a>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 6. NewsCarousel -->
+                <section class="py-24">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
+                            <div>
+                               <p class="kicker text-sm font-semibold uppercase tracking-wider text-gold">Stay Informed</p>
+                               <h2 class="mt-2 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">News & Updates</h2>
+                            </div>
+                             <a href="#news" class="group text-sm font-semibold leading-6 text-ink/80 whitespace-nowrap">View all articles <span class="group-hover-arrow transition-transform duration-200" aria-hidden="true">→</span></a>
+                        </div>
+                        <div class="mt-16 grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 lg:grid-cols-3">
+                             <template x-for="article in recentArticles" :key="article.id">
+                                <article>
+                                    <a :href="'#article?id=' + article.id" class="group block transition-all duration-300 hover:-translate-y-1">
+                                       <div class="overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
+                                           <img class="aspect-[16/10] w-full object-cover transition duration-300 group-hover:scale-105" :src="article.image" :alt="article.alt">
+                                       </div>
+                                       <p class="mt-6 text-sm text-ink/60" x-text="article.date"></p>
+                                       <h3 class="mt-2 font-display text-2xl font-bold text-ink transition group-hover:text-gold" x-text="article.title"></h3>
+                                       <p class="mt-2 text-base text-ink/70" x-text="article.summary"></p>
+                                    </a>
+                                </article>
+                             </template>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 8. DirectionsMap -->
+                <section id="visit" class="py-24 bg-stone/50">
+                     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+                            <div>
+                                <p class="kicker text-sm font-semibold uppercase tracking-wider text-gold">Visit Us</p>
+                                <h2 class="mt-2 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Getting Here</h2>
+                                <p class="mt-6 text-lg leading-8 text-ink/70">Located in the heart of London, Oxford Street is easily accessible via multiple tube lines, bus routes, and is a short walk from major railway stations.</p>
+                                <div class="mt-8 space-y-2">
+                                    <p class="font-semibold">Oxford Street, London, W1C 1JN</p>
+                                    <p class="text-ink/70">Nearest Tube: Oxford Circus, Bond Street, Tottenham Court Road</p>
+                                </div>
+                                <div class="mt-8 flex gap-4">
+                                    <a href="https://www.google.com/maps/dir/?api=1&destination=Oxford+Street,+London" target="_blank" rel="noopener noreferrer" class="flex-1 rounded-full bg-ink px-6 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-black">Get Directions on Google Maps</a>
+                                    <a href="http://maps.apple.com/?address=Oxford+Street,+London" target="_blank" rel="noopener noreferrer" class="flex-1 rounded-full bg-ink px-6 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-black">Open in Apple Maps</a>
+                                </div>
+                            </div>
+                            <div class="aspect-h-3 aspect-w-4 overflow-hidden rounded-2xl shadow-2xl">
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2482.906153092851!2d-0.14418602283997576!3d51.51525287181515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487604d50918ef81%3A0x6d9018443356cf46!2sOxford%20St%2C%20London!5e0!3m2!1sen!2suk!4v1694439129759!5m2!1sen!2suk" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- About OSDC Section -->
+                <section id="about" class="py-24">
+                     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+                            <div class="order-last lg:order-first">
+                                 <p class="kicker text-sm font-semibold uppercase tracking-wider text-gold">Our Mission</p>
+                                <h2 class="mt-2 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Shaping a Legacy</h2>
+                                <p class="mt-6 text-lg leading-8 text-ink/70">The Oxford Street Development Corporation (OSDC) is a public-private partnership dedicated to delivering a comprehensive, long-term vision for the district. Our mission is to enhance the public realm, support world-class retail, and foster a vibrant cultural destination for Londoners and visitors alike, ensuring Oxford Street remains the world's finest high street for generations to come.</p>
+                                <div class="mt-8">
+                                    <a href="#" class="group text-sm font-semibold leading-6 text-ink">Meet our leadership team <span class="group-hover-arrow transition-transform duration-200" aria-hidden="true">→</span></a>
+                                </div>
+                            </div>
+                            <div class="overflow-hidden rounded-2xl shadow-2xl">
+                                 <img src="https://images.pexels.com/photos/3184430/pexels-photo-3184430.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="A diverse, professional team in a strategic planning session, collaborating around a table with blueprints." class="aspect-h-3 aspect-w-4 object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- VIEW: SHOPS DIRECTORY -->
+            <div x-show="currentPage === 'shops'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-cloak>
+                <div class="bg-stone/50 py-24">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="text-center max-w-2xl mx-auto">
+                            <h1 class="font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Shops Directory</h1>
+                            <p class="mt-6 text-lg leading-8 text-ink/70">From global fashion houses to independent boutiques and culinary delights, discover a world of unparalleled choice and quality.</p>
+                        </div>
+                        <div class="mt-12 max-w-4xl mx-auto">
+                            <input type="search" x-model="searchQuery" placeholder="Search for a shop..." class="w-full rounded-full border-stone bg-white px-6 py-3 text-ink placeholder-ink/50 focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-stone/50">
+                            <div class="mt-6 flex flex-wrap justify-center gap-2">
+                                <template x-for="category in categories" :key="category">
+                                    <button @click="activeCategory = category" :class="{'bg-heritage-green text-white': activeCategory === category, 'bg-white text-ink hover:bg-stone': activeCategory !== category}" class="rounded-full px-5 py-2 text-sm font-semibold transition">
+                                        <span x-text="category"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                            <template x-for="shop in filteredShops" :key="shop.id">
+                                 <div x-show="true" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
+                                    <button @click="openShopModal(shop)" class="group block w-full text-left transition-all duration-300 hover:-translate-y-1">
+                                       <div class="overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
+                                           <img class="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-105" :src="shop.image" :alt="shop.name">
+                                       </div>
+                                       <h3 class="mt-4 font-display text-2xl font-bold text-ink transition group-hover:text-gold" x-text="shop.name"></h3>
+                                       <p class="mt-1 text-sm font-semibold text-gold" x-text="shop.category"></p>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                         <div x-show="filteredShops.length === 0" class="text-center mt-16 text-ink/70" x-cloak>
+                            <p>No shops found matching your criteria.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: NEWS & UPDATES -->
+            <div x-show="currentPage === 'news'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-cloak>
+                 <div class="py-24">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="text-center max-w-2xl mx-auto">
+                            <h1 class="font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">News & Updates</h1>
+                            <p class="mt-6 text-lg leading-8 text-ink/70">The latest announcements, developments, and stories from the Oxford Street Development Corporation.</p>
+                        </div>
+                        <div class="mt-16 grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 lg:grid-cols-3">
+                            <template x-for="article in paginatedNews" :key="article.id">
+                                <article>
+                                    <a :href="'#article?id=' + article.id" class="group block transition-all duration-300 hover:-translate-y-1">
+                                       <div class="overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
+                                           <img class="aspect-[16/10] w-full object-cover transition duration-300 group-hover:scale-105" :src="article.image" :alt="article.alt">
+                                       </div>
+                                       <p class="mt-6 text-sm text-ink/60" x-text="article.date"></p>
+                                       <h3 class="mt-2 font-display text-2xl font-bold text-ink transition group-hover:text-gold" x-text="article.title"></h3>
+                                       <p class="mt-2 text-base text-ink/70" x-text="article.summary"></p>
+                                    </a>
+                                </article>
+                            </template>
+                        </div>
+                        <nav x-show="totalPagesNews > 1" class="mt-16 flex items-center justify-between border-t border-stone pt-8" aria-label="Pagination">
+                            <div class="flex flex-1 justify-between sm:justify-center">
+                                <button @click="changeNewsPage(currentPageNews - 1)" :disabled="currentPageNews === 1" class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 disabled:opacity-50 hover:bg-gray-50 focus-visible:outline-offset-0">Previous</button>
+                                <div class="hidden sm:flex items-center mx-4">
+                                    <p class="text-sm text-gray-700">
+                                        Page <span x-text="currentPageNews"></span> of <span x-text="totalPagesNews"></span>
+                                    </p>
+                                </div>
+                                <button @click="changeNewsPage(currentPageNews + 1)" :disabled="currentPageNews === totalPagesNews" class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 disabled:opacity-50 hover:bg-gray-50 focus-visible:outline-offset-0">Next</button>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VIEW: SINGLE ARTICLE -->
+            <div x-show="currentPage === 'article'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-cloak>
+                 <div class="py-24">
+                    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+                        <template x-if="currentArticle">
+                            <article>
+                                <a href="#news" class="group text-sm font-semibold leading-6 text-ink/80 inline-flex items-center">
+                                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                                    Back to News
+                                </a>
+                                <h1 class="mt-8 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl" x-text="currentArticle.title"></h1>
+                                <p class="mt-4 text-base text-ink/60" x-text="currentArticle.date"></p>
+                                <img class="mt-8 w-full rounded-2xl" :src="currentArticle.image" :alt="currentArticle.alt">
+                                <div class="prose prose-lg mt-8 max-w-none text-ink/80" x-html="currentArticle.content"></div>
+                            </article>
+                        </template>
+                         <template x-if="!currentArticle">
+                            <div class="text-center">
+                                <h1 class="font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Article not found</h1>
+                                <p class="mt-6 text-lg leading-8 text-ink/70">The article you are looking for does not exist.</p>
+                                <a href="#news" class="mt-8 inline-block rounded-full bg-heritage-green px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-heritage-green-900">Back to News</a>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- 9. HeritageFooter -->
+        <footer class="bg-heritage-green" aria-labelledby="footer-heading">
+             <h2 id="footer-heading" class="sr-only">Footer</h2>
+            <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-gold">Navigate</h3>
+                        <ul role="list" class="mt-6 space-y-4">
+                            <li><a href="#home" @click="scrollToSection('#visit')" class="text-base text-ivory/70 transition hover:text-white">Visit</a></li>
+                            <li><a href="#shops" class="text-base text-ivory/70 transition hover:text-white">Shops Directory</a></li>
+                            <li><a href="#news" class="text-base text-ivory/70 transition hover:text-white">News & Updates</a></li>
+                            <li><a href="#home" @click="scrollToSection('#about')" class="text-base text-ivory/70 transition hover:text-white">About OSDC</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-gold">Governance</h3>
+                        <ul role="list" class="mt-6 space-y-4">
+                            <li><a href="#" class="text-base text-ivory/70 transition hover:text-white">Planning Portal</a></li>
+                            <li><a href="#" class="text-base text-ivory/70 transition hover:text-white">Latest Decisions</a></li>
+                            <li><a href="#" class="text-base text-ivory/70 transition hover:text-white">Our Leadership</a></li>
+                            <li><a href="#" class="text-base text-ivory/70 transition hover:text-white">Transparency</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-gold">Connect</h3>
+                        <ul role="list" class="mt-6 space-y-4">
+                             <li><a href="#" class="text-base text-ivory/70 transition hover:text-white">Contact Us</a></li>
+                             <li><a href="#" class="text-base text-ivory/70 transition hover:text-white">Press & Media</a></li>
+                             <li><a href="#" class="text-base text-ivory/70 transition hover:text-white">For Business</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-span-2 md:col-span-1">
+                        <h3 class="font-display text-xl font-bold text-gold">Stay up to date</h3>
+                        <p class="mt-6 text-base text-ivory/70">Subscribe to our newsletter for the latest news, events, and openings.</p>
+                        <form class="mt-6 sm:flex sm:max-w-md">
+                            <label for="email-address" class="sr-only">Email address</label>
+                            <input type="email" name="email-address" id="email-address" autocomplete="email" required class="w-full min-w-0 appearance-none rounded-md border-0 bg-white/5 px-3 py-2 text-base text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gold sm:w-64 sm:text-sm sm:leading-6" placeholder="Enter your email">
+                            <div class="mt-4 sm:ml-4 sm:mt-0 sm:flex-shrink-0">
+                                <button type="submit" class="flex w-full items-center justify-center rounded-md bg-gold px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">Subscribe</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="mt-16 border-t border-white/10 pt-8">
+                    <p class="text-base text-ivory/60">&copy; 2025 Oxford Street Development Corporation. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Shop Detail Modal -->
+        <div x-show="isModalOpen" @keydown.escape.window="closeShopModal()" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div x-show="isModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity" @click="closeShopModal()"></div>
+                <div x-show="isModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative inline-block align-bottom bg-ivory rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <template x-if="selectedShop">
+                        <div>
+                            <img :src="selectedShop.image" :alt="`Interior of ${selectedShop.name}`" class="h-64 w-full object-cover">
+                            <div class="p-6">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h3 class="font-display text-3xl font-bold text-ink" x-text="selectedShop.name"></h3>
+                                        <p class="mt-1 text-sm font-semibold text-gold" x-text="selectedShop.category"></p>
+                                    </div>
+                                    <button @click="closeShopModal()" class="text-ink/50 hover:text-ink">
+                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                </div>
+                                <p class="mt-4 text-base text-ink/70" x-text="selectedShop.description"></p>
+                                <div class="mt-6 border-t border-stone pt-4">
+                                    <h4 class="font-semibold text-ink">Opening Hours</h4>
+                                    <ul class="mt-2 text-sm text-ink/70 space-y-1">
+                                        <template x-for="line in selectedShop.hours.split('\n')" :key="line">
+                                            <li><span x-text="line"></span></li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alpine.js - Placed at the end and deferred for reliability -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <script>
+        const shopsData = [
+            { id: 1, name: 'Selfridges', category: 'Fashion', image: 'https://images.pexels.com/photos/2850287/pexels-photo-2850287.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'A world-famous department store offering an extensive range of luxury goods, fashion, and food.', hours: 'Mon - Sat: 10am - 9pm\nSun: 11:30am - 6pm' },
+            { id: 2, name: 'Lush', category: 'Beauty', image: 'https://images.pexels.com/photos/7262993/pexels-photo-7262993.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'Pioneers of fresh, handmade cosmetics. Famous for their bath bombs and ethical campaigns.', hours: 'Mon - Sat: 10am - 8pm\nSun: 12pm - 6pm' },
+            { id: 3, name: 'Heal\'s', category: 'Home', image: 'https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'Iconic British furniture and home accessories store, known for its contemporary design and quality craftsmanship.', hours: 'Mon - Sat: 10am - 7pm\nSun: 12pm - 6pm' },
+            { id: 4, name: 'Sketch', category: 'Dining', image: 'https://images.pexels.com/photos/262047/pexels-photo-262047.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'An eccentric and luxurious collection of restaurants and bars, famous for its unique art-filled interiors.', hours: 'Mon - Sun: 12pm - 2am' },
+            { id: 5, name: 'Apple Store', category: 'Tech', image: 'https://images.pexels.com/photos/392018/pexels-photo-392018.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'The flagship store for Apple products, offering the full range of iPhones, MacBooks, and accessories.', hours: 'Mon - Sat: 10am - 9pm\nSun: 12pm - 6pm' },
+            { id: 6, name: 'The Palladium', category: 'Culture', image: 'https://images.pexels.com/photos/7991158/pexels-photo-7991158.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'A world-renowned theatre hosting major musicals, concerts, and the Royal Variety Performance.', hours: 'Varies by performance' },
+            { id: 7, name: 'Zara', category: 'Fashion', image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'A global fashion giant offering the latest trends in clothing, accessories, and footwear for men, women, and children.', hours: 'Mon - Sat: 10am - 9pm\nSun: 12pm - 6pm' },
+            { id: 8, name: 'Dishoom', category: 'Dining', image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', description: 'A hugely popular restaurant paying homage to the Irani cafés of Bombay, serving delicious Indian comfort food.', hours: 'Mon - Sun: 8am - 11pm' },
+        ];
+        const newsData = [
+            { id: 1, title: "Oxford Street Unveils Ambitious 'Pedestrian First' Future", date: "September 10, 2025", image: "https://images.pexels.com/photos/53464/blue-moon-super-moon-moon-lighting-53464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2", alt: "Wide-angle shot of a pedestrianised Oxford Street at twilight", summary: "The OSDC has released new renders showcasing wider pavements, increased green spaces, and dedicated cycle lanes, marking a new era for the district.", content: "<p>The Oxford Street Development Corporation (OSDC) has officially unveiled its long-term strategic vision, placing pedestrians and sustainable transport at the heart of its plans. The new renders, released today, illustrate a transformed district featuring significantly wider pavements, extensive tree planting, and numerous pocket parks. A key highlight is the introduction of dedicated, protected cycle lanes running the length of the street, aiming to create a safer and more welcoming environment for cyclists.</p><p>Lord Mayor of London, John Smith, commented, 'This is a landmark day for London. We are reclaiming Oxford Street for the people, creating a greener, safer, and more enjoyable destination for residents and visitors alike. This is a bold step that will secure its status as the world's greatest high street for decades to come.'</p>" },
+            { id: 2, title: "Global Tech Giant to Open New Flagship Experience Store", date: "September 5, 2025", image: "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2", alt: "Sleek, modern interior of a technology store", summary: "A major US technology company has announced it will open a new 30,000 sq. ft. flagship store on Oxford Street, set to launch in Spring 2026.", content: "<p>In a major vote of confidence for London's retail scene, a leading US-based technology company has confirmed it has secured a 30,000 square foot location on Oxford Street for a new flagship 'experience store'. While the company's name remains under wraps, sources suggest it is one of the world's largest consumer electronics brands. The store promises to be an interactive hub, allowing customers to get hands-on with the latest technology and attend workshops and events. Construction is expected to begin in Q4 2025, with a grand opening slated for Spring 2026.</p>" },
+            { id: 3, title: "Autumn Festival of Light Announced for October", date: "September 1, 2025", image: "https://images.pexels.com/photos/994605/pexels-photo-994605.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2", alt: "Abstract, colourful light installations illuminating a city street at night", summary: "The OSDC announces a month-long 'Festival of Light' for October, featuring installations from renowned international artists to illuminate the district.", content: "<p>This October, Oxford Street will be transformed into a spectacular open-air gallery with the announcement of the first-ever 'Festival of Light'. The OSDC has commissioned several internationally acclaimed artists to create a series of breathtaking light installations that will be displayed along the length of the street. The festival will run for the entire month of October, with special events, late-night shopping, and pop-up food stalls planned to coincide with the installations. The event aims to draw visitors into the district during the darker autumn evenings and provide a unique, free cultural experience for all.</p>" },
+            { id: 4, title: "Historic Facade Restoration Project Completed", date: "August 28, 2025", image: "https://images.pexels.com/photos/1618269/pexels-photo-1618269.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2", alt: "Detailed shot of beautifully restored historic stonework on a building", summary: "A two-year project to restore the historic facades of several key buildings has been completed, preserving the architectural heritage of the area.", content: "<p>A painstaking two-year restoration project has concluded, bringing several of Oxford Street's most iconic historic buildings back to their former glory. The project, managed by the OSDC in partnership with heritage conservation specialists, involved cleaning stonework, repairing original features, and upgrading lighting to sensitively highlight the architecture. The result is a stunning reminder of the district's rich history and architectural grandeur.</p>" },
+            { id: 5, title: "New Report Shows Visitor Satisfaction at All-Time High", date: "August 20, 2025", image: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2", alt: "A group of diverse people smiling and collaborating in a bright, modern space", summary: "The latest quarterly report indicates that visitor satisfaction scores for Oxford Street have reached their highest level in five years.", content: "<p>The Q2 2025 Visitor Sentiment Report has revealed a significant uptick in public satisfaction. Scores relating to cleanliness, safety, and overall experience have reached their highest point in five years, a testament to the ongoing investment in the public realm and visitor services. The report highlighted the success of the new 'Street Ambassador' program as a key contributor to the positive results.</p>" },
+            { id: 6, title: "Culinary Pop-Up 'Taste of the World' Returns in November", date: "August 15, 2025", image: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2", alt: "A vibrant, bustling street food market with various stalls", summary: "The hugely popular 'Taste of the World' food market will return to the district for a special winter edition throughout November.", content: "<p>Following its successful summer run, the 'Taste of the World' culinary pop-up market is set to return this November. The market will feature a curated selection of London's best street food vendors, offering cuisines from across the globe. This special winter edition will also include heated seating areas and festive-themed stalls, providing a perfect destination for shoppers and food lovers during the run-up to the holiday season.</p>" },
+        ];
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('osdcApp', () => ({
+                // --- Global State ---
+                currentPage: 'home',
+                mobileMenuOpen: false,
+                isModalOpen: false, 
+                selectedShop: null, 
+
+                // --- Data ---
+                allShops: shopsData,
+                allNews: newsData,
+
+                // --- Homepage State ---
+                get recentArticles() {
+                    return this.allNews.slice(0, 3);
+                },
+
+                // --- Shops Page State ---
+                searchQuery: '',
+                activeCategory: 'All',
+                get filteredShops() {
+                    if (!this.allShops) return [];
+                    return this.allShops.filter(shop => {
+                        const categoryMatch = this.activeCategory === 'All' || shop.category === this.activeCategory;
+                        const searchMatch = shop.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        return categoryMatch && searchMatch;
+                    });
+                },
+                categories: ['All', 'Fashion', 'Beauty', 'Home', 'Dining', 'Tech', 'Culture'],
+
+                // --- News Page State ---
+                currentPageNews: 1,
+                itemsPerPageNews: 6,
+                get totalPagesNews() {
+                    return Math.ceil(this.allNews.length / this.itemsPerPageNews);
+                },
+                get paginatedNews() {
+                    const start = (this.currentPageNews - 1) * this.itemsPerPageNews;
+                    const end = start + this.itemsPerPageNews;
+                    return this.allNews.slice(start, end);
+                },
+                changeNewsPage(page) {
+                    if (page > 0 && page <= this.totalPagesNews) {
+                        this.currentPageNews = page;
+                        window.scrollTo(0,0);
+                    }
+                },
+
+                // --- Article Page State ---
+                currentArticle: null,
+
+                // --- Methods ---
+                init() {
+                    this.handleRouteChange();
+                    window.addEventListener('hashchange', () => this.handleRouteChange());
+                },
+
+                handleRouteChange() {
+                    const hash = window.location.hash || '#home';
+                    if (hash.startsWith('#article?id=')) {
+                        const id = new URLSearchParams(hash.split('?')[1]).get('id');
+                        this.currentArticle = this.allNews.find(a => a.id == id) || null;
+                        this.currentPage = 'article';
+                    } else if (hash === '#shops') {
+                        const params = new URLSearchParams(window.location.search);
+                        if(params.has('category')) {
+                            this.activeCategory = params.get('category');
+                        }
+                        this.currentPage = 'shops';
+                    } else if (hash === '#news') {
+                        this.currentPage = 'news';
+                    } else {
+                        this.currentPage = 'home';
+                    }
+                    window.scrollTo(0, 0);
+                },
+
+                scrollToSection(selector) {
+                    this.currentPage = 'home';
+                    this.$nextTick(() => {
+                        const element = document.querySelector(selector);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    });
+                },
+                
+                openShopModal(shop) {
+                    this.selectedShop = shop;
+                    this.isModalOpen = true;
+                },
+                closeShopModal() {
+                    this.isModalOpen = false;
+                    setTimeout(() => { this.selectedShop = null; }, 300);
+                }
+            }));
+        });
+    </script>
+</body>
+</html>
+
