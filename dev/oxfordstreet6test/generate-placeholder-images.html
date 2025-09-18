@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Placeholder Images - OSDC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .generator {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            display: block;
+        }
+        button {
+            background: #01422A;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0A5D3A;
+        }
+        .image-info {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        h1, h2 {
+            color: #01422A;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 OSDC Placeholder Image Generator</h1>
+    
+    <div class="note">
+        <strong>Note:</strong> This tool generates basic placeholder images for development. 
+        For production, replace with professional Oxford Street photography and official brand logos.
+    </div>
+
+    <div class="generator">
+        <h2>Hero Images</h2>
+        <canvas id="hero-desktop" width="1200" height="600"></canvas>
+        <div class="image-info">hero-desktop.jpg (1200x600px)</div>
+        <button onclick="generateHeroImage('hero-desktop', 1200, 600, 'Oxford Street - London\\'s Premier Shopping Destination')">Generate Desktop Hero</button>
+        <button onclick="downloadCanvas('hero-desktop', 'hero-desktop.jpg')">Download</button>
+
+        <canvas id="hero-mobile" width="800" height="400"></canvas>
+        <div class="image-info">hero-mobile.jpg (800x400px)</div>
+        <button onclick="generateHeroImage('hero-mobile', 800, 400, 'Oxford Street\nShopping District')">Generate Mobile Hero</button>
+        <button onclick="downloadCanvas('hero-mobile', 'hero-mobile.jpg')">Download</button>
+    </div>
+
+    <div class="generator">
+        <h2>Story/News Images</h2>
+        <canvas id="story-heritage" width="600" height="400"></canvas>
+        <div class="image-info">story-heritage-restoration.jpg (600x400px)</div>
+        <button onclick="generateStoryImage('story-heritage', 600, 400, 'Heritage\nRestoration', '#8B4513')">Generate Heritage</button>
+        <button onclick="downloadCanvas('story-heritage', 'story-heritage-restoration.jpg')">Download</button>
+
+        <canvas id="story-sustainability" width="400" height="300"></canvas>
+        <div class="image-info">story-sustainability.jpg (400x300px)</div>
+        <button onclick="generateStoryImage('story-sustainability', 400, 300, 'Green\nInitiatives', '#228B22')">Generate Sustainability</button>
+        <button onclick="downloadCanvas('story-sustainability', 'story-sustainability.jpg')">Download</button>
+
+        <canvas id="story-innovation" width="400" height="300"></canvas>
+        <div class="image-info">story-retail-innovation.jpg (400x300px)</div>
+        <button onclick="generateStoryImage('story-innovation', 400, 300, 'Retail\nInnovation', '#4169E1')">Generate Innovation</button>
+        <button onclick="downloadCanvas('story-innovation', 'story-retail-innovation.jpg')">Download</button>
+    </div>
+
+    <div class="generator">
+        <h2>Shop Category Images</h2>
+        <canvas id="cat-fashion" width="300" height="200"></canvas>
+        <div class="image-info">category-fashion.jpg (300x200px)</div>
+        <button onclick="generateCategoryImage('cat-fashion', 'Fashion & Clothing', '👕')">Generate Fashion</button>
+        <button onclick="downloadCanvas('cat-fashion', 'category-fashion.jpg')">Download</button>
+
+        <canvas id="cat-luxury" width="300" height="200"></canvas>
+        <div class="image-info">category-luxury.jpg (300x200px)</div>
+        <button onclick="generateCategoryImage('cat-luxury', 'Luxury Goods', '💎')">Generate Luxury</button>
+        <button onclick="downloadCanvas('cat-luxury', 'category-luxury.jpg')">Download</button>
+
+        <canvas id="cat-department" width="300" height="200"></canvas>
+        <div class="image-info">category-department.jpg (300x200px)</div>
+        <button onclick="generateCategoryImage('cat-department', 'Department Stores', '🏬')">Generate Department</button>
+        <button onclick="downloadCanvas('cat-department', 'category-department.jpg')">Download</button>
+
+        <canvas id="cat-beauty" width="300" height="200"></canvas>
+        <div class="image-info">category-beauty.jpg (300x200px)</div>
+        <button onclick="generateCategoryImage('cat-beauty', 'Beauty & Cosmetics', '💄')">Generate Beauty</button>
+        <button onclick="downloadCanvas('cat-beauty', 'category-beauty.jpg')">Download</button>
+    </div>
+
+    <div class="generator">
+        <h2>Shop Logos (Square)</h2>
+        <canvas id="logo-selfridges" width="120" height="120"></canvas>
+        <button onclick="generateShopLogo('logo-selfridges', 'Selfridges', '#000000', '#FFD700')">Selfridges</button>
+        <button onclick="downloadCanvas('logo-selfridges', 'selfridges-logo.jpg')">Download</button>
+
+        <canvas id="logo-johnlewis" width="120" height="120"></canvas>
+        <button onclick="generateShopLogo('logo-johnlewis', 'John Lewis', '#FFFFFF', '#000000')">John Lewis</button>
+        <button onclick="downloadCanvas('logo-johnlewis', 'john-lewis-logo.jpg')">Download</button>
+
+        <canvas id="logo-zara" width="120" height="120"></canvas>
+        <button onclick="generateShopLogo('logo-zara', 'ZARA', '#000000', '#FFFFFF')">Zara</button>
+        <button onclick="downloadCanvas('logo-zara', 'zara-logo.jpg')">Download</button>
+
+        <canvas id="logo-hm" width="120" height="120"></canvas>
+        <button onclick="generateShopLogo('logo-hm', 'H&M', '#DC143C', '#FFFFFF')">H&M</button>
+        <button onclick="downloadCanvas('logo-hm', 'hm-logo.jpg')">Download</button>
+    </div>
+
+    <div class="note">
+        <strong>Instructions for Deployment:</strong>
+        <ol>
+            <li>Generate and download all placeholder images using the buttons above</li>
+            <li>Create an <code>assets/</code> folder in your website directory</li>
+            <li>Upload the images to the appropriate subfolders:
+                <ul>
+                    <li>Hero images: <code>assets/</code></li>
+                    <li>Story images: <code>assets/</code></li>
+                    <li>Category images: <code>assets/</code></li>
+                    <li>Shop logos: <code>assets/shops/</code></li>
+                </ul>
+            </li>
+            <li>For production, replace with professional Oxford Street photography</li>
+        </ol>
+    </div>
+
+    <script>
+        function generateHeroImage(canvasId, width, height, text) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#01422A');
+            gradient.addColorStop(1, '#0A5D3A');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Overlay pattern
+            ctx.fillStyle = 'rgba(212, 165, 116, 0.1)';
+            for (let i = 0; i < width; i += 50) {
+                for (let j = 0; j < height; j += 50) {
+                    ctx.fillRect(i, j, 25, 25);
+                }
+            }
+            
+            // Text
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold ${Math.floor(width/20)}px serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const lines = text.split('\\n');
+            lines.forEach((line, index) => {
+                ctx.fillText(line, width/2, height/2 + (index * Math.floor(width/15)));
+            });
+            
+            // Oxford Street label
+            ctx.font = `${Math.floor(width/40)}px sans-serif`;
+            ctx.fillStyle = '#D4A574';
+            ctx.fillText('Oxford Street Development Corporation', width/2, height - 30);
+        }
+        
+        function generateStoryImage(canvasId, width, height, text, color) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Overlay
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(0, 0, width, height/3);
+            
+            // Text
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold ${Math.floor(width/12)}px serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const lines = text.split('\\n');
+            lines.forEach((line, index) => {
+                ctx.fillText(line, width/2, height/2 + (index * Math.floor(width/10)));
+            });
+        }
+        
+        function generateCategoryImage(canvasId, text, emoji) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const width = 300;
+            const height = 200;
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#F5F5F5');
+            gradient.addColorStop(1, '#E0E0E0');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Emoji
+            ctx.font = '60px serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(emoji, width/2, height/2 - 20);
+            
+            // Text
+            ctx.fillStyle = '#01422A';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(text, width/2, height/2 + 40);
+        }
+        
+        function generateShopLogo(canvasId, name, bgColor, textColor) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const size = 120;
+            
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Border
+            ctx.strokeStyle = textColor;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(5, 5, size-10, size-10);
+            
+            // Text
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(name, size/2, size/2);
+        }
+        
+        function downloadCanvas(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.8);
+            link.click();
+        }
+
+        // Generate all images on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // Generate hero images
+                generateHeroImage('hero-desktop', 1200, 600, 'Oxford Street - London\\'s Premier Shopping Destination');
+                generateHeroImage('hero-mobile', 800, 400, 'Oxford Street\\nShopping District');
+                
+                // Generate story images
+                generateStoryImage('story-heritage', 600, 400, 'Heritage\\nRestoration', '#8B4513');
+                generateStoryImage('story-sustainability', 400, 300, 'Green\\nInitiatives', '#228B22');
+                generateStoryImage('story-innovation', 400, 300, 'Retail\\nInnovation', '#4169E1');
+                
+                // Generate category images
+                generateCategoryImage('cat-fashion', 'Fashion & Clothing', '👕');
+                generateCategoryImage('cat-luxury', 'Luxury Goods', '💎');
+                generateCategoryImage('cat-department', 'Department Stores', '🏬');
+                generateCategoryImage('cat-beauty', 'Beauty & Cosmetics', '💄');
+                
+                // Generate shop logos
+                generateShopLogo('logo-selfridges', 'Selfridges', '#000000', '#FFD700');
+                generateShopLogo('logo-johnlewis', 'John Lewis', '#FFFFFF', '#000000');
+                generateShopLogo('logo-zara', 'ZARA', '#000000', '#FFFFFF');
+                generateShopLogo('logo-hm', 'H&M', '#DC143C', '#FFFFFF');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
