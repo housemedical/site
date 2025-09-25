@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to South Derbyshire District Council</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom styles */
+        :root {
+            --base-font-size: 16px;
+        }
+        html {
+            font-size: var(--base-font-size);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+        #hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100;
+            transform: translateX(-50%) translateY(-50%);
+            background-size: cover;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(to top, rgba(0, 41, 82, 0.8), rgba(0, 51, 102, 0.6));
+            z-index: -50;
+        }
+
+        /* Mobile Menu Transition */
+        #mobile-menu, #accessibility-panel {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        /* Mega Menu & Dropdown Fix */
+        .dropdown {
+            position: relative;
+        }
+        .mega-menu-content, .dropdown-content {
+            display: none;
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            top: 100%;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 50;
+        }
+        .mega-menu-content {
+            left: 0;
+            background-color: white;
+            width: 100%;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            padding: 2rem;
+        }
+        .dropdown-content {
+            left: 0;
+            background-color: white;
+            min-width: 240px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0;
+        }
+        .dropdown:hover .mega-menu-content, .dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Interactive Cards */
+        .priority-action-btn:hover, .priority-card:hover {
+            border-color: #14B8A6; /* teal-500 */
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+        }
+        .priority-action-btn, .priority-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+
+        /* Scroll Animations */
+        [data-animate] {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        [data-animate].is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Accessibility High Contrast Mode */
+        .high-contrast {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+        .high-contrast .bg-white, .high-contrast .bg-gray-50, .high-contrast .bg-gray-100 {
+            background-color: #111 !important;
+        }
+        .high-contrast [class*="text-"], .high-contrast h1, .high-contrast h2, .high-contrast h3, .high-contrast p, .high-contrast a, .high-contrast span {
+            color: #fff !important;
+        }
+        .high-contrast [class*="border-"] {
+             border-color: #fff !important;
+        }
+        .high-contrast a:hover {
+            color: #FFFF00 !important; /* Bright yellow for hover */
+            text-decoration: underline;
+        }
+        
+        /* Calendar Styles */
+        .calendar-grid {
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+        .calendar-day.is-today {
+            background-color: #0D9488; /* teal-600 */
+            color: white;
+            font-weight: bold;
+        }
+        .calendar-day.has-event {
+            background-color: #F0FDFA; /* teal-50 */
+            font-weight: bold;
+            color: #115E59; /* teal-800 */
+            border: 1px solid #99F6E4; /* teal-200 */
+        }
+        
+        /* Textured Footer */
+        .footer-textured {
+            background-color: #1E3A8A; /* blue-800 as fallback */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%231d4ed8' fill-opacity='0.2'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+
+    <!-- Accessibility Panel -->
+    <div id="accessibility-panel" class="fixed top-24 right-4 bg-white shadow-xl rounded-lg p-6 w-64 z-[100] transform translate-x-[150%] opacity-0">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-lg text-blue-900">Accessibility</h3>
+            <button id="close-accessibility-panel" class="text-gray-500 hover:text-teal-600"><i data-lucide="x"></i></button>
+        </div>
+        <div class="space-y-4">
+            <button id="high-contrast-toggle" class="w-full flex items-center justify-between text-left p-2 rounded-md hover:bg-gray-100">
+                <span>High Contrast</span>
+                <div class="w-12 h-6 bg-gray-200 rounded-full flex items-center p-1 duration-300 ease-in-out">
+                    <div class="w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out"></div>
+                </div>
+            </button>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Text Size</p>
+                <div class="flex items-center justify-between mt-1">
+                    <button id="decrease-text-size" class="p-2 rounded-md hover:bg-gray-100" aria-label="Decrease text size"><i data-lucide="minus"></i></button>
+                    <span class="text-sm">Normal</span>
+                    <button id="increase-text-size" class="p-2 rounded-md hover:bg-gray-100" aria-label="Increase text size"><i data-lucide="plus"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="flex items-center space-x-3">
+                        <div class="bg-teal-600 p-2 rounded-md">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <span class="text-xl font-bold text-blue-900 hidden sm:inline">South Derbyshire</span>
+                        <span class="text-xl font-light text-gray-600 hidden lg:inline">District Council</span>
+                    </a>
+                </div>
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-1 h-full">
+                    <div class="dropdown static h-full flex items-center">
+                        <a href="#" class="text-gray-600 hover:text-teal-600 transition-colors p-3 rounded-md text-base font-medium flex items-center">Residents <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></a>
+                        <div class="mega-menu-content">
+                             <div class="grid grid-cols-4 gap-8">
+                                <div>
+                                    <h3 class="font-bold text-teal-700 mb-3">Bins, Waste and Recycling</h3>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Bin collection dates</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Report a missed bin</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">What goes in which bin?</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Recycling centres</a>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-teal-700 mb-3">Council Tax</h3>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Pay your Council Tax</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Apply for a reduction</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Moving home</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Banding and appeals</a>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-teal-700 mb-3">Housing</h3>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Report a repair</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Housing Benefit</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Find a home</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Homelessness support</a>
+                                </div>
+                                 <div>
+                                    <h3 class="font-bold text-teal-700 mb-3">Planning</h3>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Find a planning application</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Apply for permission</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Building regulations</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="dropdown static h-full flex items-center">
+                         <a href="#" class="text-gray-600 hover:text-teal-600 transition-colors p-3 rounded-md text-base font-medium flex items-center">Business <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></a>
+                         <div class="mega-menu-content">
+                            <div class="grid grid-cols-4 gap-8">
+                                <div>
+                                    <h3 class="font-bold text-teal-700 mb-3">Business Rates</h3>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Pay your business rates</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Relief and exemptions</a>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-teal-700 mb-3">Licensing</h3>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Alcohol and entertainment</a>
+                                    <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Taxi and private hire</a>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-teal-700 mb-3">Support & Advice</h3>
+                                     <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Grants and funding</a>
+                                     <a href="#" class="block py-1 text-sm text-gray-700 hover:text-teal-600 hover:underline">Starting a business</a>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                    <div class="dropdown relative h-full flex items-center">
+                        <a href="#" class="text-gray-600 hover:text-teal-600 transition-colors p-3 rounded-md text-base font-medium flex items-center">Your Council <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700">Councillors</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700">Voting and Elections</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700">Jobs and Careers</a>
+                        </div>
+                    </div>
+                     <div class="dropdown relative h-full flex items-center">
+                        <a href="#" class="text-gray-600 hover:text-teal-600 transition-colors p-3 rounded-md text-base font-medium flex items-center">Things to Do <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700">Leisure Centres</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700">Parks and Open Spaces</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700">Events</a>
+                        </div>
+                    </div>
+                </nav>
+                <!-- Login & Accessibility -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <button id="accessibility-button" class="text-gray-600 hover:text-teal-600" aria-label="Accessibility Settings">
+                        <i data-lucide="person-standing" class="w-6 h-6"></i>
+                    </button>
+                    <a href="#" class="bg-blue-800 text-white hover:bg-blue-900 font-medium py-2 px-4 rounded-lg transition-colors">My Account</a>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-teal-600" aria-label="Open Menu">
+                        <i data-lucide="menu" class="w-8 h-8"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-white z-[60] transform -translate-x-full md:hidden">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="font-bold text-lg text-blue-900">Menu</h2>
+                <button id="close-mobile-menu-button" class="text-gray-600 hover:text-teal-600">
+                    <i data-lucide="x" class="w-8 h-8"></i>
+                </button>
+            </div>
+            <nav class="flex flex-col p-4 space-y-2">
+                <a href="#" class="text-gray-700 hover:bg-teal-50 p-3 rounded-md font-medium">Residents</a>
+                <a href="#" class="text-gray-700 hover:bg-teal-50 p-3 rounded-md font-medium">Business</a>
+                <a href="#" class="text-gray-700 hover:bg-teal-50 p-3 rounded-md font-medium">Your Council</a>
+                <a href="#" class="text-gray-700 hover:bg-teal-50 p-3 rounded-md font-medium">Things to Do</a>
+                <hr class="my-4"/>
+                <a href="#" class="bg-blue-800 text-white hover:bg-blue-900 font-medium py-2 px-4 rounded-lg transition-colors text-center">My Account</a>
+                <button id="mobile-accessibility-button" class="flex items-center justify-center space-x-2 text-gray-600 hover:text-teal-600 p-3" aria-label="Accessibility Settings">
+                    <i data-lucide="person-standing" class="w-6 h-6"></i>
+                    <span>Accessibility</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section text-white">
+            <video autoplay loop muted playsinline id="hero-video">
+                <source src="https://assets.mixkit.co/videos/preview/mixkit-countryside-meadow-4075-large.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-bold tracking-tight">Working for our residents</h1>
+                <p class="mt-4 text-lg md:text-xl max-w-2xl mx-auto">Find information and services from South Derbyshire District Council.</p>
+                <div class="mt-8 max-w-xl mx-auto">
+                    <form action="#" method="GET" class="relative">
+                        <label for="search" class="sr-only">Search</label>
+                        <input type="search" id="search" name="search" placeholder="Search our website, e.g. 'Bin collections'" class="w-full py-4 px-6 text-gray-900 rounded-full border-2 border-transparent focus:ring-4 focus:ring-teal-300 focus:border-teal-500 outline-none transition-shadow">
+                        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full transition-colors" aria-label="Submit Search">
+                            <i data-lucide="search" class="w-6 h-6"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Area Section -->
+        <section class="bg-gray-50" data-animate>
+             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20">
+                <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8">
+                    <div class="md:flex md:items-center md:justify-between">
+                         <div class="text-center md:text-left">
+                            <h2 class="text-2xl font-bold text-blue-900 flex items-center justify-center md:justify-start"><i data-lucide="map-pin" class="w-7 h-7 mr-3 text-teal-600"></i>My Area</h2>
+                            <p class="mt-1 text-gray-600">Enter your postcode for local information and service updates.</p>
+                        </div>
+                        <form action="#" class="mt-6 md:mt-0 md:ml-6 flex-grow md:max-w-sm">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <label for="postcode" class="sr-only">Your Postcode</label>
+                                <input type="text" id="postcode" placeholder="e.g. DE11 0AH" class="w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                                <button type="submit" class="bg-teal-600 text-white font-medium py-3 px-6 rounded-md hover:bg-teal-700 transition-colors flex-shrink-0">Find</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+             </div>
+        </section>
+        
+        <!-- Priority Actions Section -->
+        <section class="bg-gray-50 pt-12" data-animate>
+             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <a href="#" class="priority-action-btn bg-teal-50 p-6 rounded-lg flex flex-col items-center justify-center text-center border-2 border-transparent hover:bg-teal-100">
+                        <i data-lucide="credit-card" class="w-10 h-10 text-teal-600 mb-2"></i>
+                        <span class="font-bold text-lg text-teal-900">Pay Council Tax</span>
+                    </a>
+                     <a href="#" class="priority-action-btn bg-blue-50 p-6 rounded-lg flex flex-col items-center justify-center text-center border-2 border-transparent hover:bg-blue-100">
+                        <i data-lucide="trash-2" class="w-10 h-10 text-blue-600 mb-2"></i>
+                        <span class="font-bold text-lg text-blue-900">Report a Missed Bin</span>
+                    </a>
+                     <a href="#" class="priority-action-btn bg-indigo-50 p-6 rounded-lg flex flex-col items-center justify-center text-center border-2 border-transparent hover:bg-indigo-100">
+                        <i data-lucide="file-search-2" class="w-10 h-10 text-indigo-600 mb-2"></i>
+                        <span class="font-bold text-lg text-indigo-900">Find Applications</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Council Priorities Section -->
+        <section class="bg-gray-50 py-16 sm:py-24" data-animate>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-blue-900">Our Commitment to South Derbyshire</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Focusing on key priorities to build a better future for our district.</p>
+                </div>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Priority 1 -->
+                    <div class="priority-card bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+                        <div class="inline-block bg-teal-100 text-teal-700 p-4 rounded-full mb-4">
+                            <i data-lucide="leaf" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-blue-900">A Greener District</h3>
+                        <p class="mt-2 text-gray-600">Working towards a carbon-neutral district by 2030 through sustainable initiatives.</p>
+                        <div class="mt-4">
+                            <span class="text-sm font-medium text-gray-600">Progress: 65%</span>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                                <div class="bg-teal-500 h-2.5 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <a href="#" class="mt-6 inline-block font-semibold text-teal-600 hover:text-teal-800">Learn More &rarr;</a>
+                    </div>
+                    <!-- Priority 2 -->
+                    <div class="priority-card bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+                        <div class="inline-block bg-blue-100 text-blue-700 p-4 rounded-full mb-4">
+                            <i data-lucide="store" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-blue-900">Boosting Local Economy</h3>
+                        <p class="mt-2 text-gray-600">Supporting local businesses and creating new job opportunities for residents.</p>
+                        <div class="mt-4">
+                            <p id="businesses-stat" class="text-3xl font-bold text-blue-800" data-target="150">0</p>
+                            <p class="text-sm text-gray-600">New businesses supported this year</p>
+                        </div>
+                        <a href="#" class="mt-6 inline-block font-semibold text-teal-600 hover:text-teal-800">Find Support &rarr;</a>
+                    </div>
+                    <!-- Priority 3 -->
+                    <div class="priority-card bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+                        <div class="inline-block bg-indigo-100 text-indigo-700 p-4 rounded-full mb-4">
+                            <i data-lucide="heart-handshake" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-blue-900">Healthier Communities</h3>
+                        <p class="mt-2 text-gray-600">Investing in leisure facilities and programmes to improve community wellbeing.</p>
+                        <div class="mt-4">
+                           <p id="leisure-stat" class="text-3xl font-bold text-indigo-800" data-target="3">0</p>
+                           <p class="text-sm text-gray-600">New leisure projects underway</p>
+                        </div>
+                        <a href="#" class="mt-6 inline-block font-semibold text-teal-600 hover:text-teal-800">Get Involved &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Latest News & Spotlight Section -->
+        <section class="bg-white py-16 sm:py-24" data-animate>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-center text-blue-900">Latest News & Spotlight</h2>
+                    <p class="mt-2 text-center text-gray-600 max-w-2xl mx-auto">Celebrating the people, places and projects that make our district special.</p>
+                </div>
+                <div class="mt-12 grid gap-8 lg:grid-cols-3">
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                        <div class="relative overflow-hidden rounded-t-xl">
+                            <img src="https://placehold.co/600x400/818CF8/FFFFFF?text=Volunteers" alt="Community volunteers planting trees" class="h-56 w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                             <div><span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full">Volunteering</span></div>
+                            <h3 class="mt-4 text-xl font-semibold text-blue-900 group-hover:text-teal-700 transition-colors">Local Heroes: The Mercia Marina Wombles</h3>
+                            <p class="mt-3 text-gray-600 flex-grow text-sm">Meet the dedicated group of volunteers who are keeping our beautiful marina litter-free for everyone to enjoy.</p>
+                            <a href="#" class="mt-4 font-semibold text-teal-600 hover:text-teal-800 self-start group-hover:underline">Read their story &rarr;</a>
+                        </div>
+                    </article>
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                        <div class="relative overflow-hidden rounded-t-xl">
+                            <img src="https://placehold.co/600x400/F472B6/FFFFFF?text=Market" alt="Bustling local food market" class="h-56 w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                             <div><span class="bg-pink-100 text-pink-800 text-xs font-medium px-2.5 py-1 rounded-full">Local Business</span></div>
+                            <h3 class="mt-4 text-xl font-semibold text-blue-900 group-hover:text-teal-700 transition-colors">Swadlincote's Market Buzzes with New Artisan Stalls</h3>
+                            <p class="mt-3 text-gray-600 flex-grow text-sm">The monthly artisan market is proving a huge success, bringing unique crafts and delicious food to the town centre.</p>
+                            <a href="#" class="mt-4 font-semibold text-teal-600 hover:text-teal-800 self-start group-hover:underline">Visit the market &rarr;</a>
+                        </div>
+                    </article>
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                        <div class="relative overflow-hidden rounded-t-xl">
+                            <img src="https://placehold.co/600x400/22D3EE/FFFFFF?text=Playground" alt="Children playing in a new playground" class="h-56 w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                             <div><span class="bg-cyan-100 text-cyan-800 text-xs font-medium px-2.5 py-1 rounded-full">Parks</span></div>
+                            <h3 class="mt-4 text-xl font-semibold text-blue-900 group-hover:text-teal-700 transition-colors">New 'Green Heart' Playground Now Open!</h3>
+                            <p class="mt-3 text-gray-600 flex-grow text-sm">The much-anticipated adventure playground at Green Heart Community Park is now open for families to enjoy.</p>
+                            <a href="#" class="mt-4 font-semibold text-teal-600 hover:text-teal-800 self-start group-hover:underline">Plan your visit &rarr;</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Events Calendar Section -->
+        <section class="bg-gray-50 py-16 sm:py-24" data-animate>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-blue-900">What's On in South Derbyshire</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Discover upcoming council meetings, community events and activities.</p>
+                </div>
+                <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="calendar-month-year" class="text-xl font-semibold text-blue-800"></h3>
+                        </div>
+                        <div class="grid calendar-grid text-center font-semibold text-gray-500 text-sm">
+                            <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+                        </div>
+                        <div id="calendar-grid" class="grid calendar-grid mt-2">
+                            <!-- Calendar days will be generated by JS -->
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-blue-800 mb-4">Upcoming Events</h3>
+                        <div id="event-list" class="space-y-4">
+                           <!-- Events will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Map Section -->
+        <section class="py-16 sm:py-24 bg-white" data-animate>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-blue-900">Explore Your District</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Find parks, leisure centres, recycling points and more on our interactive map.</p>
+                </div>
+                <div class="mt-8 flex justify-center flex-wrap gap-3">
+                    <button class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-full text-sm font-medium hover:bg-teal-50 hover:border-teal-500 hover:text-teal-800 transition-colors">
+                        <i data-lucide="tree-pine" class="inline w-4 h-4 mr-2"></i>Parks & Green Spaces
+                    </button>
+                    <button class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-full text-sm font-medium hover:bg-teal-50 hover:border-teal-500 hover:text-teal-800 transition-colors">
+                        <i data-lucide="dumbbell" class="inline w-4 h-4 mr-2"></i>Leisure Centres
+                    </button>
+                    <button class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-full text-sm font-medium hover:bg-teal-50 hover:border-teal-500 hover:text-teal-800 transition-colors">
+                        <i data-lucide="recycle" class="inline w-4 h-4 mr-2"></i>Recycling Points
+                    </button>
+                    <button class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-full text-sm font-medium hover:bg-teal-50 hover:border-teal-500 hover:text-teal-800 transition-colors">
+                        <i data-lucide="library" class="inline w-4 h-4 mr-2"></i>Libraries
+                    </button>
+                </div>
+                <div id="map-container" class="mt-8 w-full h-96 bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
+                    <p class="text-gray-500 font-medium">Interactive map placeholder</p>
+                    <!-- A library like Leaflet.js or Mapbox would be initialized here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white footer-textured">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <div class="md:col-span-2 lg:col-span-1">
+                    <h3 class="text-lg font-semibold">South Derbyshire District Council</h3>
+                    <p class="mt-4 text-blue-200 text-sm leading-relaxed">Civic Offices, Civic Way<br>Swadlincote, Derbyshire<br>DE11 0AH</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Quick Links</h3>
+                    <ul class="mt-4 space-y-3 text-sm">
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">Contact Us</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">Jobs</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">News</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">Your Councillors</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Information</h3>
+                    <ul class="mt-4 space-y-3 text-sm">
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">Accessibility</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">Privacy Policy</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">Cookies</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white hover:underline">Sitemap</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Connect with us</h3>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-blue-200 hover:text-white" aria-label="Facebook"><i data-lucide="facebook" class="w-6 h-6"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white" aria-label="Twitter"><i data-lucide="twitter" class="w-6 h-6"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white" aria-label="YouTube"><i data-lucide="youtube" class="w-6 h-6"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white" aria-label="Instagram"><i data-lucide="instagram" class="w-6 h-6"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-blue-800 pt-8 text-center text-sm text-blue-300">
+                <p>&copy; 2025 South Derbyshire District Council. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            // --- Accessibility Panel Logic ---
+            const accessibilityButton = document.getElementById('accessibility-button');
+            const mobileAccessibilityButton = document.getElementById('mobile-accessibility-button');
+            const accessibilityPanel = document.getElementById('accessibility-panel');
+            const closeAccessibilityPanel = document.getElementById('close-accessibility-panel');
+            
+            const highContrastToggle = document.getElementById('high-contrast-toggle');
+            const increaseTextSize = document.getElementById('increase-text-size');
+            const decreaseTextSize = document.getElementById('decrease-text-size');
+            const body = document.body;
+            const html = document.documentElement;
+
+            if (accessibilityButton && accessibilityPanel && closeAccessibilityPanel) {
+                let isPanelOpen = false;
+                const togglePanel = () => {
+                    isPanelOpen = !isPanelOpen;
+                    if (isPanelOpen) {
+                        accessibilityPanel.classList.remove('translate-x-[150%]', 'opacity-0');
+                    } else {
+                        accessibilityPanel.classList.add('translate-x-[150%]', 'opacity-0');
+                    }
+                }
+                accessibilityButton.addEventListener('click', togglePanel);
+                if(mobileAccessibilityButton) mobileAccessibilityButton.addEventListener('click', togglePanel);
+                closeAccessibilityPanel.addEventListener('click', togglePanel);
+            }
+
+            // High Contrast
+            if (highContrastToggle) {
+                highContrastToggle.addEventListener('click', () => {
+                    body.classList.toggle('high-contrast');
+                    const toggleCircle = highContrastToggle.querySelector('div div');
+                    if (body.classList.contains('high-contrast')) {
+                        toggleCircle.style.transform = 'translateX(24px)';
+                    } else {
+                        toggleCircle.style.transform = 'translateX(0)';
+                    }
+                });
+            }
+
+            // Text Size
+            if (increaseTextSize && decreaseTextSize && html) {
+                let currentFontSize = 16;
+                increaseTextSize.addEventListener('click', () => {
+                    if (currentFontSize < 24) { // Max size
+                        currentFontSize += 2;
+                        html.style.setProperty('--base-font-size', `${currentFontSize}px`);
+                    }
+                });
+                decreaseTextSize.addEventListener('click', () => {
+                    if (currentFontSize > 12) { // Min size
+                        currentFontSize -= 2;
+                        html.style.setProperty('--base-font-size', `${currentFontSize}px`);
+                    }
+                });
+            }
+
+            // --- Mobile Menu Logic ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const closeMobileMenuButton = document.getElementById('close-mobile-menu-button');
+            
+            if (mobileMenuButton && mobileMenu && closeMobileMenuButton) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.remove('-translate-x-full');
+                });
+                closeMobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.add('-translate-x-full');
+                });
+            }
+
+            // --- Animated Counter Logic ---
+            const animateStat = (el) => {
+                const target = +el.getAttribute('data-target');
+                const duration = 1500; // 1.5 seconds
+                let start = 0;
+                const step = (timestamp) => {
+                    if (!start) start = timestamp;
+                    const progress = timestamp - start;
+                    const current = Math.min(Math.floor(progress / duration * target), target);
+                    el.innerText = current;
+                    if (current < target) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                         if (el.id === "businesses-stat") el.innerText = `${target}+`;
+                         else el.innerText = target;
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            // --- Calendar Logic ---
+            const calendarGrid = document.getElementById('calendar-grid');
+            const monthYearEl = document.getElementById('calendar-month-year');
+            const eventListEl = document.getElementById('event-list');
+
+            if (calendarGrid && monthYearEl && eventListEl) {
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                const currentYear = today.getFullYear();
+
+                const events = [
+                    { day: 27, title: 'Planning Committee Meeting', time: '6:00 PM', location: 'Council Chamber' },
+                    { day: 29, title: 'Community Safety Partnership', time: '4:30 PM', location: 'Online' },
+                    { day: 30, title: 'Art in the Park Workshop', time: '10:00 AM', location: 'Green Heart Park' }
+                ];
+                
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                monthYearEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+                const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                
+                const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+                calendarGrid.innerHTML = ''; // Clear previous
+                for (let i = 0; i < startOffset; i++) {
+                    calendarGrid.innerHTML += '<div></div>';
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    let classes = 'calendar-day flex items-center justify-center h-10 rounded-full text-sm cursor-pointer';
+                    if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+                        classes += ' is-today';
+                    }
+                    const eventForDay = events.find(e => e.day === day);
+                    if (eventForDay) {
+                        classes += ' has-event';
+                    }
+                    calendarGrid.innerHTML += `<div class="${classes}">${day}</div>`;
+                }
+
+                eventListEl.innerHTML = ''; // Clear previous
+                events.forEach(event => {
+                    eventListEl.innerHTML += `
+                        <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-100">
+                            <div class="flex-shrink-0 text-center bg-teal-600 text-white rounded-md p-2 w-16">
+                                <p class="font-bold text-lg">${event.day}</p>
+                                <p class="text-xs uppercase">${monthNames[currentMonth].substring(0,3)}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">${event.title}</h4>
+                                <p class="text-sm text-gray-500">${event.time} | ${event.location}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // --- Scroll Animation Logic ---
+            const animatedEls = document.querySelectorAll('[data-animate]');
+            if (animatedEls.length > 0) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            const stats = entry.target.querySelectorAll('[data-target]');
+                            stats.forEach(stat => {
+                                if (!stat.hasAttribute('data-animated')) {
+                                    animateStat(stat);
+                                    stat.setAttribute('data-animated', 'true');
+                                }
+                            });
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                animatedEls.forEach(el => observer.observe(el));
+            }
+        });
+    </script>
+</body>
+</html>
+
