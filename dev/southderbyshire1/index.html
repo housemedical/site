@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>South Derbyshire District Council — Prototype</title>
+<meta content="A modern, accessible prototype homepage for South Derbyshire District Council with live events, filters and map overlays." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root{
+      --bg: #0b1020; --bg-2:#0f1428; --card:#121a34; --muted:#8da2c0; --text:#e9f0ff;
+      --accent:#76e4c5; --accent-2:#64b5f6; --warning:#ffd166; --danger:#ff6b6b;
+      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    @media (prefers-color-scheme: light){ :root{ --bg:#f5f7fb; --bg-2:#eef2f9; --card:#ffffff; --text:#0d1224; --muted:#526281 } header.hero{background:linear-gradient(180deg,#e8f2ff,transparent 60%)} }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 800px at 80% -10%,rgba(118,228,197,.22),transparent 60%), radial-gradient(900px 600px at -10% 10%,rgba(100,181,246,.20),transparent 60%), var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(118,228,197,.6)}
+    .container{width:min(1200px,92vw);margin:auto}
+    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{position:fixed;left:1rem;top:1rem;width:auto;height:auto;background:#000;color:#fff;padding:.6rem .9rem;border-radius:10px;z-index:9999}
+
+    header.site{position:sticky;top:0;z-index:50;backdrop-filter:saturate(160%) blur(12px);background:linear-gradient(180deg, rgba(8,12,24,.85), rgba(8,12,24,.6));border-bottom:1px solid rgba(255,255,255,.06)}
+    .site-inner{display:flex;gap:1rem;align-items:center;justify-content:space-between;padding:.8rem 1rem}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#07221a;font-weight:800}
+    .brand h1{font-size:1.05rem;margin:0;line-height:1.1}
+    nav.top a{padding:.55rem .8rem;border-radius:999px;color:var(--muted)}
+    nav.top a:hover{background:rgba(255,255,255,.08);color:var(--text)}
+    .cta{display:flex;gap:.6rem;align-items:center}
+    .btn{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#05141b;font-weight:700;padding:.6rem .9rem;border-radius:999px}
+
+    header.hero{padding:3.3rem 0 2.2rem}
+    .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;align-items:center}
+    .hero h2{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;margin:.2rem 0 1rem}
+    .hero p{color:var(--muted);margin:0 0 1.4rem}
+    .search-wrap{display:flex;gap:.6rem;flex-wrap:wrap}
+    .search{flex:1;display:flex;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:.35rem;border-radius:999px}
+    .search input{flex:1;background:transparent;border:0;color:var(--text);padding:.65rem .9rem}
+    .search button{background:#fff;color:#091224;border:0;padding:.65rem 1rem;border-radius:999px;font-weight:700}
+    .quick-links{display:flex;gap:.6rem;flex-wrap:wrap}
+    .quick-links a{padding:.5rem .75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;color:var(--text)}
+
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12);box-shadow:var(--shadow);border-radius:var(--radius)}
+    .card h3{margin:.2rem 0 0;font-size:1.05rem}
+
+    .tasks{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:1.5rem 0}
+    .task{display:flex;gap:.9rem;align-items:center;padding:1rem;border-radius:var(--radius);transition:transform .15s ease, background .2s}
+    .task:hover{transform:translateY(-2px);background:rgba(118,228,197,.08)}
+    .task svg{width:28px;height:28px}
+    .task strong{display:block}
+    .task small{display:block;color:var(--muted)}
+
+    .services{display:grid;grid-template-columns:repeat(6,1fr);gap:1rem}
+    .service{padding:1rem;border-radius:var(--radius);display:grid;gap:.6rem;align-content:start}
+    .service:hover{background:rgba(255,255,255,.06)}
+
+    .ribbon{display:flex;gap:1rem;flex-wrap:wrap;margin:2rem 0}
+
+    .section{margin:2.2rem 0}
+    .section header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1rem}
+    .section h2{margin:0;font-size:1.4rem}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+    footer{margin:0;color:var(--muted);font-size:.95rem;padding:2.75rem 0 2rem;background:linear-gradient(180deg, rgba(118,228,197,.06), rgba(100,181,246,.04)), var(--bg-2);border-top:2px solid rgba(255,255,255,.16);box-shadow:0 -1px 0 rgba(255,255,255,.06) inset, 0 -30px 60px rgba(0,0,0,.25) inset}
+    footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:1.5rem}
+
+    @media (max-width:1100px){.services{grid-template-columns:repeat(4,1fr)}.tasks{grid-template-columns:repeat(3,1fr)}.hero-grid{grid-template-columns:1fr}}
+    @media (max-width:800px){.services{grid-template-columns:repeat(2,1fr)}.tasks{grid-template-columns:repeat(2,1fr)}footer .cols{grid-template-columns:1fr}}
+
+    /* --- bottom sections polish & filters --- */
+    .filters{display:flex;flex-wrap:wrap;gap:.5rem;margin:.75rem 0 1rem}
+    .filters .pill{cursor:pointer;user-select:none}
+    .filters input[type="checkbox"]{appearance:none;width:1px;height:1px;position:absolute;overflow:hidden;clip:rect(0 0 0 0)}
+    .filters label{display:inline-flex}
+    .filters input:checked+span{background:linear-gradient(180deg,rgba(118,228,197,.18),rgba(100,181,246,.14));border-color:rgba(118,228,197,.5);color:var(--text)}
+    .filters select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:.5rem .7rem;color:var(--text)}
+
+    .calendar{padding:1rem}
+    .whats-on-grid{align-items:start}
+    .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+    .cal-head button{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);border-radius:10px;padding:.4rem .6rem;color:var(--text)}
+    .cal-head button:hover{background:rgba(255,255,255,.12)}
+    .cal-label{font-weight:700}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.35rem}
+    .cal-dow,.cal-day{padding:.55rem;border-radius:12px;text-align:center}
+    .cal-dow{color:var(--muted);font-weight:600}
+    .cal-day{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+    .cal-day.muted{opacity:.45}
+    .cal-day.today{outline:2px solid rgba(118,228,197,.6)}
+    .cal-day.has-event{background:linear-gradient(180deg,rgba(118,228,197,.15),rgba(100,181,246,.12));border-color:rgba(118,228,197,.4)}
+    .cal-legend{display:flex;gap:.6rem;align-items:center;margin-top:.6rem;color:var(--muted);font-size:.9rem}
+    .swatch{width:.9rem;height:.9rem;border-radius:4px;background:linear-gradient(180deg,rgba(118,228,197,.5),rgba(100,181,246,.5))}
+
+    .upcoming{padding:1rem}
+    .upcoming ul{list-style:none;margin:0;padding:0;display:grid;gap:.6rem}
+    .upcoming li{display:grid;gap:.2rem;padding:.6rem;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.04)}
+    .upcoming time{font-weight:700}
+
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+    @media (max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:800px){.grid-4{grid-template-columns:1fr}}
+
+    .map-form{display:grid;grid-template-columns:1.4fr 1fr;gap:1rem;align-items:end;margin-top:1rem}
+    .map-form .group{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:.6rem}
+    .map-form input[type="text"]{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:.65rem .8rem;color:var(--text)}
+    .map-form fieldset{display:grid;grid-template-columns:repeat(2,1fr);gap:.4rem;border:0;margin:0;padding:0}
+    .map-form label{display:flex;gap:.5rem;align-items:center}
+    .map-form button{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#05141b;border:0;border-radius:12px;padding:.7rem 1rem;font-weight:800}
+    @media (max-width:900px){.map-form{grid-template-columns:1fr}}
+
+    .chip{font-size:.8rem;color:var(--muted)}
+    .footer-sep{height:28px;margin:2.5rem 0 -1rem;background:radial-gradient(60% 80% at 50% 0%, rgba(118,228,197,.28), transparent 70%);}
+  </style>
+<style>
+/* === One-line + dropdown and sticky footer tweaks (injected) === */
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; }
+main { flex: 1; }
+
+/* Footer clarity (light-touch; keep existing styles) */
+footer { font-size: .95rem; line-height: 1.5; }
+footer ul { list-style: none; padding: 0; margin: .25rem 0 1rem; }
+footer a { text-decoration: underline; text-underline-offset: 2px; }
+
+/* Pill buttons as clickable */
+button.pill { cursor: pointer; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); }
+button.pill:hover { background: rgba(255,255,255,.12); }
+</style><style>
+/* === Theme toggle (injected) === */
+/* Light mode implemented via inversion filter to avoid refactoring existing styles */
+body.theme-invert {
+  filter: invert(1) hue-rotate(180deg);
+}
+/* Re-invert media so photos/logos look correct in light mode */
+body.theme-invert img,
+body.theme-invert video,
+body.theme-invert picture,
+body.theme-invert svg,
+body.theme-invert canvas,
+body.theme-invert iframe { 
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* Toggle button: small floating pill in the top-right */
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem;
+  border-radius: 999px;
+  font-size: .9rem;
+  line-height: 1;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+/* In light mode, button background should still be readable */
+body.theme-invert .theme-toggle {
+  background: rgba(255,255,255,.6);
+  border-color: rgba(0,0,0,.25);
+}
+
+/* Simple icon circles */
+.theme-toggle .dot {
+  width: .75rem;
+  height: .75rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+.theme-toggle .dot.dark { background: #111; }
+.theme-toggle .dot.light { background: #f5f5f5; border: 1px solid rgba(0,0,0,.15); }
+.theme-toggle button {
+  all: unset;
+  cursor: pointer;
+}
+.theme-toggle button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+</style><style>
+/* === Theme variables & strong overrides (injected v2) === */
+:root {
+  /* Dark (default) */
+  --bg: #0b1020;
+  --text: #eef2ff;
+  --muted: #9aa3b2;
+  --surface: #131a2a;
+  --border: #2a3448;
+  --link: #9ec5ff;
+  --accent: #4da3ff;
+}
+
+:root[data-theme="light"], body[data-theme="light"] {
+  --bg: #ffffff;
+  --text: #0b1020;
+  --muted: #4a5568;
+  --surface: #f7fafc;
+  --border: #e2e8f0;
+  --link: #1a56db;
+  --accent: #0ea5e9;
+}
+
+/* Force the page to honor theme colors even if legacy styles set fixed colors */
+html, body { background: var(--bg) !important; color: var(--text) !important; }
+main { background: transparent !important; }
+
+/* Generic surface elements */
+.section, section, .card, .tile, .panel, .box, .callout, .notice, .banner,
+nav, header, footer, .grid > *, .list, .a-z, .tasks, .services, .search,
+.container, .cta, .quick-links, .footer, .header {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+/* Inputs */
+input, select, textarea {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Links & muted text */
+a { color: var(--link) !important; }
+.muted, small, .help, .hint { color: var(--muted) !important; }
+
+/* Pills / chips / buttons */
+button, .pill, .chip {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Make top-level sections breathe on light theme */
+:root[data-theme="light"] .section,
+body[data-theme="light"] .section {
+  box-shadow: 0 1px 0 var(--border) inset;
+}
+
+/* Theme toggle specific backgrounds */
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem;
+  border-radius: 999px;
+  font-size: .9rem;
+  line-height: 1;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+:root[data-theme="light"] .theme-toggle,
+body[data-theme="light"] .theme-toggle {
+  background: rgba(255,255,255,.7);
+  border-color: rgba(0,0,0,.15);
+}
+.theme-toggle .dot { width: .75rem; height: .75rem; border-radius: 50%; display: inline-block; }
+.theme-toggle .dot.dark { background: #111; }
+.theme-toggle .dot.light { background: #f5f5f5; border: 1px solid rgba(0,0,0,.15); }
+.theme-toggle button { all: unset; cursor: pointer; }
+.theme-toggle button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+</style></head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header aria-label="Primary" class="site" role="banner">
+<div class="site-inner container">
+<div class="brand">
+<div aria-hidden="true" class="logo">SD</div>
+<h1>South Derbyshire District Council</h1>
+</div>
+<nav aria-label="Top" class="top">
+<a href="#tasks">Popular tasks</a>
+<a href="#services">Services</a>
+<a href="#events">Events</a>
+<a href="https://my.southderbyshire.gov.uk/" rel="noopener" target="_blank">mySouthDerbyshire</a>
+</nav>
+<div class="cta">
+<a class="btn" href="https://ip.e-paycapita.com/AIP/itemSelectionPage.do?languageCode=EN&amp;link=showItemSelectionPage&amp;siteId=058&amp;source=AIP" rel="noopener" target="_blank">Pay online</a>
+</div>
+</div>
+</header><div aria-label="Theme" class="theme-toggle" role="group"><span aria-hidden="true" class="dot dark"></span><button aria-label="Toggle light mode" aria-pressed="false" id="themeToggle" type="button"><span>Light</span></button><span aria-hidden="true" class="dot light"></span></div>
+<header class="hero">
+<div class="container hero-grid">
+<div>
+<span class="chip" style="color:var(--accent)">Welcome</span>
+<h2>All your local services in one fast, accessible place.</h2>
+<p>Find bin days, pay bills, report issues, and explore things to do across South Derbyshire.</p>
+<form aria-label="Site filter" class="search-wrap" onsubmit="event.preventDefault();" role="search">
+<div aria-live="polite" class="search">
+<input aria-controls="tasks services" autocomplete="off" id="q" placeholder="Type to filter tasks and services…" type="search"/>
+<button onclick="document.getElementById('q').value='';filterAll();" type="button">Clear</button>
+</div>
+<div class="quick-links">
+<a class="pill" href="https://www.southderbyshire.gov.uk/our-services/recycling-bins-and-waste/bin-collection-dates" rel="noopener" target="_blank">♻️ Bin dates</a>
+<a class="pill" href="https://planning.southderbyshire.gov.uk/" rel="noopener" target="_blank">📄 Planning</a>
+<a class="pill" href="https://south-derbys.cmis.uk.com/south-derbys/Councillors.aspx" rel="noopener" target="_blank">👥 Councillors</a>
+<a class="pill" href="https://my.southderbyshire.gov.uk/" rel="noopener" target="_blank">🔐 Sign in</a>
+</div>
+</form>
+</div>
+<div class="card" style="padding:1.1rem 1.1rem 1.2rem">
+<div class="pill" style="margin-bottom:.6rem;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.55);color:#ffd166">Service update</div>
+<h3 style="margin:.2rem 0 .4rem">Bin collections &amp; disruptions</h3>
+<p class="muted">Check your collection day, find your waste calendar, or report an issue.</p>
+<div class="ribbon">
+<a class="pill" href="https://www.southderbyshire.gov.uk/our-services/recycling-bins-and-waste/bin-collection-dates" rel="noopener" target="_blank">View bin dates</a>
+<a class="pill" href="https://my.southderbyshire.gov.uk/" rel="noopener" target="_blank">Report missed bin</a>
+</div>
+<small class="muted">Links go to official South Derbyshire services.</small>
+</div>
+</div>
+</header>
+<main class="container" id="main" tabindex="-1">
+<!-- Popular tasks -->
+<section class="section" id="tasks">
+<header>
+<h2>Popular tasks</h2>
+<a class="pill" href="https://www.southderbyshire.gov.uk/forms/" rel="noopener" target="_blank">Browse all online forms →</a>
+</header>
+<div style="margin:.25rem 0 0"><button aria-controls="tasksGrid" aria-expanded="false" class="pill" id="toggleTasks" type="button">Show all popular tasks</button></div><div class="tasks" data-filter-scope="" id="tasksGrid">
+<a class="task card" data-filter="vote register electoral elections" href="https://www.gov.uk/register-to-vote" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 12l6 6L20 6" stroke-width="2"></path></svg>
+<div><strong>Register to vote</strong><small>GOV.UK</small></div>
+</a>
+<a class="task card" data-filter="pay council tax rent invoice business rates online payment" href="https://ip.e-paycapita.com/AIP/itemSelectionPage.do?languageCode=EN&amp;link=showItemSelectionPage&amp;siteId=058&amp;source=AIP" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="14" rx="3" width="20" x="2" y="5"></rect><path d="M2 10h20"></path></svg>
+<div><strong>Pay online</strong><small>Cards accepted • Secure</small></div>
+</a>
+<a class="task card" data-filter="bin recycling waste collection dates calendar" href="https://www.southderbyshire.gov.uk/our-services/recycling-bins-and-waste/bin-collection-dates" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7h16M7 7l1 13m8-13-1 13M9 7V4h6v3"></path></svg>
+<div><strong>View bin collection dates</strong><small>Check your next pick‑up</small></div>
+</a>
+<a class="task card" data-filter="planning applications search maps notices" href="https://planning.southderbyshire.gov.uk/" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+<div><strong>Find planning applications</strong><small>Search the planning portal</small></div>
+</a>
+<a class="task card" data-filter="council tax reduction support help benefits ctrs apply" href="https://www.southderbyshire.gov.uk/our-services/benefits/housing-benefit-and-council-tax-reduction" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 3l9 6-9 6-9-6 9-6Z"></path><path d="M3 12l9 6 9-6"></path></svg>
+<div><strong>Apply for Council Tax reduction</strong><small>How to apply &amp; eligibility</small></div>
+</a>
+<a class="task card" data-filter="find your councillor ward member contact" href="https://south-derbys.cmis.uk.com/south-derbys/Councillors.aspx" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z"></path><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+<div><strong>Find Your Councillor</strong><small>By name or ward</small></div>
+</a>
+<a class="task card" data-filter="tasks do it online more forms" href="https://www.southderbyshire.gov.uk/forms/" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+<div><strong>More tasks</strong><small>Do it online A–Z</small></div>
+</a>
+<a class="task card" data-filter="report anti social behaviour asb noise nuisance street care" href="https://www.southderbyshire.gov.uk/our-services/crime-and-community-safety/report-anti-social-behaviour-noise-and-street-care-issues" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v4m0 4h.01"></path><circle cx="12" cy="12" r="9"></circle></svg>
+<div><strong>Report anti‑social behaviour</strong><small>ASB, noise &amp; street care</small></div>
+</a>
+<a class="task card" data-filter="reload saved online form resume application" href="https://www.southderbyshire.gov.uk/forms/LoadForm.asp" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+<div><strong>Re‑load saved online form</strong><small>Resume where you left off</small></div>
+</a>
+<a class="task card" data-filter="local info postcode bin day ward councillor map" href="https://maps.southderbyshire.gov.uk/MyWorkshop/Layers.aspx" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 21s-7-4.35-7-10A7 7 0 0 1 19 11c0 5.65-7 10-7 10Z"></path><circle cx="12" cy="11" r="3"></circle></svg>
+<div><strong>Find my local info</strong><small>Enter your postcode</small></div>
+</a>
+<a class="task card" data-filter="housing repair council tenant maintenance" href="https://www.southderbyshire.gov.uk/forms/ShowForm.asp?fm_fid=48" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12L12 3l9 9"></path><path d="M9 21V9h6v12"></path></svg>
+<div><strong>Report a housing repair</strong><small>For council tenants</small></div>
+</a>
+<a class="task card" data-filter="events activities what's on family" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/events/all" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="18" rx="3" width="18" x="3" y="4"></rect><path d="M3 10h18"></path></svg>
+<div><strong>View all events &amp; activities</strong><small>Find something to do</small></div>
+</a>
+<a class="task card" data-filter="report fly tipping litter waste enforcement" href="https://southderbyshiredc-self.achieveservice.com/en/AchieveForms/?cancelRedirectLink=%2Fen&amp;consentMessage=yes&amp;form_uri=sandbox-publish%3A%2F%2FAF-Process-956e8c40-dfbe-49e9-a7e2-0a4b60f458dd%2FAF-Stage-c195decf-d777-4b64-ada4-bd8348463f99%2Fdefinition.json&amp;redirectlink=%2Fen" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 21h16l-1-12H5l-1 12Z"></path><path d="M7 9V6h10v3"></path></svg>
+<div><strong>Report fly‑tipping</strong><small>Online form</small></div>
+</a>
+<a class="task card" data-filter="apply housing benefit council tax reduction support claim" href="https://s-derbyshire-hbnc.egovhub.net/HBNewClaim/launch" rel="noopener" target="_blank">
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7h16M7 7l1 13m8-13-1 13M9 7V4h6v3"></path></svg>
+<div><strong>Apply for Housing Benefit &amp; CTR</strong><small>Start a new claim</small></div>
+</a>
+</div>
+</section>
+<!-- Services A–Z -->
+<section class="section" id="services">
+<header>
+<h2>Services A–Z</h2>
+<span class="chip">Tip: Use the search box above to filter instantly.</span>
+</header>
+<div style="margin:.25rem 0 0"><button aria-controls="servicesGrid" aria-expanded="false" class="pill" id="toggleServices" type="button">Show all services</button></div><div class="services" data-filter-scope="" id="servicesGrid">
+<a class="service card" data-filter="benefits universal credit ctrs support" href="https://www.southderbyshire.gov.uk/our-services/benefits" rel="noopener" target="_blank"><strong>Benefits &amp; Universal Credit</strong><span class="muted">Help with rent &amp; Council Tax</span></a>
+<a class="service card" data-filter="births marriages deaths registrars certificates" href="https://www.southderbyshire.gov.uk/our-services/births-marriages-and-deaths" rel="noopener" target="_blank"><strong>Births, marriages &amp; deaths</strong><span class="muted">Registrations &amp; certificates</span></a>
+<a class="service card" data-filter="business investment rates grants planning" href="https://www.southderbyshire.gov.uk/our-services/business-and-investment" rel="noopener" target="_blank"><strong>Business &amp; investment</strong><span class="muted">Support, rates &amp; premises</span></a>
+<a class="service card" data-filter="climate environment emergency grants ev charging biodiversity" href="https://www.southderbyshire.gov.uk/our-services/climate" rel="noopener" target="_blank"><strong>Climate</strong><span class="muted">Projects, grants &amp; EVs</span></a>
+<a class="service card" data-filter="council tax bills discounts exemptions pay" href="https://www.southderbyshire.gov.uk/our-services/council-tax" rel="noopener" target="_blank"><strong>Council Tax</strong><span class="muted">Pay, discounts &amp; support</span></a>
+<a class="service card" data-filter="crime community safety asb neighbourhood watch" href="https://www.southderbyshire.gov.uk/our-services/crime-and-community-safety" rel="noopener" target="_blank"><strong>Crime &amp; community</strong><span class="muted">Report issues &amp; stay safe</span></a>
+<a class="service card" data-filter="education schools adult learning" href="https://www.southderbyshire.gov.uk/our-services/education-and-schools" rel="noopener" target="_blank"><strong>Education &amp; schools</strong><span class="muted">Local learning &amp; projects</span></a>
+<a class="service card" data-filter="environment noise air quality pests flooding green space" href="https://www.southderbyshire.gov.uk/our-services/environment" rel="noopener" target="_blank"><strong>Environment</strong><span class="muted">Noise, air, land &amp; more</span></a>
+<a class="service card" data-filter="health wellbeing fitness mental support" href="https://www.southderbyshire.gov.uk/our-services/health-and-wellbeing" rel="noopener" target="_blank"><strong>Health &amp; wellbeing</strong><span class="muted">Be active &amp; well</span></a>
+<a class="service card" data-filter="housing council tenants homefinder homelessness repairs" href="https://www.southderbyshire.gov.uk/our-services/housing" rel="noopener" target="_blank"><strong>Housing</strong><span class="muted">Council tenants &amp; more</span></a>
+<a class="service card" data-filter="licensing taxi alcohol premises street trading" href="https://www.southderbyshire.gov.uk/our-services/licensing" rel="noopener" target="_blank"><strong>Licensing</strong><span class="muted">Taxi, premises &amp; more</span></a>
+<a class="service card" data-filter="account mysouthderbyshire online services login" href="https://my.southderbyshire.gov.uk/" rel="noopener" target="_blank"><strong>mySouthDerbyshire</strong><span class="muted">Track, pay &amp; report</span></a>
+<a class="service card" data-filter="planning building control applications guidance" href="https://www.southderbyshire.gov.uk/our-services/planning-and-building-control" rel="noopener" target="_blank"><strong>Planning &amp; Building Control</strong><span class="muted">Applications &amp; policy</span></a>
+<a class="service card" data-filter="recycling bins waste collections bulky" href="https://www.southderbyshire.gov.uk/our-services/recycling-bins-and-waste" rel="noopener" target="_blank"><strong>Recycling, bins &amp; waste</strong><span class="muted">Collections &amp; tips</span></a>
+<a class="service card" data-filter="street care litter graffiti highways cleansing" href="https://www.southderbyshire.gov.uk/our-services/street-care" rel="noopener" target="_blank"><strong>Street care</strong><span class="muted">Report local issues</span></a>
+<a class="service card" data-filter="things to do places visit leisure culture" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit" rel="noopener" target="_blank"><strong>Things to do &amp; places to visit</strong><span class="muted">Explore the district</span></a>
+<a class="service card" data-filter="transport roads parking buses cycling" href="https://www.southderbyshire.gov.uk/our-services/transport-and-roads" rel="noopener" target="_blank"><strong>Transport &amp; roads</strong><span class="muted">Travel &amp; parking</span></a>
+<a class="service card" data-filter="voting elections electoral register" href="https://www.southderbyshire.gov.uk/our-services/voting-and-elections" rel="noopener" target="_blank"><strong>Voting &amp; elections</strong><span class="muted">Elections &amp; register</span></a>
+</div>
+</section>
+<!-- What’s on: calendar + upcoming + filters -->
+<section class="section" id="events">
+<header>
+<div>
+<h2 style="margin-bottom:.25rem">What’s on</h2>
+<p class="muted" style="margin:0">Live feed from Council / Visit South Derbyshire with filters. Use the calendar to browse by month.</p>
+</div>
+<a class="pill" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/events/all" rel="noopener" target="_blank">View all events →</a>
+</header>
+<div class="filters">
+<label><input name="cat" type="checkbox" value="Family"/><span class="pill">Family</span></label>
+<label><input name="cat" type="checkbox" value="Outdoors"/><span class="pill">Outdoors</span></label>
+<label><input name="cat" type="checkbox" value="Culture"/><span class="pill">Culture</span></label>
+<label><input name="cat" type="checkbox" value="Community"/><span class="pill">Community</span></label>
+<span style="flex:1"></span>
+<select aria-label="Filter by location" id="locFilter"><option value="">All locations</option></select>
+</div>
+<div class="grid-2 whats-on-grid">
+<div class="card calendar">
+<div class="cal-head">
+<button aria-label="Previous month" id="calPrev" type="button">‹</button>
+<div class="cal-label" id="calLabel"></div>
+<button aria-label="Next month" id="calNext" type="button">›</button>
+</div>
+<div aria-labelledby="calLabel" class="cal-grid" id="calGrid" role="grid"></div>
+<div class="cal-legend"><span class="swatch"></span> Dates with events</div>
+<small class="muted">Calendar auto-populates from official listings (prototype, may take a second to load).</small>
+</div>
+<aside class="card upcoming">
+<h3 style="margin:0 0 .4rem">Upcoming events</h3>
+<ul id="eventList"></ul>
+<div class="ribbon">
+<a class="pill" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/events/all" rel="noopener" target="_blank">All events &amp; activities</a>
+<a class="pill" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/arts-and-culture/what-s-on" rel="noopener" target="_blank">What’s On guide</a>
+</div>
+</aside>
+</div>
+</section>
+<!-- Explore Your District with map overlays + postcode search -->
+<section class="section" id="explore">
+<header>
+<div>
+<h2>Explore Your District</h2>
+<p class="muted">Find parks, leisure centres, recycling points and more on our interactive map.</p>
+</div>
+<a class="pill" href="https://maps.southderbyshire.gov.uk/iShareLive.Web/" rel="noopener" target="_blank">Open interactive map →</a>
+</header>
+<div class="grid-4" style="margin-bottom:1rem">
+<a class="service card" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/parks-and-open-spaces" rel="noopener" target="_blank">
+<strong>Parks &amp; Green Spaces</strong>
+<span class="muted">Play areas, woodlands &amp; trails</span>
+</a>
+<a class="service card" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/community-and-leisure-facilities" rel="noopener" target="_blank">
+<strong>Leisure Centres</strong>
+<span class="muted">Green Bank &amp; Etwall</span>
+</a>
+<a class="service card" href="https://www.southderbyshire.gov.uk/our-services/recycling-bins-and-waste/tip-and-recycling-centres" rel="noopener" target="_blank">
+<strong>Recycling Points</strong>
+<span class="muted">Tips, bring banks &amp; advice</span>
+</a>
+<a class="service card" href="https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/arts-and-culture/libraries" rel="noopener" target="_blank">
+<strong>Libraries</strong>
+<span class="muted">Find your nearest library</span>
+</a>
+</div>
+<form class="map-form" id="mapForm" onsubmit="return false;">
+<div class="group">
+<label class="muted" for="pc">Postcode</label>
+<input autocomplete="postal-code" id="pc" inputmode="text" placeholder="e.g. DE11 0AH" type="text"/>
+</div>
+<div class="group">
+<label class="muted">Show layers</label>
+<fieldset>
+<label><input checked="" type="checkbox" value="parks_and_open_spaces"/> Parks &amp; Green Spaces</label>
+<label><input checked="" type="checkbox" value="leisure_centres"/> Leisure Centres</label>
+<label><input checked="" type="checkbox" value="household_recycling"/> Recycling Points</label>
+<label><input type="checkbox" value="libraries"/> Libraries</label>
+</fieldset>
+</div>
+<button class="btn" id="openMapBtn" type="submit">Open map with these layers</button>
+</form>
+<small class="muted">Note: Layer names are based on the Council’s iShare profiles. If a layer isn’t available, the map will still open. You can toggle additional categories in the side panel.</small>
+</section>
+<div aria-hidden="true" class="footer-sep"></div>
+</main><footer>
+<div class="cols container">
+<div>
+<strong>South Derbyshire District Council</strong>
+<p class="muted">Civic Offices, Civic Way<br/>Swadlincote, Derbyshire<br/>DE11 0AH</p>
+</div>
+<div>
+<strong>Quick Links</strong>
+<ul class="muted">
+<li><a href="https://www.southderbyshire.gov.uk/about-us/contact-us" rel="noopener" target="_blank">Contact Us</a></li>
+<li><a href="https://www.southderbyshire.gov.uk/working-for-us" rel="noopener" target="_blank">Jobs</a></li>
+<li><a href="https://www.southderbyshire.gov.uk/news" rel="noopener" target="_blank">News</a></li>
+<li><a href="https://south-derbys.cmis.uk.com/south-derbys/Councillors.aspx" rel="noopener" target="_blank">Your Councillors</a></li>
+</ul>
+</div>
+<div>
+<strong>Information</strong>
+<ul class="muted">
+<li><a href="https://www.southderbyshire.gov.uk/website-information/accessibility" rel="noopener" target="_blank">Accessibility</a></li>
+<li><a href="https://www.southderbyshire.gov.uk/about-us/data-privacy-and-cookies/privacy-notice" rel="noopener" target="_blank">Privacy Policy</a></li>
+<li><a href="https://www.southderbyshire.gov.uk/about-us/data-privacy-and-cookies" rel="noopener" target="_blank">Cookies</a></li>
+<li><a href="https://www.southderbyshire.gov.uk/website-information/site-map" rel="noopener" target="_blank">Sitemap</a></li>
+</ul>
+<strong>Connect with us</strong>
+<div class="quick-links">
+<a class="pill" href="https://www.facebook.com/southderbyshiredc/" rel="noopener" target="_blank">Facebook</a>
+<a class="pill" href="https://www.youtube.com/%40SouthDerbyshire" rel="noopener" target="_blank">YouTube</a>
+</div>
+</div>
+</div>
+<p class="muted container" style="margin-top:1.4rem">© South Derbyshire District Council • People | Place | Progress</p>
+</footer>
+<button id="fab" style="position:fixed;right:1rem;bottom:1rem;border:0;border-radius:999px;padding:.9rem 1rem;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#05141b;font-weight:800;box-shadow:var(--shadow)" title="Report it">Report it</button>
+<script>
+    // Instant filter for tasks/services
+    const q = document.getElementById('q');
+    const scopes = document.querySelectorAll('[data-filter-scope]');
+    function filterAll(){
+      const term = (q?.value||'').toLowerCase().trim();
+      scopes.forEach(scope=>{
+        scope.querySelectorAll('[data-filter]').forEach(el=>{
+          const hay = el.getAttribute('data-filter') + ' ' + el.textContent;
+          el.style.display = hay.toLowerCase().includes(term) ? '' : 'none';
+        })
+      });
+    }
+    q?.addEventListener('input', filterAll);
+
+    // --- Calendar helpers ---
+    const grid = document.getElementById('calGrid');
+    const label = document.getElementById('calLabel');
+    const prevBtn = document.getElementById('calPrev');
+    const nextBtn = document.getElementById('calNext');
+    let calMonth = new Date(); calMonth.setDate(1);
+    const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const dow = d => (d.getDay()+6)%7; // Mon=0...Sun=6
+    const sameDate = (a,b)=> a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+
+    // --- Events state ---
+    let EVENTS = [];
+    let activeCats = new Set();
+    let activeLoc = '';
+
+    function categorise(title=''){
+      const t = title.toLowerCase();
+      if(/family|kids|children|santa|christmas|easter|half\\s*term/.test(t)) return 'Family';
+      if(/walk|parkrun|trail|outdoor|cycle|cycling|run|hike|wildlife|park/.test(t)) return 'Outdoors';
+      if(/music|film|cinema|concert|theatre|festival|exhibit|craft|art|culture/.test(t)) return 'Culture';
+      if(/market|fair|community|coffee|talk|workshop|open\\s*day|volunteer/.test(t)) return 'Community';
+      return 'Community';
+    }
+
+    function toISODate(d){ return d.toISOString().slice(0,10); }
+
+    function renderCalendar(){
+      if(!grid||!label) return;
+      const y = calMonth.getFullYear();
+      const m = calMonth.getMonth();
+      label.textContent = calMonth.toLocaleString('en-GB',{month:'long',year:'numeric'});
+      grid.innerHTML = '';
+      // headings
+      DOW.forEach(d=> grid.insertAdjacentHTML('beforeend', `<div class="cal-dow">${d}</div>`));
+      const firstDow = dow(new Date(y,m,1));
+      const daysInMonth = new Date(y,m+1,0).getDate();
+      const totalCells = Math.ceil((firstDow+daysInMonth)/7)*7;
+      const today = new Date();
+      for(let i=0;i<totalCells;i++){
+        const dayNum = i - firstDow + 1;
+        const date = new Date(y,m,dayNum);
+        const inMonth = dayNum>=1 && dayNum<=daysInMonth;
+        const iso = toISODate(date);
+        const dayEvents = inMonth ? filteredEvents().filter(e=> (e.date||'').slice(0,10)===iso) : [];
+        const classes = ['cal-day', inMonth ? '' : 'muted', inMonth && sameDate(date,today) ? 'today':'' , dayEvents.length? 'has-event':''].filter(Boolean).join(' ');
+        const items = dayEvents.map(e=>`<div style="font-size:.78rem;line-height:1.2;margin-top:.25rem"><a href="${e.url}" target="_blank" rel="noopener">${e.title}</a></div>`).join('');
+        grid.insertAdjacentHTML('beforeend', `<div class="${classes}" aria-label="${iso}">${inMonth? `<div>${dayNum}</div>${items}`: ''}</div>`);
+      }
+    }
+
+    function renderEventList(){
+      const list = document.getElementById('eventList');
+      if(!list) return;
+      const todayStr = toISODate(new Date());
+      const upcoming = filteredEvents().filter(e=> (e.date||'').slice(0,10) >= todayStr).sort((a,b)=> (a.date||'').localeCompare(b.date));
+      list.innerHTML = upcoming.slice(0,10).map(e=>{
+        const d = new Date(e.date);
+        const when = isNaN(d) ? '' : d.toLocaleDateString('en-GB',{weekday:'short', day:'2-digit', month:'short'});
+        const time = e.time ? ` • ${e.time}` : '';
+        const loc = e.location ? ` • ${e.location}` : '';
+        const cats = e.category ? ` <span class="muted">• ${e.category}</span>` : '';
+        return `<li><time datetime="${e.date}">${when}</time> <a href="${e.url}" target="_blank" rel="noopener">${e.title}</a>${time}${loc}${cats}</li>`;
+      }).join('') || '<li><span class="muted">No scheduled events. See the full listing.</span></li>';
+    }
+
+    function filteredEvents(){
+      return EVENTS.filter(e=>{
+        const catOk = activeCats.size ? activeCats.has(e.category) : true;
+        const locOk = activeLoc ? (e.location||'').toLowerCase().includes(activeLoc.toLowerCase()) : true;
+        return catOk && locOk;
+      });
+    }
+
+    function populateLocationOptions(){
+      const sel = document.getElementById('locFilter');
+      if(!sel) return;
+      const locs = Array.from(new Set(EVENTS.map(e=>e.location).filter(Boolean))).sort();
+      sel.innerHTML = '<option value="">All locations</option>' + locs.map(l=>`<option>${l}</option>`).join('');
+    }
+
+    // --- Live events feed (prototype) ---
+    async function loadEvents(){
+      try{
+        let out = [];
+        // Prefer official Visit South Derbyshire RSS feed
+        try{
+          const rssRes = await fetch('https://www.visitsouthderbyshire.co.uk/event/feed/', {cache:'no-store'});
+          if(rssRes.ok){
+            const xml = await rssRes.text();
+            const doc = new DOMParser().parseFromString(xml, 'application/xml');
+            const items = Array.from(doc.querySelectorAll('item'));
+            for(const it of items){
+              const title = (it.querySelector('title')?.textContent||'').trim();
+              const link = it.querySelector('link')?.textContent?.trim()||'https://www.visitsouthderbyshire.co.uk/event/';
+              let d = new Date(it.querySelector('pubDate')?.textContent||'');
+              const mTitleDate = title.match(/\\b(\\d{1,2}\\s+\\w+\\s+20\\d{2})\\b/);
+              if(!isFinite(d) && mTitleDate){ d = new Date(mTitleDate[1]); }
+              const dateISO = isFinite(d) ? d.toISOString() : '';
+              out.push({title, date: dateISO, time:'', url: link, location:'South Derbyshire', category: categorise(title)});
+            }
+          }
+        }catch(e){}
+        // Also scrape SDDC listing (date/time blocks) as a supplement
+        try{
+          const res = await fetch('https://r.jina.ai/http://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/events/all', {cache:'no-store'});
+          if(res.ok){
+            const txt = await res.text();
+            const pattA = /(Featured\\s+)?([A-Z].+?)\\nDate:\\s*([0-9]{1,2}\\s+\\w+\\s+20[0-9]{2})\\s*\\nTime:\\s*([^\\n]+)\\n/gi;
+            let m; while((m=pattA.exec(txt))){
+              const title = m[2].trim();
+              const dateISO = new Date(m[3]).toISOString();
+              out.push({title, date:dateISO, time:m[4].trim(), url:'https://www.southderbyshire.gov.uk/our-services/things-to-do-and-places-to-visit/events/all', location:'South Derbyshire', category:categorise(title)});
+            }
+          }
+        }catch(e){}
+        // Deduplicate
+        const seen = new Set();
+        EVENTS = out.filter(e=>{ const k = e.title+'|'+(e.date||''); if(seen.has(k)) return false; seen.add(k); return true; });
+      }catch(e){ console.warn('Events feed failed', e); }
+      finally{ populateLocationOptions(); renderCalendar(); renderEventList(); }
+    }
+
+    // Filters
+    document.querySelectorAll('.filters input[name="cat"]').forEach(cb=> cb.addEventListener('change', ()=>{
+      activeCats = new Set(Array.from(document.querySelectorAll('.filters input[name="cat"]:checked')).map(x=>x.value));
+      renderCalendar(); renderEventList();
+    }));
+    document.getElementById('locFilter')?.addEventListener('change', e=>{ activeLoc = e.target.value || ''; renderCalendar(); renderEventList(); });
+
+    // Calendar nav
+    prevBtn?.addEventListener('click', ()=>{ calMonth.setMonth(calMonth.getMonth()-1); renderCalendar(); });
+    nextBtn?.addEventListener('click', ()=>{ calMonth.setMonth(calMonth.getMonth()+1); renderCalendar(); });
+
+    // Initial renders
+    renderCalendar();
+    loadEvents();
+
+    // Floating FAB shortcut focuses search
+    document.getElementById('fab')?.addEventListener('click', ()=>{
+      const input = document.getElementById('q'); if(input){ input.value='report'; filterAll(); input.focus(); }
+    });
+
+    // --- Map overlays & postcode centring ---
+    document.getElementById('openMapBtn')?.addEventListener('click', async ()=>{
+      const pc = document.getElementById('pc').value.trim();
+      const picked = Array.from(document.querySelectorAll('#mapForm input[type="checkbox"]:checked')).map(x=>x.value);
+      const layers = encodeURIComponent(picked.join(','));
+      const base = 'https://maps.southderbyshire.gov.uk/iShareLIVE.Web/atmyresponsivecouncil.aspx';
+      const suffix = (e,n)=> `${base}?MapSource=mapsources/AllMaps&StartEasting=${e}&StartNorthing=${n}&StartZoom=6000&o=1${picked.length?`&Layers=${layers}`:''}`;
+      if(!pc){ window.open(suffix(430000,323000),'_blank'); return; }
+      try{
+        const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`);
+        const j = await r.json();
+        if(j.status===200){
+          const e = j.result.eastings, n = j.result.northings;
+          window.open(suffix(e,n),'_blank');
+        } else { alert('Sorry, postcode not found.'); }
+      }catch(err){ console.warn(err); alert('Postcode lookup failed. Try again.'); }
+    });
+  </script>
+<script>
+/* === One-line + dropdown behavior (injected) === */
+(function(){
+  function setupOneLineToggle(gridSelector, toggleSelector, showAllLabel, showLessLabel){
+    var grid = document.querySelector(gridSelector);
+    var btn  = document.querySelector(toggleSelector);
+    if(!grid || !btn) return;
+
+    var items = Array.prototype.slice.call(grid.children);
+
+    function getCols(){
+      var gtc = window.getComputedStyle(grid).gridTemplateColumns;
+      if (!gtc || gtc === 'none') return 1;
+      // Split by spaces but account for functions like minmax(...) which include spaces.
+      // A simpler robust approach is counting column tracks: match groups ending with ')', 'px', 'fr', '%', etc.
+      // However, splitting by ' ' generally works for typical definitions.
+      return gtc.split(' ').length;
+    }
+
+    function apply(collapsed){
+      var cols = getCols();
+      items.forEach(function(el, i){
+        el.style.display = (collapsed && i >= cols) ? 'none' : '';
+      });
+      btn.textContent = collapsed ? showAllLabel : showLessLabel;
+      btn.setAttribute('aria-expanded', String(!collapsed));
+      grid.setAttribute('data-collapsed', collapsed ? '1' : '0');
+    }
+
+    // Initial collapsed state (one row)
+    apply(true);
+
+    window.addEventListener('resize', function(){
+      apply(grid.getAttribute('data-collapsed') !== '0');
+    });
+
+    btn.addEventListener('click', function(){
+      var nowCollapsed = grid.getAttribute('data-collapsed') === '1';
+      apply(!nowCollapsed);
+    });
+  }
+
+  // Initialize for Popular tasks and Services A–Z (only if grids/buttons exist)
+  setupOneLineToggle('#tasksGrid', '#toggleTasks', 'Show all popular tasks', 'Show less');
+  setupOneLineToggle('#servicesGrid', '#toggleServices', 'Show all services', 'Show less');
+})();
+</script><script>
+/* === Theme toggle behavior (injected v2) === */
+(function(){
+  var STORAGE_KEY = 'site-theme'; // 'dark' or 'light'
+  var body = document.body;
+  var btn = document.getElementById('themeToggle');
+  if(!btn) return;
+
+  function applyTheme(theme){
+    // Remove legacy class if present
+    body.classList.remove('theme-invert');
+    // Set attribute for CSS variable scope
+    body.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    // Update button state/label
+    var to = (theme === 'dark') ? 'light' : 'dark';
+    btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+    btn.setAttribute('aria-label', 'Switch to ' + to + ' mode');
+    btn.textContent = (to.charAt(0).toUpperCase() + to.slice(1));
+  }
+
+  function getInitialTheme(){
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if(saved === 'light' || saved === 'dark') return saved;
+    } catch(e){}
+    return 'dark'; // default as requested
+  }
+
+  var theme = getInitialTheme();
+  applyTheme(theme);
+
+  btn.addEventListener('click', function(){
+    theme = (theme === 'dark') ? 'light' : 'dark';
+    applyTheme(theme);
+    try { localStorage.setItem(STORAGE_KEY, theme); } catch(e){}
+  });
+})();
+</script></body>
+</html>
