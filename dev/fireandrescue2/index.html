@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DWFRS Redesign Concept: Passionate About Changing & Saving Lives</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom styles using DWFRS brand colors */
+        :root {
+            --color-red: #CF2E2E; /* Persian Red */
+            --color-blue: #001E54; /* Prussian Blue */
+        }
+        .bg-dw-red { background-color: var(--color-red); }
+        .text-dw-red { color: var(--color-red); }
+        .bg-dw-blue { background-color: var(--color-blue); }
+        .text-dw-blue { color: var(--color-blue); }
+        
+        /* Set Inter font as default */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+
+        /* Hero background (Mock fire/rescue image) */
+        .hero-bg {
+            background-image: url('https://placehold.co/1920x800/222222/FFFFFF?text=Serving+Dorset+\n%26+Wiltshire');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Modal specific style to ensure it covers everything */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 60; /* Higher than header */
+            background-color: rgba(0, 30, 84, 0.9); /* Semi-transparent DW-Blue */
+            display: none; /* Controlled by JS */
+            overflow-y: auto; /* Allows scrolling if content is too long */
+        }
+    </style>
+</head>
+<body class="antialiased bg-gray-50">
+
+    <!-- Tailwind CSS Script Setup -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dw-red': '#CF2E2E',
+                        'dw-blue': '#001E54',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo/Branding -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="flex items-center space-x-2">
+                        <span class="text-dw-red text-4xl font-extrabold italic">DW</span>
+                        <span class="text-dw-blue text-lg font-bold">Fire & Rescue</span>
+                    </a>
+                </div>
+
+                <!-- Primary Navigation (Desktop) -->
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4 text-sm font-medium">
+                        <a href="#home" class="text-gray-600 hover:text-dw-red px-3 py-2 rounded-md transition duration-150">Home</a>
+                        <a href="#safety" class="text-gray-600 hover:text-dw-red px-3 py-2 rounded-md transition duration-150">Your Safety</a>
+                        <a href="#about" class="text-gray-600 hover:text-dw-red px-3 py-2 rounded-md transition duration-150">About Us</a>
+                        <a href="#careers" class="text-gray-600 hover:text-dw-red px-3 py-2 rounded-md transition duration-150">Working for Us</a>
+                        <a href="#incidents-dashboard" class="text-gray-600 hover:text-dw-red px-3 py-2 rounded-md transition duration-150">News & Incidents</a>
+                        <a href="#contact" class="bg-dw-blue text-white hover:bg-dw-red px-4 py-2 rounded-lg transition duration-300 shadow-md">Contact</a>
+                    </div>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-dw-red focus:outline-none focus:ring-2 focus:ring-inset focus:ring-dw-red transition duration-150" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+                        <i data-lucide="x" class="hidden w-6 h-6" id="close-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-sm font-medium bg-gray-50 border-t border-gray-200">
+                <a href="#home" class="text-gray-700 hover:bg-dw-blue hover:text-white block px-3 py-2 rounded-md transition duration-150">Home</a>
+                <a href="#safety" class="text-gray-700 hover:bg-dw-blue hover:text-white block px-3 py-2 rounded-md transition duration-150">Your Safety</a>
+                <a href="#about" class="text-gray-700 hover:bg-dw-blue hover:text-white block px-3 py-2 rounded-md transition duration-150">About Us</a>
+                <a href="#careers" class="text-gray-700 hover:bg-dw-blue hover:text-white block px-3 py-2 rounded-md transition duration-150">Working for Us</a>
+                <a href="#incidents-dashboard" class="text-gray-700 hover:bg-dw-blue hover:text-white block px-3 py-2 rounded-md transition duration-150">News & Incidents</a>
+                <a href="#contact" class="bg-dw-red text-white hover:bg-dw-blue block px-3 py-2 rounded-md transition duration-300 mt-2">Contact</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero-bg py-24 md:py-36 relative">
+            <!-- Overlay for contrast -->
+            <div class="absolute inset-0 bg-dw-blue opacity-70"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
+                <div class="max-w-3xl">
+                    <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
+                        Protecting Our Communities
+                    </h1>
+                    <p class="text-xl md:text-2xl font-light mb-8 italic">
+                        "Passionate about changing and saving lives"
+                    </p>
+                    <a href="#safety" class="inline-block bg-dw-red text-white font-bold text-lg py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">
+                        Get Safety Advice <i data-lucide="arrow-right" class="w-5 h-5 inline-block ml-2"></i>
+                    </a>
+                </div>
+
+                <!-- Latest Incidents Alert Strip (Link updated to new dashboard section) -->
+                <div class="mt-12 md:mt-16 bg-yellow-400 text-gray-900 p-4 rounded-lg shadow-xl flex items-center space-x-3 animate-pulse">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 flex-shrink-0 text-dw-blue"></i>
+                    <p class="font-semibold text-sm md:text-base">
+                        LATEST INCIDENTS: Major road closure on A303 near Salisbury. <span class="hidden sm:inline">Fire crews attending serious RTC. Avoid the area.</span>
+                        <a href="#incidents-dashboard" class="underline hover:text-dw-red ml-2 font-bold">View Details</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Service Areas / Action Grid -->
+        <section class="py-16 md:py-24 bg-white" id="safety">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-dw-blue mb-12">How We Serve You</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                    <!-- Card 1: Safety in the Home - WITH MODAL BUTTON -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border-t-4 border-dw-red transform hover:-translate-y-1">
+                        <i data-lucide="home" class="w-10 h-10 text-dw-red mb-4"></i>
+                        <h3 class="text-xl font-bold text-dw-blue mb-3">Home Fire Safety</h3>
+                        <p class="text-gray-600 mb-4">Request a free Home Fire Safety Visit or learn essential advice on smoke alarms, escape routes, and appliance safety.</p>
+                        <button onclick="openModal('hfsVModal')" class="text-dw-red font-semibold flex items-center group focus:outline-none focus:ring-2 focus:ring-dw-red rounded-md">
+                            Book a Visit
+                            <i data-lucide="chevron-right" class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Card 2: Road Safety -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border-t-4 border-dw-red transform hover:-translate-y-1">
+                        <i data-lucide="car" class="w-10 h-10 text-dw-red mb-4"></i>
+                        <h3 class="text-xl font-bold text-dw-blue mb-3">Road Safety Campaigns</h3>
+                        <p class="text-gray-600 mb-4">Information on our road safety initiatives, driving tips for young drivers, and advice for motorcycle riders.</p>
+                        <a href="#" class="text-dw-red font-semibold flex items-center group">
+                            See Our Campaigns
+                            <i data-lucide="chevron-right" class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+
+                    <!-- Card 3: Working for Us (Recruitment) -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border-t-4 border-dw-red transform hover:-translate-y-1">
+                        <i data-lucide="briefcase" class="w-10 h-10 text-dw-red mb-4"></i>
+                        <h3 class="text-xl font-bold text-dw-blue mb-3">Join Our Team</h3>
+                        <p class="text-gray-600 mb-4">Explore current vacancies for Wholetime Firefighters, On-Call roles, and corporate support staff. Make a difference today.</p>
+                        <a href="#careers" class="text-dw-red font-semibold flex items-center group">
+                            View Vacancies
+                            <i data-lucide="chevron-right" class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- NEW SECTION: Active Incidents Dashboard (Phase 1, Item 2) -->
+        <section class="py-16 md:py-24 bg-gray-100" id="incidents-dashboard">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-extrabold text-dw-blue text-center mb-4">Active Incident Dashboard</h2>
+                <p class="text-center text-lg text-gray-600 mb-10">Real-time information on major incidents across Dorset & Wiltshire.</p>
+
+                <!-- Incident Filters -->
+                <div class="flex flex-wrap justify-center gap-4 mb-10">
+                    <button onclick="renderIncidents('All', this)" class="incident-filter-btn px-6 py-2 rounded-full font-semibold transition duration-300 bg-dw-red text-white shadow-md active-filter" data-filter="All">
+                        All Incidents
+                    </button>
+                    <button onclick="renderIncidents('Fire', this)" class="incident-filter-btn px-6 py-2 rounded-full font-semibold transition duration-300 bg-white text-dw-blue border border-dw-blue hover:bg-dw-blue hover:text-white" data-filter="Fire">
+                        <i data-lucide="flame" class="w-4 h-4 inline-block mr-2"></i> Fires
+                    </button>
+                    <button onclick="renderIncidents('RTC', this)" class="incident-filter-btn px-6 py-2 rounded-full font-semibold transition duration-300 bg-white text-dw-blue border border-dw-blue hover:bg-dw-blue hover:text-white" data-filter="RTC">
+                        <i data-lucide="car-crash" class="w-4 h-4 inline-block mr-2"></i> Road Traffic Collisions
+                    </button>
+                    <button onclick="renderIncidents('Other', this)" class="incident-filter-btn px-6 py-2 rounded-full font-semibold transition duration-300 bg-white text-dw-blue border border-dw-blue hover:bg-dw-blue hover:text-white" data-filter="Other">
+                        <i data-lucide="life-buoy" class="w-4 h-4 inline-block mr-2"></i> Other/Special Service
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Mock Map Placeholder (Left Side) -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-xl p-4 md:p-6 h-96 relative">
+                        <h3 class="text-xl font-bold text-dw-blue mb-3 flex items-center">
+                            <i data-lucide="map-pin" class="w-5 h-5 mr-2 text-dw-red"></i> Operational Area Overview
+                        </h3>
+                        <img src="https://placehold.co/1200x800/808080/FFFFFF?text=MOCK+INCIDENT+MAP+AREA\n(DWFRS+Operational+Area)" alt="Mock map of Dorset and Wiltshire" class="w-full h-72 object-cover rounded-lg">
+                        <div class="absolute bottom-6 right-6 bg-dw-blue text-white text-xs font-medium px-3 py-1 rounded-full opacity-90">
+                            Map Updated: <span id="map-update-time">12:30 BST</span>
+                        </div>
+                    </div>
+
+                    <!-- Incident List (Right Side) -->
+                    <div class="lg:col-span-1 bg-white rounded-xl shadow-xl p-4 md:p-6 h-96 overflow-y-auto">
+                        <h3 class="text-xl font-bold text-dw-blue mb-4 border-b pb-2">
+                            <i data-lucide="sirens" class="w-5 h-5 mr-2 text-dw-red"></i> Filtered Incidents
+                        </h3>
+                        <div id="incident-list" class="space-y-4">
+                            <!-- Incidents rendered here by JavaScript -->
+                        </div>
+                        <div id="no-incidents" class="text-center text-gray-500 mt-12 hidden">
+                            <i data-lucide="check-check" class="w-10 h-10 mx-auto mb-2 text-green-500"></i>
+                            <p class="font-semibold">No active incidents of this type currently reported.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Us / Service Spotlight Section -->
+        <section class="py-16 md:py-24 bg-gray-100" id="about">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="lg:flex lg:items-center lg:space-x-12">
+                    <!-- Text Content -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-dw-red mb-2">Our Mission & Values</h2>
+                        <h3 class="text-4xl font-extrabold text-dw-blue mb-6">More Than Just a Fire Service</h3>
+                        <p class="text-gray-600 text-lg mb-6">
+                            We are committed to helping you become safer, healthier, and to live more independently. Our work focuses on prevention, protection, and resilience, ensuring our communities in Dorset and Wiltshire are as safe as possible.
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-dw-red mt-1 flex-shrink-0"></i>
+                                <span class="ml-3 text-gray-700">Protecting you and the built environment from harm.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-dw-red mt-1 flex-shrink-0"></i>
+                                <span class="ml-3 text-gray-700">Providing a professional and prompt emergency response.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-dw-red mt-1 flex-shrink-0"></i>
+                                <span class="ml-3 text-gray-700">Supporting and developing our dedicated staff.</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="inline-block text-white bg-dw-red font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-dw-blue transition duration-300">
+                            Explore Our Structure
+                        </a>
+                    </div>
+                    
+                    <!-- Placeholder Image/Graphic -->
+                    <div class="lg:w-1/2 mt-10 lg:mt-0">
+                        <img src="https://placehold.co/600x400/CF2E2E/FFFFFF?text=Community+Focus" alt="Firefighters interacting with the community" class="rounded-xl shadow-2xl w-full h-auto object-cover">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recruitment/Careers CTA -->
+        <section class="py-16 bg-dw-blue" id="careers">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+                <h2 class="text-3xl md:text-4xl font-extrabold mb-4">Ready to Change Lives?</h2>
+                <p class="text-lg mb-8 max-w-3xl mx-auto opacity-90">
+                    We are actively recruiting Wholetime, On-Call, and support staff across Dorset and Wiltshire. Find a fulfilling career that truly matters.
+                </p>
+                <a href="#" class="inline-block bg-dw-red text-white font-bold text-lg py-3 px-8 rounded-full shadow-lg hover:bg-white hover:text-dw-blue transition duration-300 transform hover:scale-105">
+                    View All Current Vacancies
+                </a>
+            </div>
+        </section>
+
+        <!-- News & Incidents Section -->
+        <section class="py-16 md:py-24 bg-white" id="news">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-end mb-10">
+                    <h2 class="text-3xl font-bold text-dw-blue">Latest News & Updates</h2>
+                    <a href="#incidents-dashboard" class="text-dw-red font-semibold flex items-center hover:underline transition duration-150">
+                        View All News <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- News Article 1 -->
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden group">
+                        <img src="https://placehold.co/400x250/2563EB/FFFFFF?text=Training+Exercise" alt="Training Exercise" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-300">
+                        <div class="p-6">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">22 OCT 2025 | PREVENTION</span>
+                            <h4 class="mt-2 text-xl font-bold text-dw-blue group-hover:text-dw-red transition duration-300">
+                                Investing in Firefighter Training for New Technologies
+                            </h4>
+                            <p class="mt-3 text-gray-600 text-sm">
+                                Our crews participated in a multi-agency exercise simulating a major industrial incident in Poole...
+                            </p>
+                            <a href="#" class="mt-4 inline-flex items-center text-dw-red font-medium text-sm">
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- News Article 2 -->
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden group">
+                        <img src="https://placehold.co/400x250/FBBF24/333333?text=Community+Event" alt="Community Event" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-300">
+                        <div class="p-6">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">18 OCT 2025 | COMMUNITY</span>
+                            <h4 class="mt-2 text-xl font-bold text-dw-blue group-hover:text-dw-red transition duration-300">
+                                Safety Day Success in Swindon Town Centre
+                            </h4>
+                            <p class="mt-3 text-gray-600 text-sm">
+                                Thousands attended our annual community safety day, focusing on electric scooter safety and fire prevention...
+                            </p>
+                            <a href="#" class="mt-4 inline-flex items-center text-dw-red font-medium text-sm">
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- News Article 3 -->
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden group">
+                        <img src="https://placehold.co/400x250/CF2E2E/FFFFFF?text=Emergency+Response" alt="Emergency Response" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-300">
+                        <div class="p-6">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">16 OCT 2025 | INCIDENTS</span>
+                            <h4 class="mt-2 text-xl font-bold text-dw-blue group-hover:text-dw-red transition duration-300">
+                                Update on Major Commercial Fire in Blandford
+                            </h4>
+                            <p class="mt-3 text-gray-600 text-sm">
+                                Incident declared closed after 48 hours. Investigation is now underway to determine the cause...
+                            </p>
+                            <a href="#" class="mt-4 inline-flex items-center text-dw-red font-medium text-sm">
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Modal: Home Fire Safety Visit Application (Phase 1, Item 1) -->
+    <div id="hfsVModal" class="modal-overlay hidden">
+        <div class="flex items-center justify-center min-h-screen p-4 sm:p-6">
+            <div class="bg-white w-full max-w-xl p-6 md:p-8 rounded-xl shadow-2xl relative transform transition-all sm:my-8 sm:align-middle">
+                
+                <!-- Close Button -->
+                <button onclick="closeModal('hfsVModal')" class="absolute top-4 right-4 text-gray-400 hover:text-dw-red transition duration-150 rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-dw-red">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+
+                <h3 class="text-3xl font-extrabold text-dw-blue mb-2">Request a Home Safety Visit</h3>
+                <p class="text-gray-600 mb-6 border-b pb-4">
+                    Complete this short form to request a **free** visit from our crew for safety advice, smoke alarm checks, and fire prevention guidance.
+                </p>
+
+                <form id="hfsVForm" onsubmit="return handleHFSVSubmit(event)">
+                    <!-- Contact Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                            <input type="text" id="fullName" name="fullName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-dw-red focus:border-dw-red">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-dw-red focus:border-dw-red">
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-4">
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Full Address (including Postcode) *</label>
+                        <input type="text" id="address" name="address" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-dw-red focus:border-dw-red">
+                    </div>
+
+                    <!-- Concern Type -->
+                    <div class="mb-6">
+                        <label for="concern" class="block text-sm font-medium text-gray-700 mb-1">Primary Concern / Reason for Visit *</label>
+                        <select id="concern" name="concern" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-dw-red focus:border-dw-red appearance-none bg-white">
+                            <option value="" disabled selected>Select a reason...</option>
+                            <option value="smoke_alarm">Smoke alarm check/installation</option>
+                            <option value="escape_plan">Developing an escape plan</option>
+                            <option value="appliance_safety">Electrical appliance safety</option>
+                            <option value="elderly_relative">Safety advice for an elderly or vulnerable relative</option>
+                            <option value="other">Other/General advice</option>
+                        </select>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-6">
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Additional Notes (Optional)</label>
+                        <textarea id="notes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-dw-red focus:border-dw-red"></textarea>
+                    </div>
+
+                    <!-- Privacy and Consent -->
+                    <div class="flex items-start mb-6">
+                        <input id="privacy" name="privacy" type="checkbox" required class="h-4 w-4 text-dw-red border-gray-300 rounded focus:ring-dw-red mt-1">
+                        <label for="privacy" class="ml-2 block text-sm text-gray-900">
+                            I confirm that I have read and agree to the <a href="#" class="text-dw-red font-semibold hover:underline">Privacy Policy</a> regarding the storage of personal data. *
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full bg-dw-red text-white font-bold py-3 rounded-lg shadow-md hover:bg-red-700 transition duration-300 flex items-center justify-center">
+                        Submit Request for Visit
+                        <i data-lucide="send" class="w-5 h-5 ml-2"></i>
+                    </button>
+
+                    <!-- Mock Status Message -->
+                    <p id="formStatus" class="mt-4 text-center text-sm font-medium text-dw-blue hidden"></p>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="bg-dw-blue text-white" id="contact">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 border-b border-dw-red pb-8">
+                
+                <!-- Brand Info -->
+                <div class="col-span-2 md:col-span-1">
+                    <a href="#" class="flex items-center space-x-2 mb-4">
+                        <span class="text-dw-red text-3xl font-extrabold italic">DW</span>
+                        <span class="text-white text-lg font-bold">Fire & Rescue</span>
+                    </a>
+                    <p class="text-sm text-gray-400">Serving Bournemouth, Christchurch, Poole, Dorset, Swindon, and Wiltshire.</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h5 class="text-lg font-semibold mb-4 text-dw-red">Service Links</h5>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white transition duration-150">Fire & Rescue Authority</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-150">What We Spend</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-150">Service Plans</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-150">Our Stations</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Safety Links -->
+                <div>
+                    <h5 class="text-lg font-semibold mb-4 text-dw-red">Your Safety</h5>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white transition duration-150">Business Fire Safety</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-150">Road Safety</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-150">Water Safety</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-150">Advice for Landlords</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Us -->
+                <div class="col-span-2 md:col-span-2">
+                    <h5 class="text-lg font-semibold mb-4 text-dw-red">Contact</h5>
+                    <p class="text-sm text-gray-300 mb-2">Emergency: <span class="text-xl font-bold text-white block">999</span></p>
+                    <p class="text-sm text-gray-300 mb-4">Non-Emergency: 01722 691000</p>
+                    <a href="#" class="text-sm bg-dw-red text-white py-2 px-4 rounded-lg hover:bg-dw-red/80 transition duration-300">
+                        Email Our Team
+                    </a>
+                </div>
+            </div>
+
+            <!-- Copyright & Social -->
+            <div class="mt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                <p>&copy; 2025 Dorset & Wiltshire Fire and Rescue Service. All rights reserved. | <a href="#" class="hover:text-dw-red">Privacy Policy</a></p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-dw-red transition duration-150"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-dw-red transition duration-150"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-dw-red transition duration-150"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Mobile Menu Toggle and Modal Logic -->
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        const closeIcon = document.getElementById('close-icon');
+        const formStatus = document.getElementById('formStatus');
+        
+        // Render Lucide Icons
+        lucide.createIcons();
+
+        // --- Mobile Menu Logic ---
+        mobileMenuButton.addEventListener('click', () => {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+            
+            // Toggle aria-expanded attribute
+            mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded));
+            
+            // Toggle menu visibility
+            mobileMenu.classList.toggle('hidden');
+            
+            // Toggle icons
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when a link is clicked (for single-page navigation)
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            });
+        });
+
+        // --- Modal Logic (Phase 1, Item 1) ---
+
+        /**
+         * Opens the specified modal.
+         * @param {string} modalId - The ID of the modal element to open.
+         */
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+                // Hide any previous status message
+                formStatus.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Closes the specified modal.
+         * @param {string} modalId - The ID of the modal element to close.
+         */
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Handles the mock submission of the Home Fire Safety Visit form.
+         * @param {Event} event - The submission event.
+         * @returns {boolean} False to prevent default form submission.
+         */
+        function handleHFSVSubmit(event) {
+            event.preventDefault(); // Prevent default form submission to the server
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Simple validation check (should be more robust in a live environment)
+            if (!data.fullName || !data.address || !data.phone || !data.concern) {
+                 formStatus.textContent = 'Please fill in all required fields (*).';
+                 formStatus.classList.remove('hidden', 'text-dw-blue', 'text-green-600');
+                 formStatus.classList.add('text-dw-red');
+                 return false;
+            }
+
+            // Simulate API request delay
+            formStatus.textContent = 'Submitting request... please wait.';
+            formStatus.classList.remove('hidden', 'text-dw-red', 'text-green-600');
+            formStatus.classList.add('text-dw-blue');
+            
+            console.log("--- HFSV Form Submission Data (MOCK API) ---");
+            console.log(data);
+            console.log("------------------------------------------");
+
+            setTimeout(() => {
+                // Mock success
+                formStatus.textContent = 'Thank you, your request has been successfully submitted! A crew member will contact you within 5 working days.';
+                formStatus.classList.remove('text-dw-red', 'text-dw-blue');
+                formStatus.classList.add('text-green-600');
+                
+                // Clear the form after a short delay
+                setTimeout(() => {
+                    form.reset();
+                }, 2000);
+
+            }, 1500); // 1.5 second delay simulation
+
+            return false;
+        }
+
+
+        // --- Incident Dashboard Logic (Phase 1, Item 2) ---
+
+        const mockIncidents = [
+            { id: 1, type: 'RTC', location: 'A303, Near Salisbury', time: '12:15 BST', description: 'Two vehicle collision. Crews from Salisbury and Wilton attending. Expect significant delays.', severity: 'Major' },
+            { id: 2, type: 'Fire', location: 'Commercial Road, Poole', time: '11:45 BST', description: 'Small fire in a commercial bin store, extinguished quickly. Investigation underway.', severity: 'Minor' },
+            { id: 3, type: 'Other', location: 'River Stour, Blandford', time: '10:30 BST', description: 'Water rescue assistance provided to a person stuck on river bank. Safe outcome.', severity: 'Minor' },
+            { id: 4, type: 'Fire', location: 'Residential Property, Swindon', time: '09:00 BST', description: 'Kitchen fire contained and extinguished by smoke alarm action. Fire safety advice given.', severity: 'Moderate' },
+            { id: 5, type: 'RTC', location: 'M4 Eastbound J16', time: '07:45 BST', description: 'Multi-vehicle crash, all casualties released before arrival. Road remains partially blocked.', severity: 'Major' },
+        ];
+        
+        const incidentListEl = document.getElementById('incident-list');
+        const noIncidentsEl = document.getElementById('no-incidents');
+
+        /**
+         * Renders the mock incident list based on the selected filter.
+         * @param {string} filter - 'All', 'Fire', 'RTC', or 'Other'.
+         * @param {HTMLElement} clickedButton - The button element that was clicked (for styling).
+         */
+        function renderIncidents(filter, clickedButton = null) {
+            const filteredIncidents = (filter === 'All')
+                ? mockIncidents
+                : mockIncidents.filter(inc => inc.type === filter);
+
+            // Update filter button styling
+            document.querySelectorAll('.incident-filter-btn').forEach(btn => {
+                // Reset to default white/blue style
+                btn.classList.remove('active-filter', 'bg-dw-red', 'text-white', 'border-dw-blue');
+                btn.classList.add('bg-white', 'text-dw-blue', 'border', 'border-dw-blue', 'hover:bg-dw-blue', 'hover:text-white');
+            });
+
+            // Set the active button style
+            if (clickedButton) {
+                clickedButton.classList.remove('bg-white', 'text-dw-blue', 'border', 'border-dw-blue', 'hover:bg-dw-blue', 'hover:text-white');
+                clickedButton.classList.add('bg-dw-red', 'text-white', 'active-filter');
+            } else if (filter === 'All') {
+                 // Initial load, highlight 'All' button
+                const allButton = document.querySelector('[data-filter="All"]');
+                if (allButton) {
+                    allButton.classList.remove('bg-white', 'text-dw-blue', 'border', 'border-dw-blue', 'hover:bg-dw-blue', 'hover:text-white');
+                    allButton.classList.add('bg-dw-red', 'text-white', 'active-filter');
+                }
+            }
+
+
+            incidentListEl.innerHTML = ''; // Clear previous incidents
+
+            if (filteredIncidents.length === 0) {
+                noIncidentsEl.classList.remove('hidden');
+                return;
+            }
+            noIncidentsEl.classList.add('hidden');
+
+
+            filteredIncidents.forEach(incident => {
+                let severityColor = 'text-green-600';
+                let icon = 'info';
+
+                if (incident.severity === 'Major') {
+                    severityColor = 'text-dw-red';
+                    icon = 'alert-octagon';
+                } else if (incident.severity === 'Moderate') {
+                    severityColor = 'text-orange-500';
+                    icon = 'alert-triangle';
+                }
+
+                const incidentHtml = `
+                    <div class="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider ${severityColor} flex items-center">
+                                <i data-lucide="${icon}" class="w-4 h-4 mr-1"></i> ${incident.severity}
+                            </span>
+                            <span class="text-xs text-gray-500">${incident.time}</span>
+                        </div>
+                        <p class="text-base font-semibold text-dw-blue">${incident.location}</p>
+                        <p class="text-sm text-gray-600 mt-1">${incident.description}</p>
+                    </div>
+                `;
+                incidentListEl.insertAdjacentHTML('beforeend', incidentHtml);
+            });
+
+            // Re-render Lucide icons for the new HTML content
+            lucide.createIcons();
+            
+             // Update the mock map time
+             document.getElementById('map-update-time').textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' BST';
+        }
+
+        // --- Initialization and Event Listeners ---
+        
+        // Initialize Lucide Icons and setup all on load functions
+        window.onload = () => {
+            lucide.createIcons();
+            
+            // Set up HFSV Modal close on outside click
+            document.getElementById('hfsVModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal('hfsVModal');
+                }
+            });
+
+            // Initial render of incidents
+            renderIncidents('All');
+        };
+
+    </script>
+</body>
+</html>
