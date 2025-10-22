@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DWFRS Prototype (Demo) — Fire & Rescue Service</title>
+  <meta name="description" content="Demo prototype of a modern Fire & Rescue Service website: incidents, stations map, safety advice, news, careers, accessibility features, and contact." />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    /* ==========================================================
+       DWFRS PROTOTYPE — SINGLE FILE HTML (ENHANCED)
+       ----------------------------------------------------------
+       Notes for reviewers:
+       - From-scratch demo inspired by dwfire.org.uk with original copy.
+       - Improvements included: robust routing & deep links, aria-current,
+         mobile menu fixes, JSON-LD structured data, major-incident mode,
+         RSS export (demo), postcode finder (demo), SEO/accessibility tweaks.
+       ========================================================== */
+
+    :root {
+      --brand-1: #e11d48; /* rose-600 */
+      --brand-2: #f97316; /* orange-500 */
+      --brand-3: #111827; /* gray-900 */
+      --bg: #ffffff;
+      --bg-soft: #f8fafc; /* slate-50 */
+      --text: #0f172a; /* slate-900 */
+      --muted: #475569; /* slate-600 */
+      --card: #ffffff;
+      --border: #e2e8f0; /* slate-200 */
+      --focus: #2563eb; /* blue-600 */
+      --okay: #16a34a;
+      --warn: #f59e0b;
+      --danger: #dc2626;
+      --shadow: 0 10px 25px rgba(2,6,23,.1);
+    }
+
+    [data-theme="dark"]:root {
+      --bg: #0b1220;
+      --bg-soft: #0f172a;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --card: #0b1220;
+      --border: #1f2937;
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+    }
+
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: ui-sans-serif, system-ui, Segoe UI,
+      Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text); background: var(--bg);
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+
+    /* Utilities */
+    .container { width: min(1200px, 92vw); margin-inline: auto; }
+    .grid { display: grid; gap: 1rem; }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+    @media (max-width: 900px){ .grid-4,.grid-3{ grid-template-columns: 1fr 1fr;} }
+    @media (max-width: 640px){ .grid-4,.grid-3,.grid-2{ grid-template-columns: 1fr;} }
+
+    .btn {
+      appearance: none; border: 0; cursor: pointer;
+      padding: .75rem 1rem; border-radius: .85rem;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      color: white; font-weight: 600; box-shadow: var(--shadow);
+    }
+    .btn.ghost{ background: transparent; color: var(--text); box-shadow: none; border: 1px solid var(--border); }
+    .btn.link{ background: transparent; color: var(--brand-1); padding: 0; box-shadow: none; }
+    .btn[disabled]{ opacity:.6; cursor:not-allowed }
+
+    .chip { font-size:.85rem; padding:.25rem .5rem; border-radius: 999px; border:1px solid var(--border); color: var(--muted); }
+
+    header {
+      position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg), transparent 0%);
+      backdrop-filter: saturate(180%) blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav { display:flex; align-items:center; gap:.5rem; padding:.5rem 0; }
+    nav .brand { display:flex; align-items:center; gap:.6rem; text-decoration:none; color:var(--text); }
+    .logo { width:40px; height:40px; border-radius: .6rem; background: conic-gradient(from 30deg, var(--brand-1), var(--brand-2)); box-shadow: var(--shadow); }
+    .brand span { font-weight:800; letter-spacing:.2px; }
+
+    .nav-links { margin-left:auto; display:flex; flex-wrap:wrap; gap:.5rem; }
+    .nav-links a { text-decoration:none; color: var(--text); padding:.5rem .75rem; border-radius:.6rem; }
+    .nav-links a:hover, .nav-links a:focus { background: var(--bg-soft); outline: none; }
+    .nav-links a[aria-current="page"]{ outline:2px solid var(--brand-2); outline-offset: 2px; }
+
+    .topbar {
+      background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+      color:white; font-weight:700; text-align:center; padding:.4rem .6rem; font-size:.95rem;
+    }
+    .topbar.major{ background: linear-gradient(90deg, #7f1d1d, #b91c1c); }
+
+    .hero { padding: clamp(2rem, 4vw, 4rem) 0; background: radial-gradient(1000px 500px at 20% -10%, color-mix(in oklab, var(--brand-2), transparent 80%), transparent), radial-gradient(1100px 600px at 120% 10%, color-mix(in oklab, var(--brand-1), transparent 85%), transparent); }
+    .hero h1 { font-size: clamp(1.8rem, 3.5vw, 3rem); margin:.2rem 0 1rem; }
+    .hero p { color: var(--muted); max-width: 68ch; }
+
+    .card { background: var(--card); border:1px solid var(--border); border-radius: 1rem; box-shadow: var(--shadow); padding: 1rem; }
+    .card h3 { margin-top:.2rem; }
+
+    .section { padding: 2rem 0; }
+    .section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); margin: 0 0 .75rem; }
+    .muted { color: var(--muted); }
+
+    .kpis { display:flex; gap:1rem; flex-wrap: wrap; }
+    .kpi { flex: 1 1 180px; background: var(--card); border:1px solid var(--border); border-radius: 1rem; padding:1rem; text-align:center; box-shadow: var(--shadow) }
+    .kpi b { display:block; font-size:1.6rem; }
+
+    .searchbox { position: relative; }
+    .searchbox input { width:100%; border:1px solid var(--border); background: var(--card); padding: .85rem 1rem; border-radius:.85rem; }
+
+    .results { display:grid; gap:.75rem; margin-top:1rem; }
+    .result { padding:.75rem 1rem; border:1px solid var(--border); border-radius:.75rem; background: var(--card); }
+
+    .map { height: 420px; border-radius: 1rem; overflow: clip; border:1px solid var(--border); }
+
+    .footer { border-top:1px solid var(--border); padding:2rem 0; background: var(--bg-soft); }
+    .footer a { color: inherit; }
+
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+
+    /* Accessibility & contrast modes */
+    [data-contrast="high"] body, [data-contrast="high"] .card { letter-spacing: .2px; }
+    [data-contrast="high"]:root { --border: #000; --text: #000; --bg: #fff; }
+
+    /* Simple toast */
+    .toast { position: fixed; right: 1rem; bottom: 1rem; background: var(--card); color:var(--text); border: 1px solid var(--border); border-radius:.75rem; padding:.75rem 1rem; box-shadow: var(--shadow); display:none }
+
+    /* Table */
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid var(--border); padding: .65rem .5rem; text-align:left; }
+
+    /* Cookie banner */
+    .cookie { position: fixed; inset: auto 1rem 1rem 1rem; background: var(--card); border:1px solid var(--border); border-radius: .9rem; padding: 1rem; box-shadow: var(--shadow); display:none }
+
+    /* Responsive mobile menu */
+    .hamburger { display:none; }
+    @media (max-width: 900px){
+      .nav-links { display:none; }
+      .hamburger { display:block; margin-left:auto; }
+      .mobile-menu { display:none; position:fixed; inset:60px 1rem auto 1rem; background: var(--card); border:1px solid var(--border); border-radius: .9rem; padding: .5rem; box-shadow: var(--shadow); }
+      .mobile-menu a { display:block; padding: .8rem; border-radius:.6rem; text-decoration:none; color:var(--text); }
+      .mobile-menu a:hover { background: var(--bg-soft); }
+    }
+  </style>
+  <!-- Leaflet (map) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin></script>
+</head>
+<body>
+  <a href="#main" class="sr-only">Skip to content</a>
+  <div class="topbar" role="status" id="topbar">Emergency? Call <a href="tel:999" style="color:#fff;text-decoration:underline">999</a> • For non-emergencies, see <a href="#/contact" style="color:#fff;text-decoration:underline">Contact</a></div>
+
+  <header>
+    <div class="container">
+      <nav aria-label="Primary">
+        <a class="brand" href="#/home" aria-label="DWFRS Prototype Home">
+          <div class="logo" aria-hidden="true"></div>
+          <span>DWFRS Prototype</span>
+        </a>
+        <div class="nav-links" role="menubar">
+          <a role="menuitem" href="#/incidents">Incidents</a>
+          <a role="menuitem" href="#/stations">Stations</a>
+          <a role="menuitem" href="#/safety">Your Safety</a>
+          <a role="menuitem" href="#/business">Business</a>
+          <a role="menuitem" href="#/news">News</a>
+          <a role="menuitem" href="#/careers">Careers</a>
+          <a role="menuitem" href="#/education">Education</a>
+          <a role="menuitem" href="#/authority">Authority</a>
+          <a role="menuitem" href="#/about">About</a>
+          <a role="menuitem" href="#/contact">Contact</a>
+        </div>
+        <button class="hamburger btn ghost" aria-expanded="false" aria-controls="mobile-menu" id="menuBtn">Menu</button>
+        <div id="mobile-menu" class="mobile-menu" role="menu" aria-label="Mobile">
+          <a href="#/incidents">Incidents</a>
+          <a href="#/stations">Stations</a>
+          <a href="#/safety">Your Safety</a>
+          <a href="#/business">Business</a>
+          <a href="#/news">News</a>
+          <a href="#/careers">Careers</a>
+          <a href="#/education">Education</a>
+          <a href="#/authority">Authority</a>
+          <a href="#/about">About</a>
+          <a href="#/contact">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- HOME -->
+    <section class="hero container" data-route="home">
+      <div class="grid grid-2" style="align-items: center;">
+        <div>
+          <p class="chip" aria-label="Service area">Dorset & Wiltshire region — demo</p>
+          <h1>Helping you stay safe — and showcasing a modern public service website.</h1>
+          <p>Explore a fast, accessible prototype with live-like <b>Incidents</b>, an interactive <b>Stations map</b>, comprehensive <b>Safety advice</b>, and transparent <b>Authority</b> info. Built as a single HTML file to demo functionality without a backend.</p>
+          <div style="display:flex; gap:.5rem; margin-top:1rem; flex-wrap:wrap">
+            <a class="btn" href="#/stations">Find your nearest station</a>
+            <a class="btn ghost" href="#/incidents">See latest incidents</a>
+            <button class="btn ghost" id="readPageBtn" aria-pressed="false">Read this page aloud</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Quick search</h3>
+            <p class="muted">Search incidents, stations, advice and news.</p>
+            <div class="searchbox">
+              <label for="q" class="sr-only">Search</label>
+              <input id="q" type="search" placeholder="Try ‘smoke alarms’ or ‘Salisbury’" autocomplete="off" />
+            </div>
+            <div id="results" class="results" aria-live="polite"></div>
+          </div>
+          <div class="kpis" style="margin-top:1rem;">
+            <div class="kpi"><b id="kpi-incidents">0</b><span class="muted">incidents (last 7 days)</span></div>
+            <div class="kpi"><b id="kpi-stations">0</b><span class="muted">fire stations</span></div>
+            <div class="kpi"><b id="kpi-oncall">0</b><span class="muted">on-call roles open</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INCIDENTS -->
+    <section class="section container" data-route="incidents" hidden>
+      <h2>Latest incidents</h2>
+      <p class="muted">Sample data for demonstration. Filter by type or area.</p>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0 1rem">
+        <select id="incType">
+          <option value="">All types</option>
+          <option>Fire</option>
+          <option>RTC</option>
+          <option>Rescue</option>
+          <option>Alarm</option>
+        </select>
+        <select id="incArea">
+          <option value="">All areas</option>
+          <option>Dorset</option>
+          <option>Wiltshire</option>
+          <option>Swindon</option>
+          <option>BCP</option>
+        </select>
+        <input type="date" id="incFrom" />
+        <input type="date" id="incTo" />
+        <button class="btn ghost" id="incReset">Reset</button>
+      </div>
+      <div id="incList" class="grid"></div>
+    </section>
+
+    <!-- STATIONS -->
+    <section class="section container" data-route="stations" hidden>
+      <h2>Stations</h2>
+      <p class="muted">Use your location or postcode to find the nearest fire station, or browse the map.</p>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0 1rem">
+        <button class="btn" id="geoBtn">Use my location</button>
+        <input id="postcode" placeholder="Enter postcode (demo: BH2 5AA / SP1 1AA)" />
+        <button class="btn ghost" id="pcBtn">Go</button>
+        <input id="stationFilter" placeholder="Filter by name or town…" />
+      </div>
+      <div id="map" class="map" role="application" aria-label="Stations map"></div>
+      <div id="stationCards" class="grid grid-3" style="margin-top:1rem"></div>
+    </section>
+
+    <!-- SAFETY -->
+    <section class="section container" data-route="safety" hidden>
+      <h2>Your safety</h2>
+      <div class="grid grid-3">
+        <article class="card"><h3>Home safety</h3><p>Plan escape routes, test smoke alarms monthly, and keep cooking areas clear. Request a free Home Fire Safety visit.</p><p><a class="btn link" href="#/contact">Request a visit</a></p></article>
+        <article class="card"><h3>Road safety</h3><p>Slow down, wear a seatbelt, and never drive under the influence. Keep a breakdown kit in your car.</p></article>
+        <article class="card"><h3>Outdoor safety</h3><p>Avoid disposable BBQs on dry grass, and fully extinguish campfires. Pack water and check local restrictions.</p></article>
+        <article class="card"><h3>Business fire safety</h3><p>See the Business section for legal duties, risk assessments and how to report concerns.</p><p><a class="btn link" href="#/business">Business guidance</a></p></article>
+        <article class="card"><h3>Seasonal campaigns</h3><p>Stay safe during festivals and holidays: candles, fairy lights, fireworks, and heaters need extra care.</p></article>
+        <article class="card"><h3>Resources</h3><p>Posters, leaflets, and translated advice for community groups and educators.</p></article>
+      </div>
+    </section>
+
+    <!-- BUSINESS -->
+    <section class="section container" data-route="business" hidden>
+      <h2>Business fire safety</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Your legal duties</h3>
+          <p>Businesses must carry out a suitable fire risk assessment, maintain fire detection and alarm systems, provide staff training, and keep escape routes clear.</p>
+          <ul>
+            <li>Who is the Responsible Person</li>
+            <li>Risk assessment templates</li>
+            <li>Licensing & events</li>
+            <li>High-rise & specialist premises</li>
+          </ul>
+        </div>
+        <form class="card" id="concernForm" aria-describedby="concernHelp">
+          <h3>Report a fire safety concern</h3>
+          <p id="concernHelp" class="muted">Demo only — stores locally. In production this would submit to the Service.</p>
+          <label>Business/premises name<input required name="name" /></label>
+          <label>Address<input required name="address" /></label>
+          <label>Concern details<textarea required name="details" rows="4"></textarea></label>
+          <label>Your email (for updates)<input type="email" name="email" /></label>
+          <div style="display:flex; gap:.5rem; margin-top:.5rem"><button class="btn" type="submit">Submit</button><button class="btn ghost" type="reset">Clear</button></div>
+          <output id="concernOut" aria-live="polite" style="display:block; margin-top:.5rem"></output>
+        </form>
+      </div>
+    </section>
+
+    <!-- NEWS -->
+    <section class="section container" data-route="news" hidden>
+      <h2>News & updates</h2>
+      <div id="newsList" class="grid grid-3"></div>
+      <div style="margin-top:1rem"><button class="btn ghost" id="rssBtn" aria-label="Download RSS feed (demo)">Download RSS (demo)</button></div>
+    </section>
+
+    <!-- CAREERS -->
+    <section class="section container" data-route="careers" hidden>
+      <h2>Careers</h2>
+      <p class="muted">On-call, wholetime, control and support roles. Inclusive employer.</p>
+      <div class="grid grid-3" id="jobs"></div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section class="section container" data-route="education" hidden>
+      <h2>Education</h2>
+      <div class="grid grid-2">
+        <article class="card"><h3>Schools & colleges</h3><p>Book visits or download lesson plans for fire safety education across key stages.</p></article>
+        <article class="card"><h3>Community outreach</h3><p>Talks for community groups, older people, and new arrivals — with translated materials.</p></article>
+      </div>
+    </section>
+
+    <!-- AUTHORITY -->
+    <section class="section container" data-route="authority" hidden>
+      <h2>Fire & Rescue Authority</h2>
+      <div class="grid grid-2">
+        <article class="card"><h3>About the Authority</h3><p>How decisions are made, committees and meetings, and how to access information.</p></article>
+        <article class="card"><h3>Transparency</h3><p>Budgets, performance, and publication scheme. Contact details for members and officers.</p></article>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3>Publication scheme</h3>
+        <table>
+          <thead><tr><th>Category</th><th>What we publish</th><th>How often</th></tr></thead>
+          <tbody>
+            <tr><td>Spending</td><td>Over £500, procurement, contracts</td><td>Quarterly</td></tr>
+            <tr><td>Performance</td><td>Response times, prevention outcomes</td><td>Quarterly</td></tr>
+            <tr><td>Meetings</td><td>Agendas & minutes</td><td>Per meeting</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section container" data-route="about" hidden>
+      <h2>About the Service</h2>
+      <div class="grid grid-2">
+        <article class="card"><h3>What we do</h3><p>We prevent, protect and respond. Our crews work from stations across the region, supported by control and specialist teams.</p></article>
+        <article class="card"><h3>Plans & strategy</h3><p>Community Risk Management Plan (CRMP), equality objectives, and sustainability commitments.</p></article>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3>Contact a department</h3>
+        <ul class="grid grid-3" style="list-style:none; padding:0; margin:0">
+          <li class="card"><b>Prevention</b><p class="muted">Home safety visits, community outreach.</p></li>
+          <li class="card"><b>Protection</b><p class="muted">Business fire safety, audits and enforcement.</p></li>
+          <li class="card"><b>Response</b><p class="muted">Operational crews and resilience.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section container" data-route="contact" hidden>
+      <h2>Contact us</h2>
+      <div class="grid grid-2">
+        <form class="card" id="contactForm">
+          <h3>General enquiry</h3>
+          <label>Your name<input name="name" required /></label>
+          <label>Email<input name="email" type="email" required /></label>
+          <label>Message<textarea name="message" rows="4" required></textarea></label>
+          <div style="display:flex; gap:.5rem; margin-top:.5rem"><button class="btn" type="submit">Send</button><button class="btn ghost" type="reset">Clear</button></div>
+          <output id="contactOut" aria-live="polite" style="display:block; margin-top:.5rem"></output>
+        </form>
+        <div class="card">
+          <h3>Other ways to reach us</h3>
+          <ul>
+            <li>Emergency: <a href="tel:999">999</a></li>
+            <li>Non-emergency switchboard: <a href="tel:+441234567890">+44 1234 567 890</a></li>
+            <li>Email: <a href="mailto:info@example.fire">info@example.fire</a></li>
+            <li>Media: <a href="#/news">see News</a></li>
+            <li>Freedom of Information: foi@example.fire</li>
+          </ul>
+          <div class="card" style="margin-top:1rem">
+            <h4>Accessibility</h4>
+            <div style="display:flex; gap:.5rem; flex-wrap:wrap">
+              <button class="btn ghost" id="toggleDark">Toggle dark</button>
+              <button class="btn ghost" id="toggleContrast">High contrast</button>
+              <button class="btn ghost" id="toggleDyslexic">Readable font</button>
+              <button class="btn ghost" id="incFont">A+</button>
+              <button class="btn ghost" id="decFont">A−</button>
+            </div>
+          </div>
+          <div class="card" style="margin-top:1rem">
+            <h4>Demo controls</h4>
+            <button class="btn ghost" id="majorToggle" aria-pressed="false">Toggle major-incident mode</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 404 -->
+    <section class="section container" data-route="notfound" hidden>
+      <h2>Page not found</h2>
+      <p class="muted">The page you requested isn’t available in this demo.</p>
+      <p><a class="btn" href="#/home">Back to home</a></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container grid grid-3">
+      <div>
+        <b>DWFRS Prototype</b>
+        <p class="muted">A public-sector website demo. Not affiliated with Dorset & Wiltshire Fire and Rescue Authority.</p>
+      </div>
+      <div>
+        <b>Quick links</b>
+        <ul>
+          <li><a href="#/safety">Safety advice</a></li>
+          <li><a href="#/business">Business safety</a></li>
+          <li><a href="#/stations">Stations map</a></li>
+          <li><a href="#/careers">Careers</a></li>
+          <li><a href="#/news">News</a></li>
+        </ul>
+      </div>
+      <div>
+        <b>Follow</b>
+        <p><a href="#" aria-label="Facebook">Facebook</a> · <a href="#">X</a> · <a href="#">YouTube</a> · <a href="#">LinkedIn</a> · <a href="#">Instagram</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status"></div>
+  <div id="cookie" class="cookie" role="dialog" aria-label="Cookie consent">
+    <p>We use essential cookies for this demo. <a href="#">Learn more</a>.</p>
+    <div style="display:flex; gap:.5rem; margin-top:.5rem"><button class="btn" id="acceptCookies">Accept</button><button class="btn ghost" id="rejectCookies">Reject</button></div>
+  </div>
+
+  <script>
+  // ==========================================================
+  // DATA — replace with real endpoints later
+  // ==========================================================
+  const DATA = {
+    stations: [
+      { id: "salisbury", name: "Salisbury", town: "Salisbury", area: "Wiltshire", coords: [51.074, -1.793], type: "Wholetime & On-Call", phone: "+44 1722 000000" },
+      { id: "swindon", name: "Swindon", town: "Swindon", area: "Swindon", coords: [51.558, -1.780], type: "Wholetime", phone: "+44 1793 000000" },
+      { id: "poole", name: "Poole", town: "Poole", area: "Dorset", coords: [50.729, -1.981], type: "Wholetime", phone: "+44 1202 000000" },
+      { id: "weymouth", name: "Weymouth", town: "Weymouth", area: "Dorset", coords: [50.614, -2.455], type: "On-Call", phone: "+44 1305 000000" },
+      { id: "swanage", name: "Swanage", town: "Swanage", area: "Dorset", coords: [50.610, -1.958], type: "On-Call", phone: "+44 1929 000000" },
+      { id: "bournemouth", name: "Bournemouth", town: "Bournemouth", area: "BCP", coords: [50.721, -1.879], type: "Wholetime", phone: "+44 1202 000000" }
+    ],
+    incidents: [
+      { id:"i1", type:"Fire", area:"Wiltshire", title:"Kitchen fire in terraced home", when:"2025-10-17T11:41:00Z", 
+        excerpt:"Crews used breathing apparatus and a hose reel jet to extinguish a small fire contained to a cooker. Smoke alarms alerted the occupants who evacuated safely.",
+        location:"Trowbridge", resources:"2 pumps", status:"Closed" },
+      { id:"i2", type:"RTC", area:"BCP", title:"Collision on A338 slip road", when:"2025-10-17T07:58:00Z",
+        excerpt:"Firefighters made vehicles safe and handed scene to police and ambulance. No persons trapped.",
+        location:"Bournemouth", resources:"2 pumps + rescue unit", status:"Closed" },
+      { id:"i3", type:"Rescue", area:"Dorset", title:"Assistance to ambulance with bariatric evacuation", when:"2025-10-15T11:23:00Z",
+        excerpt:"Crew supported partner agency using specialist equipment. No fire service injuries.",
+        location:"Dorchester", resources:"1 pump + support", status:"Closed" },
+      { id:"i4", type:"Alarm", area:"Wiltshire", title:"Automatic fire alarm — commercial", when:"2025-10-12T22:49:00Z",
+        excerpt:"False alarm with good intent. Premises investigated and left in control of responsible person.",
+        location:"Salisbury", resources:"2 pumps", status:"Closed" },
+      { id:"i5", type:"Fire", area:"Dorset", title:"Vehicle fire on rural road", when:"2025-10-11T04:31:00Z",
+        excerpt:"One car well alight on arrival — extinguished using two breathing apparatus and one jet.",
+        location:"Beaminster area", resources:"1 pump", status:"Closed" }
+    ],
+    news: [
+      { id:"n1", date:"2025-10-18", title:"Diwali safety tips for your home", excerpt:"Enjoy the celebrations safely with our candle and cooking guidance.", url:"#"},
+      { id:"n2", date:"2025-10-08", title:"On-call firefighter recruitment opens", excerpt:"We're hosting taster sessions across the Service area this month.", url:"#"},
+      { id:"n3", date:"2025-09-30", title:"Chimney sweep season — stay safe", excerpt:"Book a sweep before winter and test alarms monthly.", url:"#"}  
+    ],
+    jobs: [
+      { id:"j1", title:"On-call Firefighter (Multiple stations)", type:"On-Call", location:"Various", closes:"2025-11-10" },
+      { id:"j2", title:"Control Room Operator", type:"Control", location:"Swindon", closes:"2025-11-01" },
+      { id:"j3", title:"ICT Support Analyst", type:"Support", location:"Headquarters", closes:"2025-11-15" }
+    ]
+  };
+
+  // ==========================================================
+  // UTILITIES
+  // ==========================================================
+  const $ = (sel, ctx=document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+  const fmtDate = iso => new Date(iso).toLocaleString(undefined, { dateStyle:"medium", timeStyle:"short" });
+  const toast = (msg) => { const t=$("#toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none", 3000); };
+
+  // Save & load preferences
+  const PREF = {
+    theme: localStorage.getItem("theme") || "light",
+    contrast: localStorage.getItem("contrast") || "normal",
+    fontScale: +(localStorage.getItem("fontScale")||"1"),
+    dyslexic: localStorage.getItem("dyslexic")==="1"
+  };
+  document.documentElement.setAttribute("data-theme", PREF.theme);
+  if(PREF.contrast==="high") document.documentElement.setAttribute("data-contrast","high");
+  document.body.style.fontSize = (PREF.fontScale*100)+"%";
+  if(PREF.dyslexic) document.body.style.fontFamily = "Atkinson Hyperlegible, system-ui, Segoe UI, Roboto, Helvetica, Arial";
+
+  // ==========================================================
+  // ROUTER (improved: deep links, ARIA current, focus, mobile close)
+  // ==========================================================
+  const routes = new Set(["home","incidents","stations","safety","business","news","careers","education","authority","about","contact"]);
+  function parseHash(){
+    let raw = location.hash;
+    if(raw.startsWith("#/")) raw = raw.slice(2);
+    else if(raw.startsWith("#")) raw = raw.slice(1);
+    const parts = raw.split("/");
+    const route = parts[0] || "home";
+    const sub = parts[1] || "";
+    return { route: routes.has(route) ? route : "notfound", sub };
+  }
+  function renderRoute(){
+    const {route, sub} = parseHash();
+    $$("main [data-route]").forEach(sec => sec.hidden = sec.getAttribute("data-route")!==route);
+    document.title = `DWFRS Prototype — ${route.charAt(0).toUpperCase()+route.slice(1)}`;
+    // ARIA current
+    $$(".nav-links a, #mobile-menu a").forEach(a=>{
+      const isCurrent = a.getAttribute("href") === "#/" + route;
+      if(isCurrent) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
+    });
+    // Close mobile menu on navigation
+    $("#mobile-menu").style.display="none";
+    $("#menuBtn").setAttribute("aria-expanded","false");
+    // Focus main after paint
+    setTimeout(()=>$("#main").focus(), 0);
+    // Route-specific hooks
+    if(route==="stations") { initMap(); if(sub) focusStation(sub); }
+    if(route==="incidents") { paintIncidents(); if(sub) setTimeout(()=>document.getElementById(sub)?.scrollIntoView({behavior:"smooth", block:"start"}), 50); }
+  }
+  addEventListener("hashchange", renderRoute);
+  renderRoute();
+
+  // Make header links close mobile menu
+  [".nav-links", "#mobile-menu"].forEach(sel=>{
+    $$(sel+" a").forEach(a=> a.addEventListener("click", ()=>{
+      $("#mobile-menu").style.display="none";
+      $("#menuBtn").setAttribute("aria-expanded","false");
+    }));
+  });
+
+  // ==========================================================
+  // HOME — Search & KPIs
+  // ==========================================================
+  $("#kpi-incidents").textContent = DATA.incidents.filter(i=>Date.now()-new Date(i.when).getTime() < 7*864e5).length;
+  $("#kpi-stations").textContent = DATA.stations.length;
+  $("#kpi-oncall").textContent = DATA.jobs.filter(j=>j.type==="On-Call").length;
+
+  $("#q").addEventListener("input", (e)=>{
+    const q = e.target.value.trim().toLowerCase();
+    const results = [];
+    if(!q){ $("#results").innerHTML=""; return }
+    // stations
+    DATA.stations.forEach(s=>{
+      const blob = `${s.name} ${s.town} ${s.area} ${s.type}`.toLowerCase();
+      if(blob.includes(q)) results.push({kind:"Station", title:s.name, desc:`${s.town} — ${s.type}`, href:`#/stations/${s.id}`});
+    });
+    // incidents
+    DATA.incidents.forEach(i=>{
+      const blob = `${i.title} ${i.excerpt} ${i.area} ${i.type} ${i.location}`.toLowerCase();
+      if(blob.includes(q)) results.push({kind:"Incident", title:i.title, desc:`${i.type} — ${i.location}`, href:`#/incidents/${i.id}`});
+    });
+    // news
+    DATA.news.forEach(n=>{
+      const blob = `${n.title} ${n.excerpt}`.toLowerCase();
+      if(blob.includes(q)) results.push({kind:"News", title:n.title, desc:new Date(n.date).toLocaleDateString(), href:`#/news/${n.id}`});
+    });
+    $("#results").innerHTML = results.slice(0,8).map(r=>`<a class="result" href="${r.href}"><b>${r.kind}:</b> ${r.title}<br><span class="muted">${r.desc}</span></a>`).join("");
+  });
+
+  // Read page aloud (Web Speech)
+  const synth = window.speechSynthesis;
+  $("#readPageBtn").addEventListener("click", ()=>{
+    const pressed = $("#readPageBtn").getAttribute("aria-pressed")==="true";
+    if(pressed){ synth.cancel(); $("#readPageBtn").setAttribute("aria-pressed","false"); $("#readPageBtn").textContent="Read this page aloud"; return; }
+    const text = document.querySelector("main section:not([hidden])").innerText;
+    const u = new SpeechSynthesisUtterance(text);
+    $("#readPageBtn").setAttribute("aria-pressed","true");
+    $("#readPageBtn").textContent="Stop reading";
+    u.onend = ()=>{ $("#readPageBtn").setAttribute("aria-pressed","false"); $("#readPageBtn").textContent="Read this page aloud"; };
+    synth.speak(u);
+  });
+
+  // ==========================================================
+  // INCIDENTS
+  // ==========================================================
+  function paintIncidents(){
+    const type = $("#incType").value; const area = $("#incArea").value;
+    const from = $("#incFrom").value ? new Date($("#incFrom").value) : null;
+    const to = $("#incTo").value ? new Date($("#incTo").value) : null;
+    const list = DATA.incidents.filter(i=>
+      (!type || i.type===type) &&
+      (!area || i.area===area) &&
+      (!from || new Date(i.when) >= from) && (!to || new Date(i.when) <= to)
+    ).sort((a,b)=> new Date(b.when)-new Date(a.when));
+
+    $("#incList").innerHTML = list.map(i=>`
+      <article id="${i.id}" class="card">
+        <header style="display:flex; gap:.5rem; align-items:center; justify-content:space-between">
+          <div><span class="chip">${i.type}</span> <span class="chip">${i.area}</span></div>
+          <time class="muted" datetime="${i.when}">${fmtDate(i.when)}</time>
+        </header>
+        <h3>${i.title}</h3>
+        <p>${i.excerpt}</p>
+        <p class="muted">${i.location} • ${i.resources} • Status: ${i.status}</p>
+        <p><a class="btn link" href="#/incidents/${i.id}">Share link</a></p>
+      </article>`).join("");
+  }
+  ["change","input"].forEach(ev=>{
+    $("#incType").addEventListener(ev, paintIncidents);
+    $("#incArea").addEventListener(ev, paintIncidents);
+    $("#incFrom").addEventListener(ev, paintIncidents);
+    $("#incTo").addEventListener(ev, paintIncidents);
+  });
+  $("#incReset").addEventListener("click", ()=>{
+    $("#incType").value=""; $("#incArea").value=""; $("#incFrom").value=""; $("#incTo").value=""; paintIncidents();
+  });
+  paintIncidents();
+
+  // ==========================================================
+  // STATIONS + MAP + POSTCODE (demo)
+  // ==========================================================
+  let map, markers=[];
+  function initMap(){
+    if(map) return; // init once
+    map = L.map("map").setView([51.0, -2.0], 8);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19, attribution: "&copy; OpenStreetMap"
+    }).addTo(map);
+    DATA.stations.forEach(s=>{
+      const m = L.marker(s.coords).addTo(map).bindPopup(`<b>${s.name}</b><br>${s.town} • ${s.type}<br><a target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.coords[0]+','+s.coords[1])}">Directions</a>`);
+      markers.push({id:s.id, marker:m});
+    });
+  }
+  function paintStations(filter=""){
+    const list = DATA.stations.filter(s=> (s.name+s.town+s.area+s.type).toLowerCase().includes(filter.toLowerCase()));
+    $("#stationCards").innerHTML = list.map(s=>`
+      <article id="${s.id}" class="card">
+        <h3>${s.name} <span class="chip">${s.area}</span></h3>
+        <p class="muted">${s.town} • ${s.type}</p>
+        <p><a class="btn link" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.coords[0]+','+s.coords[1])}">Get directions</a> · <a class="btn link" href="#/stations/${s.id}">View on map</a></p>
+      </article>`).join("");
+  }
+  paintStations();
+  $("#stationFilter").addEventListener("input", e=> paintStations(e.target.value));
+
+  function distanceKm(a,b){ const R=6371; const d2r=x=>x*Math.PI/180; const dLat=d2r(b[0]-a[0]); const dLon=d2r(b[1]-a[1]); const lat1=d2r(a[0]); const lat2=d2r(b[0]); const sinDLat=Math.sin(dLat/2), sinDLon=Math.sin(dLon/2); const c=2*Math.asin(Math.sqrt(sinDLat**2+Math.cos(lat1)*Math.cos(lat2)*sinDLon**2)); return R*c; }
+  function focusStation(id){
+    initMap();
+    const s = DATA.stations.find(x=>x.id===id);
+    if(!s) return;
+    map.setView(s.coords, 12);
+    const mm = markers.find(m=>m.id===id)?.marker; if(mm){ mm.openPopup(); }
+    document.getElementById(id)?.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  $("#geoBtn").addEventListener("click", ()=>{
+    if(!navigator.geolocation){ toast("Geolocation not supported"); return; }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      initMap();
+      const here=[pos.coords.latitude, pos.coords.longitude];
+      const withDist = DATA.stations.map(s=> ({...s, dist: distanceKm(here, s.coords)})).sort((a,b)=>a.dist-b.dist);
+      paintStations();
+      const nearest = withDist[0];
+      toast(`Nearest station: ${nearest.name} — ${nearest.dist.toFixed(1)} km away`);
+      map.setView(nearest.coords, 11);
+      const mm = markers.find(m=>m.id===nearest.id)?.marker; if(mm){ mm.openPopup(); }
+    }, err=> toast(err.message||"Unable to get location"));
+  });
+
+  const DEMO_POSTCODES = { "BH25AA":[50.720, -1.878], "SP11AA":[51.069, -1.795] };
+  function normalizePC(pc){ return pc.toUpperCase().replace(/\s+/g,""); }
+  $("#pcBtn").addEventListener("click", ()=>{
+    const pc = normalizePC($("#postcode").value||"");
+    const coords = DEMO_POSTCODES[pc];
+    if(!coords){ toast("Postcode not in demo set. Try BH2 5AA or SP1 1AA."); return; }
+    initMap();
+    map.setView(coords, 12);
+    const withDist = DATA.stations.map(s=> ({...s, dist: distanceKm(coords, s.coords)})).sort((a,b)=>a.dist-b.dist);
+    const nearest = withDist[0];
+    toast(`Nearest station: ${nearest.name} — ${nearest.dist.toFixed(1)} km away`);
+    const mm = markers.find(m=>m.id===nearest.id)?.marker; if(mm){ mm.openPopup(); }
+  });
+
+  // Initialize map when route activates
+  addEventListener("hashchange", ()=>{ if(location.hash.includes("/stations")) initMap(); });
+
+  // ==========================================================
+  // BUSINESS FORM — local demo storage
+  // ==========================================================
+  $("#concernForm").addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    const all = JSON.parse(localStorage.getItem("concerns")||"[]");
+    all.push({...data, id: crypto.randomUUID(), at: new Date().toISOString()});
+    localStorage.setItem("concerns", JSON.stringify(all));
+    $("#concernOut").textContent = "Thank you. Your concern has been recorded for this demo.";
+    e.target.reset();
+  });
+
+  // ==========================================================
+  // NEWS & JOBS + RSS (demo)
+  // ==========================================================
+  $("#newsList").innerHTML = DATA.news.map(n=>`
+    <article id="${n.id}" class="card">
+      <h3>${n.title}</h3>
+      <p class="muted">${new Date(n.date).toLocaleDateString()}</p>
+      <p>${n.excerpt}</p>
+      <p><a class="btn link" href="${n.url}">Read more</a> · <a class="btn link" href="#/news/${n.id}">Share</a></p>
+    </article>`).join("");
+
+  $("#jobs").innerHTML = DATA.jobs.map(j=>`
+    <article class="card">
+      <h3>${j.title}</h3>
+      <p class="muted">${j.type} • ${j.location}</p>
+      <p>Closes ${new Date(j.closes).toLocaleDateString()}</p>
+      <p><a class="btn link" href="#">Apply now</a></p>
+    </article>`).join("");
+
+  // RSS download from DATA.news
+  $("#rssBtn").addEventListener("click", ()=>{
+    const items = DATA.news.map(n=>`
+      <item>
+        <title><![CDATA[${n.title}]]></title>
+        <link>${location.origin + location.pathname + "#/news/" + n.id}</link>
+        <guid>${n.id}</guid>
+        <pubDate>${new Date(n.date).toUTCString()}</pubDate>
+        <description><![CDATA[${n.excerpt}]]></description>
+      </item>`).join("");
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>DWFRS Prototype — News</title>
+    <link>${location.origin + location.pathname + "#/news"}</link>
+    <description>Demo RSS feed</description>
+    ${items}
+  </channel>
+</rss>`;
+    const blob = new Blob([xml], {type:"application/rss+xml"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "news.rss";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // ==========================================================
+  // CONTACT FORM — local demo storage
+  // ==========================================================
+  $("#contactForm").addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    const all = JSON.parse(localStorage.getItem("contactMsgs")||"[]");
+    all.push({...data, id: crypto.randomUUID(), at: new Date().toISOString()});
+    localStorage.setItem("contactMsgs", JSON.stringify(all));
+    $("#contactOut").textContent = "Thanks — we'll reply by email (demo message stored locally).";
+    e.target.reset();
+  });
+
+  // ==========================================================
+  // ACCESSIBILITY CONTROLS
+  // ==========================================================
+  $("#toggleDark").addEventListener("click", ()=>{
+    const next = document.documentElement.getAttribute("data-theme")=== "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("theme", next);
+  });
+  $("#toggleContrast").addEventListener("click", ()=>{
+    const hc = document.documentElement.getAttribute("data-contrast")==="high" ? "normal" : "high";
+    if(hc==="high") document.documentElement.setAttribute("data-contrast","high"); else document.documentElement.removeAttribute("data-contrast");
+    localStorage.setItem("contrast", hc);
+  });
+  $("#toggleDyslexic").addEventListener("click", ()=>{
+    const on = document.body.style.fontFamily.includes("Atkinson Hyperlegible");
+    if(on){ document.body.style.fontFamily=""; localStorage.setItem("dyslexic","0"); }
+    else { document.body.style.fontFamily="Atkinson Hyperlegible, system-ui, Segoe UI, Roboto, Helvetica, Arial"; localStorage.setItem("dyslexic","1"); }
+  });
+  $("#incFont").addEventListener("click", ()=>{ PREF.fontScale=Math.min(1.4, PREF.fontScale+0.05); document.body.style.fontSize=(PREF.fontScale*100)+"%"; localStorage.setItem("fontScale", PREF.fontScale);});
+  $("#decFont").addEventListener("click", ()=>{ PREF.fontScale=Math.max(.85, PREF.fontScale-0.05); document.body.style.fontSize=(PREF.fontScale*100)+"%"; localStorage.setItem("fontScale", PREF.fontScale);});
+
+  // ==========================================================
+  // COOKIE BANNER (demo)
+  // ==========================================================
+  const cookie = localStorage.getItem("cookie-demo");
+  if(!cookie) { $("#cookie").style.display="block"; }
+  $("#acceptCookies").addEventListener("click", ()=>{ localStorage.setItem("cookie-demo","accepted"); $("#cookie").style.display="none"; });
+  $("#rejectCookies").addEventListener("click", ()=>{ localStorage.setItem("cookie-demo","rejected"); $("#cookie").style.display="none"; });
+
+  // ==========================================================
+  // MOBILE MENU
+  // ==========================================================
+  $("#menuBtn").addEventListener("click", ()=>{
+    const m = $("#mobile-menu"); const v = m.style.display==="block";
+    m.style.display = v ? "none" : "block";
+    $("#menuBtn").setAttribute("aria-expanded", String(!v));
+  });
+
+  // ==========================================================
+  // MAJOR INCIDENT MODE (demo)
+  // ==========================================================
+  function setMajor(on){
+    const bar = $("#topbar");
+    if(on){
+      bar.classList.add("major");
+      bar.innerHTML = "⚠️ <b>Major incident</b>: Please avoid the area and follow official updates on the <a href=\"#/news\" style=\"color:#fff;text-decoration:underline\">News page</a>.";
+    } else {
+      bar.classList.remove("major");
+      bar.innerHTML = "Emergency? Call <a href=\"tel:999\" style=\"color:#fff;text-decoration:underline\">999</a> • For non-emergencies, see <a href=\"#/contact\" style=\"color:#fff;text-decoration:underline\">Contact</a>";
+    }
+    localStorage.setItem("major", on? "1":"0");
+    $("#majorToggle").setAttribute("aria-pressed", on? "true":"false");
+  }
+  const majorInit = localStorage.getItem("major")==="1";
+  setMajor(majorInit);
+  $("#majorToggle").addEventListener("click", ()=> setMajor(!(localStorage.getItem("major")==="1")));
+
+  // ==========================================================
+  // STRUCTURED DATA (JSON-LD) from DATA
+  // ==========================================================
+  function injectLD(){
+    const org = {
+      "@type":"GovernmentOrganization",
+      "name":"DWFRS Prototype",
+      "url": location.origin + location.pathname,
+      "areaServed": "Dorset & Wiltshire (demo)"
+    };
+    const stations = DATA.stations.map(s=>({
+      "@type":"FireStation",
+      "name": s.name + " Fire Station",
+      "address": {"@type":"PostalAddress","addressLocality": s.town, "addressRegion": s.area, "addressCountry":"GB"},
+      "geo": {"@type":"GeoCoordinates", "latitude": s.coords[0], "longitude": s.coords[1]},
+      "telephone": s.phone
+    }));
+    const news = DATA.news.map(n=>({
+      "@type":"NewsArticle",
+      "headline": n.title,
+      "datePublished": n.date,
+      "dateModified": n.date,
+      "mainEntityOfPage": location.origin + location.pathname + "#/news/" + n.id
+    }));
+    const ld = {"@context":"https://schema.org","@graph":[org, ...stations, ...news]};
+    const el = document.getElementById("ld-generated") || document.createElement("script");
+    el.type = "application/ld+json";
+    el.id = "ld-generated";
+    el.textContent = JSON.stringify(ld);
+    document.head.appendChild(el);
+  }
+  injectLD();
+
+  // Activate map if stations route exists on load
+  if(location.hash.includes("/stations")) initMap();
+  </script>
+</body>
+</html>
