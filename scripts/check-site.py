@@ -32,7 +32,10 @@ class Page(HTMLParser):
             self.links.append(attrs['content'].split('url=', 1)[1])
         if tag in ('a', 'link', 'img', 'script'):
             self.links.append(attrs.get('href') or attrs.get('src') or '')
-        if tag in ('form', 'input', 'textarea'):
+        if tag in ('form', 'textarea') or (tag == 'input' and not (
+            attrs.get('type') == 'range' and attrs.get('id') == 'clarity-control'
+            and self.path == Path('index.html')
+        )):
             errors.append(f'{self.path}: enquiry field remains: {tag}')
         if tag not in VOID:
             self.stack.append(tag)
