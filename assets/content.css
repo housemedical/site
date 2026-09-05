@@ -1,0 +1,334 @@
+/* More depth, with the same studio typography and deliberate spacing. */
+.statement-footer > div {max-width:560px}
+.statement-footer > div p + p {margin-top:20px}
+.statement-footer .text-link {margin-top:15px}
+.capability-answer > div {max-width:550px}
+.capability-answer ul {margin-top:18px;padding-left:19px;color:var(--muted);font-size:.9375rem;line-height:1.8}
+.capability-answer li + li {margin-top:5px}
+.menu-secondary {display:flex;flex-wrap:wrap;gap:12px 28px}
+.menu-secondary a {display:inline-flex;align-items:center;min-height:44px;font-size:.875rem;border-bottom:1px solid transparent}
+.menu-secondary a:hover,.menu-secondary a[aria-current] {border-color:currentColor}
+.footer-top {grid-template-columns:1.05fr .8fr 1.25fr 1fr;gap:40px}
+.footer-top .footer-label {font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:#edf3e5;margin-bottom:8px}
+.footer-top a {overflow-wrap:anywhere;line-height:1.7}
+.page-jump {display:flex;align-items:center;flex-wrap:wrap;gap:14px 35px;padding-block:0 28px}
+.page-jump a {display:inline-flex;align-items:center;justify-content:space-between;gap:26px;padding-block:13px;font-size:.875rem;border-bottom:1px solid var(--line);min-height:48px}
+.page-jump a:hover {border-color:var(--ink)}
+.page-jump a > span {font-size:.75rem;color:var(--muted)}
+.page-jump svg {width:20px;height:20px}
+.editorial-section {display:grid;grid-template-columns:1fr 1fr;gap:8%;padding-block:105px}
+.editorial-heading .eyebrow {margin-bottom:25px}
+.editorial-heading h2 {font-size:clamp(2.5rem,4.2vw,4.5rem);line-height:1.08}
+.editorial-heading > p:not(.eyebrow) {max-width:440px;margin-top:28px;font-size:1rem}
+.editorial-copy {padding-top:5px;max-width:680px}
+.editorial-copy p {font-size:1.0625rem;line-height:1.85}
+.editorial-copy p + p {margin-top:23px}
+.editorial-copy h3 {font-size:1.5rem;line-height:1.3;margin-bottom:15px}
+.editorial-copy p + h3 {margin-top:40px}
+.editorial-copy .text-link {display:flex;max-width:440px;margin-top:25px}
+.related-band {display:grid;grid-template-columns:1fr 1fr;gap:8%;padding-block:70px 100px;position:relative}
+.related-band::before {content:'';position:absolute;top:0;left:var(--gutter);right:var(--gutter);height:1px;background:var(--line)}
+.related-band .eyebrow {margin-bottom:25px}
+.related-band h2 {font-size:clamp(2.5rem,3.8vw,4rem);line-height:1.1}
+.related-band > div:last-child {align-self:center;max-width:620px}
+.related-band p:not(.eyebrow) {font-size:1rem;line-height:1.85}
+.related-band .text-link {margin-top:18px}
+.home-standards {background:#e3e9da;padding-block:90px}
+.home-standards h2,.policy-invitation h2 {font-size:clamp(2.8rem,5vw,5.3rem);line-height:1.08}
+.home-standards .section-heading > p {max-width:380px;line-height:1.8}
+.standard-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:35px;margin-top:50px}
+.standard-grid article {border-top:1px solid #8a997870;padding-top:24px}
+.standard-grid article > span {font-size:.75rem;color:#627252}
+.standard-grid h3 {font-size:1.6rem;margin-block:30px 17px;line-height:1.2}
+.standard-grid p {font-size:1rem;line-height:1.8;color:#4d5c44}
+.home-standards .text-link {margin-top:40px}
+.policy-invitation {display:grid;grid-template-columns:1.05fr 1fr;gap:8%;padding-block:110px}
+.policy-invitation > div:last-child {align-self:center;max-width:620px}
+.policy-invitation p:not(.eyebrow) {font-size:1.0625rem;line-height:1.85}
+.policy-inline-links {display:flex;flex-wrap:wrap;gap:12px 25px;margin-block:28px 20px}
+.policy-inline-links a {font-size:.875rem;border-bottom:1px solid #8a9978;padding-block:5px}
+.policy-invitation .small-followup {font-size:.875rem!important;margin-top:25px}
+.small-followup a {text-decoration:underline;text-underline-offset:4px}
+/* Long-form capabilities remain scannable: context, examples and considerations. */
+.service-depth {padding-bottom:85px}
+.service-detail {display:grid;grid-template-columns:1fr 3fr;gap:6%;padding-block:70px;border-top:1px solid var(--line);scroll-margin-top:35px}
+.detail-kicker {display:flex;flex-direction:column;align-items:flex-start;gap:40px}
+.detail-letter {font-size:clamp(4rem,7vw,7rem);line-height:1;letter-spacing:-.08em;color:#a5b197;font-weight:600}
+.service-detail-content h2 {font-size:clamp(2.5rem,4.2vw,4.5rem);line-height:1.1;max-width:960px}
+.service-detail-content > p {max-width:850px;margin-top:24px;font-size:1rem;line-height:1.85}
+.service-detail-content .detail-lead {font-size:1.25rem;line-height:1.7;margin-top:32px;color:var(--ink)}
+.detail-columns {display:grid;grid-template-columns:1fr 1fr;gap:45px;margin-top:38px}
+.detail-columns h3 {font-size:1.25rem;letter-spacing:-.035em;margin-bottom:15px}
+.detail-columns ul {padding-left:19px;color:var(--muted);font-size:1rem;line-height:1.85}
+.detail-columns li + li {margin-top:9px}
+.service-detail-content .detail-note {border-top:1px solid var(--line);padding-top:20px;margin-top:35px;font-size:.9375rem;color:#4f633b}
+.context-grid .context-tail {margin-top:28px;font-size:1rem}
+.context-grid ul {font-size:1rem;line-height:1.85}
+.context-grid li + li {margin-top:13px}
+.context-grid strong {font-weight:600;color:var(--ink)}
+/* The process explains decisions and outcomes without invented performance claims. */
+.studio-introduction {padding-top:15px;padding-bottom:80px}
+.expanded-steps {padding-top:30px}
+.expanded-steps .approach-step {scroll-margin-top:40px;padding-block:55px}
+.expanded-steps .approach-step > div p + p {margin-top:18px}
+.expanded-steps ul {padding-left:19px;color:var(--muted);font-size:.9375rem;line-height:1.8;margin-top:22px}
+.expanded-steps li + li {margin-top:8px}
+.expanded-steps .step-outcome {margin-top:25px!important;border-left:2px solid #95a775;padding-left:18px;color:var(--ink);font-size:.9375rem;line-height:1.75}
+.step-outcome > span {display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:#657653;margin-bottom:7px}
+.quality-questions article {display:grid;grid-template-columns:30px 1fr;gap:20px;border-top:1px solid var(--line);padding-block:26px}
+.quality-questions article:first-child {padding-top:0;border-top:0}
+.quality-questions article > span {font-size:.75rem;color:#647650;padding-top:6px}
+.quality-questions h3 {font-size:1.6rem;margin-bottom:12px;line-height:1.3}
+.quality-questions p {font-size:1rem;line-height:1.8}
+/* A useful email conversation starts with context. */
+.contact-preparation {padding-bottom:90px}
+.contact-preparation .section-heading > p {max-width:390px;line-height:1.8}
+.preparation-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;margin-top:45px}
+.preparation-grid article {border-top:1px solid var(--line);padding-top:25px}
+.preparation-grid h3 {font-size:clamp(1.9rem,2.5vw,2.7rem);line-height:1.15;margin-block:27px 20px}
+.preparation-grid p {font-size:1rem;line-height:1.85;max-width:430px}
+.contact-data-note {margin-top:45px;padding:25px 30px;border-left:2px solid #8ea66a;background:#e6eadf;font-size:.9375rem;line-height:1.85;color:#4c5c40}
+.contact-data-note a {display:inline-flex;align-items:center;gap:12px;margin-top:10px;font-size:.875rem;text-decoration:underline;text-underline-offset:4px}
+.contact-data-note svg {width:20px;height:20px}
+.contact-routes {display:grid;grid-template-columns:1fr 1fr;gap:8%;padding-block:0 100px}
+.contact-routes > div > .eyebrow {margin-bottom:25px}
+.contact-routes h2 {font-size:clamp(2.5rem,4.2vw,4.5rem);line-height:1.1;scroll-margin-top:40px}
+.contact-route-list article {border-top:1px solid var(--line);padding-block:30px}
+.contact-route-list h3 {font-size:1.6rem;margin-bottom:16px;line-height:1.3}
+.contact-route-list p {font-size:1rem;line-height:1.85}
+.contact-route-list .text-link {margin-top:15px}
+.contact-page .copy-email {margin-top:14px;font-size:.875rem}
+.registry-note {margin-top:30px;font-size:.9375rem;line-height:1.8;max-width:850px}
+.registry-note a {display:inline-flex;align-items:center;gap:12px;text-decoration:underline;text-underline-offset:4px}
+.registry-note svg {width:20px;height:20px}
+.company-details address {font:inherit}
+.company-section a {overflow-wrap:anywhere}
+.not-found-actions {display:flex;flex-wrap:wrap;gap:25px;align-items:center}
+/* A complete policy library with a calm, readable document layout. */
+.policy-overview {padding-bottom:25px}
+.policy-overview-intro {display:flex;justify-content:space-between;gap:25px;align-items:center;padding-block:0 24px;border-bottom:1px solid var(--ink)}
+.policy-overview-intro > p {font-size:1rem;color:var(--ink)}
+.policy-overview-intro > span {font-size:.75rem;color:var(--muted)}
+.policy-overview-intro time {margin-left:10px;color:var(--ink)}
+.policy-directory {display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.policy-card {padding:35px 38px 35px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;transition:background .25s;min-width:0}
+.policy-card:nth-child(even) {padding-left:38px;padding-right:0;border-left:1px solid var(--line)}
+.policy-card-top {display:flex;align-items:center;justify-content:space-between;gap:25px;color:#677a4d;margin-bottom:30px}
+.policy-card-top svg {width:25px;height:25px;transition:transform .25s}
+.policy-card h2 {font-size:clamp(1.8rem,2.7vw,2.9rem);line-height:1.18;letter-spacing:-.05em;max-width:600px}
+.policy-card p {font-size:1rem;line-height:1.85;margin-top:20px;max-width:560px}
+.policy-card-link {display:flex;align-items:center;gap:20px;font-size:.875rem;padding-top:30px;margin-top:auto}
+.policy-card-link svg {width:20px;height:20px;transition:transform .25s}
+.policy-card:hover .policy-card-top svg {transform:translate(4px,-4px)}
+.policy-card:hover .policy-card-link svg {transform:translateX(6px)}
+.policy-card:hover h2 {color:#4f672e}
+.policy-hero {padding-top:40px;padding-bottom:55px}
+.breadcrumbs {display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:50px;font-size:.8125rem;line-height:1.7;color:var(--muted)}
+.breadcrumbs a {text-decoration:underline;text-underline-offset:4px}
+.breadcrumbs [aria-current] {color:var(--ink)}
+.policy-hero > .eyebrow {margin-bottom:25px;color:#63784a}
+.policy-hero h1 {font-size:clamp(3.1rem,6.7vw,7rem);line-height:1.08;max-width:1250px;letter-spacing:-.06em}
+.policy-hero h1 em {color:#61783e}
+.policy-hero .page-lede {max-width:880px;font-size:1.125rem;line-height:1.8;margin-top:30px}
+.policy-meta {display:flex;flex-wrap:wrap;gap:18px 30px;align-items:center;padding-block:26px 0;margin-top:32px;border-top:1px solid var(--line);font-size:.75rem;color:var(--muted)}
+.policy-meta time {margin-left:8px;color:var(--ink)}
+.print-policy {display:inline-flex;align-items:center;gap:18px;min-height:44px;margin-left:auto;padding:9px 14px;background:none;border:1px solid #a7b29a;color:var(--ink);font-size:.8125rem}
+.print-policy svg {width:18px;height:18px}
+.print-policy:hover {background:#e2e9d7}
+.policy-layout {display:grid;grid-template-columns:260px minmax(0,1fr);gap:clamp(45px,7vw,115px);align-items:start;padding-bottom:75px}
+.policy-contents {position:sticky;top:30px;max-height:calc(100svh - 60px);overflow:auto;padding-right:10px}
+.policy-contents > .eyebrow {margin-bottom:18px;color:#63784a}
+.policy-contents ol {list-style:none;padding:0;margin:0}
+.policy-contents li {border-bottom:1px solid var(--line)}
+.policy-contents li a {display:grid;grid-template-columns:20px 1fr;gap:12px;padding-block:14px;font-size:.875rem;line-height:1.65}
+.policy-contents li a > span {font-size:.75rem;color:#7a8966;padding-top:2px}
+.policy-contents a:hover {color:#4b642d}
+.policy-back {display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:.875rem;margin-top:24px;padding-block:12px}
+.policy-back svg {width:20px;height:20px}
+.policy-document {max-width:860px;min-width:0}
+.policy-section {padding-block:0 38px;margin-bottom:35px;border-bottom:1px solid var(--line);scroll-margin-top:35px}
+.policy-section h2 {font-size:clamp(1.65rem,2.3vw,2.15rem);line-height:1.25;letter-spacing:-.04em;margin-bottom:22px}
+.policy-section p,.policy-section li {font-size:1rem;line-height:1.9;color:#525d4e}
+.policy-section p + p {margin-top:20px}
+.policy-section ul {padding-left:22px;margin-block:22px}
+.policy-section li + li {margin-top:12px}
+.policy-section strong {font-weight:600;color:var(--ink)}
+.policy-document a:not(.text-link) {text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;overflow-wrap:anywhere}
+.policy-contact {background:#e4ebd8;border-left:2px solid #82995e;padding:32px 35px;margin-top:10px;break-inside:avoid}
+.policy-contact > .eyebrow {font-size:.75rem;color:#586e3d;margin-bottom:15px}
+.policy-contact h2 {font-size:2rem;margin-bottom:17px;line-height:1.2}
+.policy-contact p:not(.eyebrow) {font-size:1rem;line-height:1.85;color:#526344}
+.policy-contact .text-link {margin-top:16px;max-width:100%;overflow-wrap:anywhere}
+.policy-resources {padding-top:40px}
+.policy-resources h2 {font-size:1.35rem;letter-spacing:-.03em;margin-bottom:17px}
+.policy-resources ul {list-style:none;padding:0;margin:0}
+.policy-resources li + li {margin-top:14px}
+.policy-resources a {display:inline-flex;align-items:center;gap:14px;font-size:.875rem;line-height:1.7}
+.policy-resources svg {width:18px;height:18px;flex:none}
+.policy-related {padding-bottom:90px}
+.policy-related > .eyebrow {margin-bottom:22px;color:#647750}
+.policy-related > div {display:grid;grid-template-columns:1fr 1fr;gap:0 40px;border-top:1px solid var(--line)}
+.policy-related a {display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:19px;border-bottom:1px solid var(--line);font-size:.9375rem;line-height:1.6}
+.policy-related svg {width:20px;height:20px;flex:none}
+/* Native expandable answers are grouped by the reader's purpose. */
+.faq-groups {padding-block:25px 95px}
+.faq-group {display:grid;grid-template-columns:1fr 2fr;gap:8%;padding-block:55px;scroll-margin-top:35px}
+.faq-group-heading > .eyebrow {color:#64784e;display:block;margin-bottom:20px}
+.faq-group-heading h2 {font-size:clamp(2rem,3vw,3rem);line-height:1.15;max-width:370px}
+.faq-list {border-top:1px solid var(--ink)}
+.faq-list details {border-bottom:1px solid var(--line);scroll-margin-top:35px}
+.faq-list summary {display:flex;align-items:center;justify-content:space-between;gap:24px;padding-block:24px;font-size:1.125rem;line-height:1.6;font-weight:600;cursor:pointer;list-style:none;letter-spacing:-.02em}
+.faq-list summary::-webkit-details-marker {display:none}
+.faq-list summary > span {font-size:1.7rem;line-height:1;font-weight:400;transition:transform .25s;flex:none}
+.faq-list details[open] summary > span {transform:rotate(45deg)}
+.faq-answer {padding:0 45px 28px 0}
+.faq-answer p {font-size:1rem;line-height:1.85}
+.faq-answer p + p {margin-top:17px}
+.faq-answer a {text-decoration:underline;text-underline-offset:4px;color:#4f6538}
+@media(max-width:1100px) {
+  .footer-top {grid-template-columns:.8fr 1.2fr 1fr;gap:35px}
+  .footer-top > p {grid-column:1/-1}
+  .service-detail {grid-template-columns:1fr 3fr;gap:5%}
+  .detail-columns {gap:30px}
+  .standard-grid {grid-template-columns:1fr 1fr;gap:35px 45px}
+  .policy-layout {grid-template-columns:220px minmax(0,1fr);gap:45px}
+  .preparation-grid {gap:30px}
+  .policy-meta {gap:16px 24px}
+}
+@media(max-width:760px) {
+  .editorial-section,.related-band,.policy-invitation,.contact-routes {grid-template-columns:1fr;gap:35px;padding-block:65px}
+  .editorial-heading > p:not(.eyebrow) {max-width:620px}
+  .editorial-copy {max-width:none;padding:0}
+  .editorial-copy p {font-size:1rem}
+  .editorial-heading h2,.related-band h2,.contact-routes h2 {font-size:2.7rem}
+  .related-band > div:last-child {max-width:none}
+  .page-jump {gap:8px 24px;padding-bottom:25px}
+  .page-jump a {font-size:.8125rem;gap:18px}
+  .service-detail {grid-template-columns:1fr;gap:28px;padding-block:45px}
+  .detail-kicker {flex-direction:row;justify-content:space-between;align-items:center;gap:20px}
+  .detail-letter {font-size:3rem}
+  .service-detail-content h2 {font-size:2.8rem}
+  .service-detail-content .detail-lead {font-size:1.125rem}
+  .detail-columns {margin-top:30px;gap:30px}
+  .service-depth {padding-bottom:35px}
+  .studio-introduction {padding-top:10px;padding-bottom:60px}
+  .expanded-steps .approach-step {padding-block:35px}
+  .expanded-steps .approach-step > div p {font-size:1rem}
+  .quality-questions article {padding-block:24px}
+  .quality-questions h3 {font-size:1.45rem}
+  .home-standards {padding-block:65px}
+  .standard-grid {margin-top:32px;gap:30px}
+  .standard-grid h3 {margin-top:23px;font-size:1.5rem}
+  .home-standards h2,.policy-invitation h2 {font-size:2.8rem}
+  .policy-invitation p:not(.eyebrow) {font-size:1rem}
+  .contact-preparation {padding-bottom:55px}
+  .preparation-grid {gap:28px;grid-template-columns:1fr;margin-top:30px}
+  .preparation-grid h3 {font-size:2.1rem;margin-block:20px 15px}
+  .preparation-grid h3 br {display:none}
+  .preparation-grid p {max-width:none}
+  .contact-data-note {margin-top:30px;padding:23px 25px}
+  .contact-routes {padding-top:10px}
+  .contact-route-list h3 {font-size:1.5rem}
+  .policy-overview-intro {align-items:flex-start;flex-direction:column;gap:12px}
+  .policy-card {padding:28px 25px 28px 0}
+  .policy-card:nth-child(even) {padding-left:25px}
+  .policy-card h2 {font-size:1.85rem}
+  .policy-card p {font-size:.9375rem}
+  .policy-card-top {margin-bottom:23px}
+  .policy-hero {padding-top:30px;padding-bottom:35px}
+  .breadcrumbs {margin-bottom:35px;font-size:.75rem;gap:8px 11px}
+  .policy-hero h1 {font-size:clamp(2.7rem,7vw,4.5rem)}
+  .policy-hero .page-lede {font-size:1rem;line-height:1.85}
+  .policy-meta {margin-top:25px;padding-top:20px}
+  .policy-meta > span {font-size:.75rem}
+  .print-policy {margin-left:0}
+  .policy-layout {grid-template-columns:1fr;gap:40px;padding-bottom:55px}
+  .policy-contents {position:static;max-height:none;overflow:visible;padding-right:0}
+  .policy-contents ol {display:grid;grid-template-columns:1fr 1fr;gap:0 25px}
+  .policy-contents li a {font-size:.8125rem;padding-block:12px}
+  .policy-back {max-width:260px;margin-top:15px}
+  .policy-section {margin-bottom:28px;padding-bottom:30px}
+  .policy-section h2 {font-size:1.8rem}
+  .policy-contact {padding:27px}
+  .policy-related {padding-bottom:65px}
+  .policy-related > div {gap:0 25px}
+  .policy-related a {font-size:.875rem}
+  .faq-groups {padding-top:5px;padding-bottom:50px}
+  .faq-group {grid-template-columns:1fr;gap:28px;padding-block:35px}
+  .faq-group-heading {display:flex;align-items:baseline;gap:20px}
+  .faq-group-heading > .eyebrow {margin-bottom:0}
+  .faq-group-heading h2 {font-size:2rem;max-width:none}
+  .faq-list summary {font-size:1.0625rem;padding-block:22px}
+}
+@media(max-width:520px) {
+  .footer-top {grid-template-columns:.8fr 1.2fr;gap:30px 24px}
+  .footer-top > div:last-child {grid-column:1/-1}
+  .footer-top a {font-size:.8125rem}
+  .menu-secondary {gap:12px 25px}
+  .editorial-section,.related-band,.policy-invitation {padding-block:55px;gap:28px}
+  .editorial-heading h2,.related-band h2,.contact-routes h2 {font-size:2.4rem}
+  .page-jump {display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+  .page-jump a {font-size:.8125rem;gap:12px;line-height:1.6}
+  .page-jump svg {width:18px;height:18px}
+  .service-detail-content h2 {font-size:2.45rem}
+  .service-detail-content .detail-lead {font-size:1.0625rem}
+  .detail-columns {grid-template-columns:1fr;gap:25px}
+  .detail-kicker .eyebrow {font-size:.75rem}
+  .detail-letter {font-size:2.6rem}
+  .service-detail-content > p {margin-top:20px}
+  .expanded-steps .approach-step {column-gap:15px}
+  .expanded-steps .approach-step h2 {font-size:2rem}
+  .expanded-steps ul {font-size:.9375rem}
+  .quality-questions article {grid-template-columns:22px 1fr;gap:15px}
+  .quality-questions h3 {font-size:1.5rem}
+  .standard-grid {grid-template-columns:1fr;gap:25px}
+  .standard-grid h3 {margin-block:18px 12px}
+  .home-standards h2,.policy-invitation h2 {font-size:2.55rem}
+  .policy-invitation .section-label {font-size:.75rem;letter-spacing:.08em}
+  .policy-inline-links {gap:12px 20px}
+  .policy-directory {grid-template-columns:1fr}
+  .policy-card,.policy-card:nth-child(even) {border-left:0;padding:28px 0}
+  .policy-card h2 {font-size:2rem}
+  .policy-card p {font-size:1rem}
+  .policy-card-link {padding-top:22px}
+  .policy-hero h1 {font-size:2.65rem}
+  .policy-meta {gap:13px;align-items:flex-start;flex-direction:column}
+  .policy-contents ol {grid-template-columns:1fr}
+  .policy-contents li a {font-size:.875rem}
+  .policy-section h2 {font-size:1.65rem}
+  .policy-section p,.policy-section li {line-height:1.85}
+  .policy-contact {padding:25px 22px}
+  .policy-contact h2 {font-size:1.8rem}
+  .policy-contact .text-link {font-size:.8125rem;gap:12px}
+  .policy-related > div {grid-template-columns:1fr}
+  .faq-group-heading {gap:15px}
+  .faq-group-heading h2 {font-size:1.8rem}
+  .faq-list summary {gap:20px;font-size:1rem}
+  .faq-answer {padding-right:0}
+  .contact-data-note {padding:22px}
+  .contact-data-note a {align-items:flex-start}
+  .registry-note a {align-items:flex-start}
+}
+@media print {
+  .breadcrumbs,.policy-contents,.policy-related,.policy-resources,.print-policy,.page-jump,.related-band,.home-standards,.policy-invitation,.contact-routes {display:none!important}
+  .policy-hero {padding-block:0 20px}
+  .policy-hero h1 {font-size:28pt;line-height:1.15}
+  .policy-hero h1 em {color:#000}
+  .policy-hero .page-lede {font-size:11pt;max-width:none;line-height:1.6}
+  .policy-meta {margin-top:18px;padding-top:14px;font-size:9pt;color:#333}
+  .policy-layout,.editorial-section,.service-detail,.detail-columns,.faq-group {display:block;padding-block:0}
+  .policy-document {max-width:none}
+  .policy-section {margin-bottom:20px;padding-bottom:15px;border-color:#bbb}
+  .policy-section h2 {font-size:16pt;break-after:avoid}
+  .policy-section p,.policy-section li {font-size:10.5pt;line-height:1.65;color:#000;orphans:3;widows:3}
+  .policy-contact {background:none;border:1px solid #bbb;padding:20px;break-inside:avoid}
+  .policy-contact h2 {font-size:16pt}
+  .policy-contact p:not(.eyebrow) {font-size:10.5pt;color:#000}
+  .policy-contact .text-link {font-size:10pt}
+  .faq-list details::details-content {content-visibility:visible}
+  .faq-list summary {font-size:12pt;break-after:avoid}
+  .faq-list summary > span {display:none}
+  .faq-answer p {font-size:10.5pt;line-height:1.6;color:#000}
+  .faq-answer {padding:0 0 20px}
+  .faq-group-heading {margin-block:20px}
+}

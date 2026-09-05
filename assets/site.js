@@ -21,6 +21,11 @@
   if (typeof module !== 'undefined' && module.exports) module.exports = {clamp, fieldPoint};
   if (typeof document === 'undefined') return;
   document.querySelectorAll('[data-year]').forEach(node => { node.textContent = String(new Date().getFullYear()); });
+  document.querySelectorAll('[data-print-page]').forEach(button => {
+    if (typeof window.print !== 'function') return;
+    button.hidden = false;
+    button.addEventListener('click', () => window.print());
+  });
   const root = document.documentElement;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');

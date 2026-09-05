@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 from urllib.parse import urlsplit, unquote
 import json
 import re
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1] / 'dist'
 VOID = set('area base br col embed hr img input link meta param source track wbr'.split())
@@ -58,6 +59,13 @@ for path in ROOT.rglob('*.html'):
         errors.append(f'{page.path}: duplicate IDs')
     if re.search(r'formspree|healthcare|london|gotaxes|councilreport', source, re.I):
         errors.append(f'{page.path}: obsolete content or named product reference')
+    for schema in re.findall(r'<script type="application/ld\+json">(.*?)</script>', source, re.S):
+        try:
+            data = json.loads(schema)
+            if data.get('@context') != 'https://schema.org':
+                errors.append(f'{page.path}: invalid structured-data context')
+        except json.JSONDecodeError:
+            errors.append(f'{page.path}: invalid structured data')
 
 references = 0
 for path, page in pages.items():
@@ -79,6 +87,28 @@ for pattern in ('*.webp', '*.jpg', '*.jpeg', '*.png', '*.pdf'):
         errors.append(f'Obsolete imagery or reports packaged: {pattern}')
 if re.search(r'fetch\(|FormData|formspree', (ROOT / 'assets/site.js').read_text(), re.I):
     errors.append('Form delivery or a network request remains in JavaScript')
+
+# These formerly retired routes must remain real pages after policy restoration.
+restored = ['policies/index.html', 'faq/index.html'] + [
+    f'policies/{slug}/index.html' for slug in (
+        'diversity-equity-inclusion', 'environmental-policy', 'health-and-safety',
+        'quality-management', 'modern-slavery', 'data-protection-privacy'
+    )
+]
+for name in restored:
+    page = pages.get(ROOT / name)
+    if page is None or page.redirect:
+        errors.append(f'{name}: restored content is missing or still redirects')
+
+namespace = {'s': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+sitemap = ET.parse(ROOT / 'sitemap.xml')
+listed = {node.text for node in sitemap.findall('s:url/s:loc', namespace)}
+expected = {
+    'https://housemedical.co.uk' + ('/' if str(page.path) == 'index.html' else '/' + str(page.path).removesuffix('index.html'))
+    for page in pages.values() if not page.redirect and str(page.path) != '404.html'
+}
+if listed != expected:
+    errors.append('Sitemap does not match the current content pages')
 
 print(json.dumps({'pages': len(pages), 'legacy_redirects': sum(p.redirect for p in pages.values()), 'local_references': references, 'errors': errors}, indent=2))
 raise SystemExit(bool(errors))
