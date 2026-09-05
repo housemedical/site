@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /dev/
+Sitemap: https://housemedical.co.uk/sitemap.xml
