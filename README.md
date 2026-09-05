@@ -1,20 +1,20 @@
-# House Medical
+# House Medical software studio
 
-A responsive, static website for House Medical. The existing GitHub Pages architecture and domain configuration are retained: public pages live at the repository root and can be served without a framework, package installation or build step.
+A responsive, static website presenting House Medical’s software work across business, finance and public services. The existing GitHub Pages architecture and domain configuration are retained.
 
-## Editing
+## Editing and building
 
-- Each public route has its own `index.html`.
-- Shared presentation and progressive enhancements are in `assets/site.css` and `assets/site.js`.
-- Contact enquiries use the existing Formspree endpoint. Native form submission remains available without JavaScript; enhanced submission handles errors and only redirects after an accepted response.
-- Existing policy wording, career requirements and reports have been retained. Reports link to the actual underscore-based filenames.
-- Original imagery and legacy styling remain available for existing development pages. The `dev/` projects are outside the redesign scope.
-- Third-party image and font credits are recorded in `assets/CREDITS.md` and `assets/OFL.txt`. Photos are illustrative, not representations of House Medical staff or premises.
+- Edit shared layouts and page content in `scripts/build-pages.py`, then run `python scripts/build-pages.py` to regenerate the root HTML.
+- Shared styling and navigation are in `assets/site.css` and `assets/site.js`.
+- Contact is by email only. There is no enquiry form, form submission service or client-side data collection.
+- Self-hosted Manrope and system Georgia provide the typography. No photography is used. Font credits are in `assets/CREDITS.md` and `assets/OFL.txt`.
+- The product references inform the positioning but are not named on the website.
+- Former healthcare pages redirect to relevant studio pages. Previous versions are recoverable through Git history. Unrelated development projects remain unchanged.
 
-## Private review packaging
+## Private review
 
-Run `python scripts/package-site.py` to copy the public site into `dist/`. The optional `.openai/hosting.json` identifies the private review site. `dist/` is generated and ignored by Git. The review package excludes the GitHub Pages `CNAME`, source tools and unrelated `dev/` projects.
+Run `python scripts/package-site.py` to generate `dist/`, excluding original photographs, old PDF reports, the GitHub Pages CNAME, source scripts and unrelated development projects. `.openai/hosting.json` retains the same private review site identity.
 
 ## Validation
 
-The redesign was checked for HTML tag structure, a single main heading on each page, local links and fragment targets, asset existence, JavaScript syntax, unchanged policy text, and contact/menu behaviour using mocked responses. No contact messages were sent. Browser-based visual and end-to-end testing have not been performed.
+Run `python scripts/check-site.py` after packaging and `node --check assets/site.js`. These inspect HTML structure, headings, metadata, local links, anchors, redirects and the absence of enquiry forms, obsolete photography and named product references. Navigation is checked separately with a mocked document. Browser-based visual testing has not been performed.
